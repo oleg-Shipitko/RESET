@@ -78,9 +78,9 @@ typedef struct {
   char command;
   float robotCoord[4];
   uint16_t checkSum;
-
 } OutPackStruct;
 #pragma pack(pop)
+
 typedef struct {
   char pidEnabled;
   char trackEn;

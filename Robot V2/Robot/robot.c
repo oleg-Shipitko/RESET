@@ -27,18 +27,18 @@ char param[30] ;                      //буфер параметров входящих команд
 char inData[64];                      //Входной буфер данных
 char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
-InPackStruct inCommand ={0xFA,0xAF,0x00,&param[0]}; //структура входящего пакета
+InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
 
-/* char packLen[0x29]={9,17,10,6, // 01,02,03,04
-                    6,10,5,17,    // 05,06,07,08
-                    21,5,5,5,     // 09,0a,0b,0c
-                    17,5,5,5,     // 0d,0e,0f,10
-                    18,5,5,5,     // 11,12,13,14
-                    25,7,6,5,     // 15,16,17,18
-                    6, 5,7,6,     // 19,1a,1b,1c
-                    7, 6,5,7,     // 1d,1e,1f,20
+char answerPackLen[0x29] = {22,7,7,7, // 01,02,03,04
+                    7,7,7,7,    // 05,06,07,08
+                    7,7,7,7,     // 09,0a,0b,0c
+                    7,7,7,7,     // 0d,0e,0f,10
+                    7,20,17,17,     // 11,12,13,14
+                    7,7,7,25,     // 15,16,17,18
+                    6,15,7,6,     // 19,1a,1b,1c
+                    7,6,15,7,     // 1d,1e,1f,20
                     6,7           // 21,22
-                    }; //длинны входящих пакетов в зависимости от номера команды */
+                    }; //длинны исходящих пакетов в зависимости от номера команды
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
                           BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
@@ -61,7 +61,7 @@ uint32_t  V12_PIN[6] ={PIN5_12V,PIN6_12V,
                             PIN3_12V,PIN4_12V,
                             PIN5_12V,PIN6_12V};
 
-uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT };  //массив указателей на счетчики энкодеров колес
+uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
 
 char  WHEELS[4]= {WHEEL1_CH,WHEEL2_CH,WHEEL3_CH,WHEEL4_CH}; //каналы подкючения колес
 
@@ -112,7 +112,7 @@ void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в 
     if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //проверка длинны пакета
     {
       checkSum = packetCheck(&inData[0], inData[2]-CHECK_SIZE);
-      test = ( uint16_t *) & inData[2] - CHECK_SIZE];
+      test = ( uint16_t *) &inData[inData[2] - CHECK_SIZE];
       if (*test == checkSum) // проверка CRC
       {
         inCommand.packLen = inData[2];
@@ -143,39 +143,40 @@ extern uint8_t  APP_Rx_Buffer []; /* Write CDC received data in this buffer.
 extern uint32_t APP_Rx_ptr_in;    /* Increment this pointer or roll it back to
                                      start address when writing received data
                                      in the buffer APP_Rx_Buffer. */
-char sendAnswer(char cmd,char * param,int paramSize) // отправить ответ по USB
+
+char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
 {
-//    __disable_irq();
-         outData[0]=0xFA;
-         outData[1]=0xFA;
-         outData[2]=cmd;
-         memcpy(&outData[3],param,paramSize);
+         //    __disable_irq();
+         outData[0] = 0xFA;
+         outData[1] = 0xFA;
+         outData[2] = answerPackLen[cmd - 1];
+         outData[3] = cmd;
+         memcpy(&outData[4], param, paramSize);
 
-         *((int16_t*)&outData[paramSize+HEADER_SIZE]) = (int16_t) packetCheck(&outData[0],paramSize+HEADER_SIZE);
-     int _size = paramSize+HEADER_SIZE+CHECK_SIZE  ;
-      int i;
-     for (i=0; i<_size;i++) putchar(outData[i]);
+         *((int16_t*)&outData[paramSize+HEADER_SIZE]) = (int16_t) packetCheck(&outData[0], paramSize + HEADER_SIZE);
+         int _size = paramSize+HEADER_SIZE+CHECK_SIZE  ;
+         int i;
+         for (i=0; i < _size; i++) putchar(outData[i]);
 
-    if (APP_Rx_ptr_in+_size < APP_RX_DATA_SIZE)
-    {
-            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in],outData,_size);
+         if (APP_Rx_ptr_in + _size < APP_RX_DATA_SIZE)
+         {
+            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, _size);
             APP_Rx_ptr_in+=_size;
-    }
-    else
-    {
-            int freeSpace = APP_RX_DATA_SIZE- APP_Rx_ptr_in;
+         }
+         else
+         {
+            int freeSpace = APP_RX_DATA_SIZE - APP_Rx_ptr_in;
 
-            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in],outData,freeSpace);
-            APP_Rx_ptr_in=0;
-            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in],&outData[freeSpace],_size-freeSpace);
-            APP_Rx_ptr_in +=_size-freeSpace;
-    }
-    //     APP_FOPS.pIf_DataTx((uint8_t*)outData,
-    //             paramSize+HEADER_SIZE+CHECK_SIZE);
+            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, freeSpace);
+            APP_Rx_ptr_in = 0;
+            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], &outData[freeSpace], _size - freeSpace);
+            APP_Rx_ptr_in += _size-freeSpace;
+         }
+         //     APP_FOPS.pIf_DataTx((uint8_t*)outData,
+         //             paramSize+HEADER_SIZE+CHECK_SIZE);
 
- // __enable_irq();
-         return paramSize+HEADER_SIZE+CHECK_SIZE;
-
+         // __enable_irq();
+         return paramSize + HEADER_SIZE + CHECK_SIZE;
 }
 
 char execCommand(InPackStruct* cmd) //обработать входящую команду
@@ -190,7 +191,7 @@ switch(cmd->command)
       if ((key[0] =='E')&&(key[1] =='C')&&(key[2] =='H')&&(key[3] =='O') )
       {
         char * str ="mobile robot V1.0";
-        sendAnswer(cmd->command,str, strlen(str)+1);
+        sendAnswer(cmd->command, str, strlen(str)+1);
         }
       }
   break;
