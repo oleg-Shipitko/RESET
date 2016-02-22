@@ -15,8 +15,12 @@
 #include "stm32f4xx.h"
 #include <stdbool.h>
 #include "gpio.h"
+//#include "Dynamixel_control.h"
 
 #define BUTTON pin_id(PORTA, 0)
+
+#define CW  0x0400
+#define CCW 0x0000
 
 void RCC_Config(void)
 {
@@ -53,7 +57,7 @@ void USART_Config(void)
 {
     clearServoReceiveBuffer();
     USART_InitTypeDef USART;
-    USART.USART_BaudRate = 115200;
+    USART.USART_BaudRate = 1000000;
     USART.USART_WordLength = USART_WordLength_8b;
     USART.USART_StopBits = USART_StopBits_1;
     USART.USART_Parity = USART_Parity_No;
@@ -90,11 +94,19 @@ int main(void)
     RCC_Config();
     GPIO_Config();
     USART_Config();
-    uint8_t ID = 11;
+
+    uint8_t ID = 5;
     bool flag = 0;
-    bool prevstate = false;
     uint16_t stVal = 0;
     uint16_t finalVal = 300;
+
+    setServoCWAngleLimit(ID, 0);
+    setServoCCWAngleLimit(ID, 0);
+    setServoMovingSpeed(ID, 1023, CW);
+    setServoMovingSpeed(ID, 0);
+    setServoMovingSpeed(ID, 1023, CCW);
+
+  /* Towers manipulator controlled from the button on discovery
   while(1)
   {
       while (1)
@@ -119,5 +131,5 @@ int main(void)
           }
       }
       flag = setServoAngle(ID, finalVal);
-  }
+  } */
 }

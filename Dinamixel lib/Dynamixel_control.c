@@ -32,12 +32,13 @@ typedef enum ServoCommand
 #define BLINK_CONDITIONS    0x11
 #define SHUTDOWN_CONDITIONS 0x12
 #define TORQUE              0x22
-#define MAX_SPEED           0x20
+#define MOVING_SPEED        0x20
 #define CURRENT_SPEED       0x26
 #define GOAL_ANGLE          0x1e
 #define CURRENT_ANGLE       0x24
 #define CW_ANGLE_LIMIT      0x06
 #define CCW_ANGLE_LIMIT     0x08
+
 
 void sendServoCommand (const uint8_t servoId,
                        const ServoCommand commandByte,
@@ -264,18 +265,20 @@ bool getServoTorque (const uint8_t servoId,
     return true;
 }
 
-// speed values go from 1 (incredibly slow) to 1023 (114 RPM)
+// speed values go from 1 (incredibly slow) to 511 (114 RPM)
 // a value of zero will disable velocity control
-bool setServoMaxSpeed (const uint8_t servoId,
-                       const uint16_t speedValue)
+bool setServoMovingSpeed (const uint8_t servoId,
+                       const uint16_t speedValue, const uint16_t direction)
 {
-    const uint8_t highByte = (uint8_t)((speedValue >> 8) & 0xff);
-    const uint8_t lowByte = (uint8_t)(speedValue & 0xff);
+    uint16_t speed = speedValue;
+    speed |= direction;
+    const uint8_t highByte = (uint8_t)((speed >> 8) & 0xff);
+    const uint8_t lowByte = (uint8_t)(speed & 0xff);
 
     if (speedValue > 1023)
         return false;
 
-    const uint8_t params[3] = {MAX_SPEED,
+    const uint8_t params[3] = {MOVING_SPEED,
                                lowByte,
                                highByte};
 
@@ -290,8 +293,8 @@ bool setServoMaxSpeed (const uint8_t servoId,
 bool getServoMaxSpeed (const uint8_t servoId,
                        uint16_t *speedValue)
 {
-    const uint8_t params[2] = {MAX_SPEED,
-                               2};  // read two bytes, starting at address MAX_SPEED
+    const uint8_t params[2] = {MOVING_SPEED,
+                               2};  // read two bytes, starting at address MOVING_SPEED
 
     sendServoCommand (servoId, READ, 2, params);
 
@@ -365,6 +368,48 @@ bool getServoAngle (const uint8_t servoId,
     angleValue |= response.params[0];
 
     *angle = (float)angleValue * 300.0 / 1023.0;
+
+    return true;
+}
+
+bool setServoCWAngleLimit (const uint8_t servoId,
+                     const uint16_t limitValue)
+{
+    const uint8_t highByte = (uint8_t)((limitValue >> 8) & 0xff);
+    const uint8_t lowByte = (uint8_t)(limitValue & 0xff);
+
+    if (limitValue > 1023)
+        return false;
+
+    const uint8_t params[3] = {CW_ANGLE_LIMIT,
+                               lowByte,
+                               highByte};
+
+    sendServoCommand (servoId, WRITE, 3, params);
+
+    if (!getAndCheckResponse (servoId))
+        return false;
+
+    return true;
+}
+
+bool setServoCCWAngleLimit (const uint8_t servoId,
+                     const uint16_t limitValue)
+{
+    const uint8_t highByte = (uint8_t)((limitValue >> 8) & 0xff);
+    const uint8_t lowByte = (uint8_t)(limitValue & 0xff);
+
+    if (limitValue > 1023)
+        return false;
+
+    const uint8_t params[3] = {CCW_ANGLE_LIMIT,
+                               lowByte,
+                               highByte};
+
+    sendServoCommand (servoId, WRITE, 3, params);
+
+    if (!getAndCheckResponse (servoId))
+        return false;
 
     return true;
 }
