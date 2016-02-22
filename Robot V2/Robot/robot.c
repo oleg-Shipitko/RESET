@@ -29,16 +29,17 @@ char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
 InPackStruct inCommand ={0xFA,0xAF,0x00,&param[0]}; //структура входящего пакета
 
-char packLen[0x29]={9,17,10,6,   // 01,02,03,04
-                    6,10,5,17,   // 05,06,07,08
-                    21,5,5,5,    // 09,0a,0b,0c
-                    17,5,5,5,    // 0d,0e,0f,10
-                    18,5,5,5,    // 11,12,13,14
-                    25,7,6,5,    // 15,16,17,18
-                    6, 5,7,6,    // 19,1a,1b,1c
-                    7, 6,5,7,    // 1d,1e,1f,20
-                    6,7          // 21,22
-                    }; //длинны входящих пакетов в зависимости от номера команды
+/* char packLen[0x29]={9,17,10,6, // 01,02,03,04
+                    6,10,5,17,    // 05,06,07,08
+                    21,5,5,5,     // 09,0a,0b,0c
+                    17,5,5,5,     // 0d,0e,0f,10
+                    18,5,5,5,     // 11,12,13,14
+                    25,7,6,5,     // 15,16,17,18
+                    6, 5,7,6,     // 19,1a,1b,1c
+                    7, 6,5,7,     // 1d,1e,1f,20
+                    6,7           // 21,22
+                    }; //длинны входящих пакетов в зависимости от номера команды */
+
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
                           BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
 uint32_t  PWM_DIR[10] ={BTN1_DIR_PIN,BTN2_DIR_PIN,
@@ -99,42 +100,43 @@ char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,
     return 0;
 }
 
-void pushByte(char inByte) // поиск и формирование и проверка входящего пакета в потоке данных
+void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в потоке данных
 {
   char j;
   uint16_t checkSum;
   uint16_t * test;
-  inData[dataIndex++] =inByte;
+  inData[dataIndex++] = inByte;
 
-  if((inData[0] ==SYNC_BYTE)&&(inData[1] ==ADR_BYTE))  //поиск заголовка
+  if((inData[0] == SYNC_BYTE) && (inData[1] == ADR_BYTE))  //поиск заголовка
   {
-    if(( (dataIndex)>=(packLen[inData[2]-1]))&&(dataIndex>2)) //проверка длинны пакета
+    if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //проверка длинны пакета
     {
-      checkSum = packetCheck(&inData[0], packLen[inData[2]-1]-CHECK_SIZE);
-      test = ( uint16_t *)&inData[packLen[inData[2]-1]-CHECK_SIZE];
+      checkSum = packetCheck(&inData[0], inData[2]-CHECK_SIZE);
+      test = ( uint16_t *) & inData[2] - CHECK_SIZE];
       if (*test == checkSum) // проверка CRC
       {
-        for (j=0;j<packLen[inData[2]-1]-CHECK_SIZE-HEADER_SIZE;j++)  //Копирование параметров
-                      *(inCommand.param+j) =inData[3+j];
-        inCommand.command= inData[2];
+        inCommand.packLen = inData[2];
+        for (j=0; j < inCommand.packLen - CHECK_SIZE - HEADER_SIZE; j++)  //Копирование параметров
+                      *(inCommand.param + j) = inData[4 + j];
+        inCommand.command = inData[3];
         execCommand(&inCommand);     //выполнение команды
       }
-
-
-      dataIndex=0;
-      inData[0]=0;
-      inData[1]=0;
+      dataIndex = 0;
+      inData[0] = 0;
+      inData[1] = 0;
     }
-  }else
+  }
+  else
   {
-    if (dataIndex>1)
+    if (dataIndex > 1)
     {
-      inData[0]=inData[1];
-      inData[1]=0;
-      dataIndex=1;
+      inData[0] = inData[1];
+      inData[1] = 0;
+      dataIndex = 1;
     }
   }
 }
+
 extern uint8_t  APP_Rx_Buffer []; /* Write CDC received data in this buffer.
                                      These data will be sent over USB IN endpoint
                                      in the CDC core functions. */
@@ -159,7 +161,8 @@ char sendAnswer(char cmd,char * param,int paramSize) // отправить ответ по USB
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in],outData,_size);
             APP_Rx_ptr_in+=_size;
     }
-    else{
+    else
+    {
             int freeSpace = APP_RX_DATA_SIZE- APP_Rx_ptr_in;
 
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in],outData,freeSpace);

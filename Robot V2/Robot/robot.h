@@ -67,6 +67,7 @@ typedef struct {
 typedef struct {
   char sync;
   char adress;
+  char packLen;
   char command ;
   char * param;
 } InPackStruct;
