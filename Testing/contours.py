@@ -17,10 +17,6 @@ import cv2
 import glob
 import math
 
-# Imports all files from a folder, with the string in its name
-# images = glob.glob('*.jpg') 
-
-
 class robotClass(object):
 	"""Robot object. Takes an image as input, returns coordinates and 
 	orientation in landmark coord system"""
@@ -43,7 +39,7 @@ class robotClass(object):
 		# Bitwise-AND mask and original image
 		self.res = cv2.bitwise_and(self.cap,self.cap, mask= self.mask)
 
-		cv2.imwrite('bluehope.jpg',self.res)
+		#cv2.imwrite('bluehope.jpg',self.res)
 
 		# Make a copy of res
 		self.im = self.res.copy()
@@ -65,8 +61,9 @@ class robotClass(object):
 
 		# Extract ruler coordinates in origin coord sys, and mm/px ratio
 		self.ruler, self.ratio = self.get_ruler(self.coordinates)
-		print 'Ruler: ', self.ruler
-		print 'Lndmrk, ratio: ', self.ruler[0][0], self.ruler[0][1], self.ratio
+		print 'Ruler in origin sys: ', self.ruler
+		print 'Lndmrk in origin sys, ratio: ', self.ruler[0][0], \
+			self.ruler[0][1], self.ratio
 		
 		# Writes point coordinates on picture
 		for i in range(len(self.ruler)):
@@ -77,7 +74,7 @@ class robotClass(object):
 
 		# Extract robot circles origin coordinates, by area ascending + center
 		self.robot_global = self.get_robot(self.coordinates)
-		print 'Robot: ',self.robot_global
+		print 'Robot in origin sys: ',self.robot_global
 		# Write robot circle coordinates
 		for i in range(len(self.robot_global)):
 			if i == 2:
@@ -95,7 +92,7 @@ class robotClass(object):
 		
 		# Robot coordinates in left pont coordinate system 
 		self.robot_local = self.translation(self.ruler, self.robot_global)
-		print 'Robot coordinates in left ruler pont system: ', self.robot_local
+		print 'Robot coordinates in left pont system: ', self.robot_local
 		# Wites robot coordinates in left point system
 		for i in range(len(self.robot_local)):
 			if i == 2:
@@ -115,8 +112,8 @@ class robotClass(object):
 		self.landmark_coord = self.translation(self.ruler, self.ruler)
 		self.landmark_slope = math.atan2(self.landmark_coord[1][1],
 			self.landmark_coord[1][0])
-		print 'Landmark coord: ', self.landmark_coord
-		print 'Landmark angle, rad: ', self.landmark_slope
+		print 'Landmark coord in left point sys: ', self.landmark_coord
+		print 'Landmark angle, rad in left point sys: ', self.landmark_slope
 		# Writes coord and slope (in degrees) of landmarks in left point sys
 		for i in range(len(self.landmark_coord)):
 			cv2.putText(self.im, str((('%.3f' % self.landmark_coord[i][0], 
@@ -213,7 +210,10 @@ class robotClass(object):
 		product = [np.dot(rot_mat, robot[i]) for i in range(len(robot))]
 		return map(tuple, product)
 
-images = ['new1.jpg', 'new2.jpg']
+# Imports all files from a folder, with the string in its name
+images = glob.glob('*.jpg') 
+
+#images = ['new1.jpg', 'new2.jpg']
 start = images[::2]
 end = images[1::2]
 
@@ -228,18 +228,32 @@ for i, j in zip(start, end):
 	robot1 = robotClass(i)
 	print ''
 	robot2 = robotClass(j,2)
+
 	# Calculates relative rotation between start and end
 	delta_tetha = math.degrees(robot2.robot_slope - robot1.robot_slope)
-	
 	print '\n', 'Angular error, deg (ccw is positive angle): ', delta_tetha
-	# Rotates Robot end position to robot coord sys
-	delta_end = robot1.rotation(robot2.robot_landmark, -robot1.robot_slope) 
-	print 'Whole: ', delta_end
-	print 'Please work: ', delta_end[3]
+	
+	# # Rotates Robot end position to robot coord sys
+	# delta_end = robot1.rotation(robot2.robot_landmark, -robot1.robot_slope) 
+	# print 'Robot coords just rotated to robot sys: ', delta_end
+	# print 'Center point just rotated to robot sys: ', delta_end[3]
+
+	# # Translates Robot end position to robot coord sys 
+	# delta_center = np.asarray(delta_end)-np.asarray(robot1.robot_landmark[3])
+	# print 'Center point in robot sys (with translation): ', delta_center
 
 	# Translates Robot end position to robot coord sys 
-	delta_center = np.asarray(delta_end)-np.asarray(robot1.robot_landmark[3])
-	print 'Pleeeeeeeease: ', delta_center
+	delta_end = np.asarray(robot2.robot_landmark)-np.asarray(robot1.\
+		robot_landmark[3])
+	print 'Center point in robot sys (with translation): ', delta_end
+	delta_end = map(tuple, delta_end)
+
+	# Rotates Robot end position to robot coord sys
+	delta_center = robot1.rotation(delta_end, -robot1.robot_slope) 
+	print 'Robot coords just rotated to robot sys: ', delta_center
+	print 'Center point just rotated to robot sys: ', delta_center[3]
+
+
 
 	distance = math.sqrt((delta_center[3][0])**2 + (delta_center[3][1])**2)
 	d_angle.append(delta_tetha)
