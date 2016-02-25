@@ -87,6 +87,10 @@ void soft_delay(long int ticks)
 {
     for(; ticks > 0; ticks-- );
 }
+    uint16_t stVal = 0;
+    uint16_t finalVal = 300;
+    uint16_t *curTorque = 0;
+
 
 int main(void)
 {
@@ -97,27 +101,33 @@ int main(void)
 
     uint8_t ID = 5;
     bool flag = 0;
-    uint16_t stVal = 0;
-    uint16_t finalVal = 300;
 
+    setServoTorque(ID, 1023);
     setServoCWAngleLimit(ID, 0);
     setServoCCWAngleLimit(ID, 0);
-    setServoMovingSpeed(ID, 1023, CW);
-    setServoMovingSpeed(ID, 0);
-    setServoMovingSpeed(ID, 1023, CCW);
+    while(1)
+    {
+        setServoMovingSpeed(ID, 1023, CCW);
+        setServoMovingSpeed(ID, 0, CCW);
+        getServoTorque(ID, curTorque);
+        //setServoMovingSpeed(ID, 0);
+        //setServoMovingSpeed(ID, 1023, CCW);
+        //setServoMovingSpeed(ID, 0);
+    }
+}
 
-  /* Towers manipulator controlled from the button on discovery
-  while(1)
+ //  Towers manipulator controlled from the button on discovery
+  /*while(1)
   {
       while (1)
       {
           if (pin_val(BUTTON))
           {
-             soft_delay(1000);
+             soft_delay(1000000);
               if (pin_val(BUTTON))
 
               break;
-          }
+         }
       }
       flag = setServoAngle(ID, stVal);
       while (1)
@@ -131,5 +141,5 @@ int main(void)
           }
       }
       flag = setServoAngle(ID, finalVal);
-  } */
-}
+  }
+} */

@@ -70,7 +70,7 @@ bool getServoResponse (void)
 {
     uint16_t retries = 0;
 
-    clearServoReceiveBuffer();
+    clearServoReceiveBuffer();setServoMovingSpeed(ID, 1023, CCW);
 
    while (getServoBytesAvailable() < 4)
     {
@@ -250,8 +250,7 @@ bool setServoTorque (const uint8_t servoId,
 bool getServoTorque (const uint8_t servoId,
                      uint16_t *torqueValue)
 {
-    const uint8_t params[2] = {TORQUE,
-                               2};  // read two bytes, starting at address TORQUE
+    const uint8_t params[2] = {TORQUE, 2};  // read two bytes, starting at address TORQUE
 
     sendServoCommand (servoId, READ, 2, params);
 
@@ -290,7 +289,7 @@ bool setServoMovingSpeed (const uint8_t servoId,
     return true;
 }
 
-bool getServoMaxSpeed (const uint8_t servoId,
+bool getServoMovingSpeed (const uint8_t servoId,
                        uint16_t *speedValue)
 {
     const uint8_t params[2] = {MOVING_SPEED,

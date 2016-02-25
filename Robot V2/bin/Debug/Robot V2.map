@@ -8831,7 +8831,7 @@ OUTPUT(bin\Debug\Robot V2.elf elf32-littlearm)
  .debug_line    0x0000a766       0xcc obj\debug\src\startup_stm32f4xx.o
  .debug_line    0x0000a832      0x55e obj\debug\src\system_stm32f4xx.o
 
-.debug_str      0x00000000    0x6702f
+.debug_str      0x00000000    0x67064
  .debug_str     0x00000000    0x5f427 obj\debug\board\adc.o
                               0x5f64d (size before relaxing)
  .debug_str     0x0005f427     0x147b obj\debug\board\interrupts.o
@@ -8856,31 +8856,31 @@ OUTPUT(bin\Debug\Robot V2.elf elf32-littlearm)
                               0x5e297 (size before relaxing)
  .debug_str     0x00063f9a      0x139 obj\debug\library\core\src\usbd_req.o
                               0x5e538 (size before relaxing)
- .debug_str     0x000640d3      0x513 obj\debug\robot\regulator.o
-                              0x5fe38 (size before relaxing)
- .debug_str     0x000645e6       0xf7 obj\debug\robot\matrix.o
+ .debug_str     0x000640d3      0x548 obj\debug\robot\regulator.o
+                              0x5fe34 (size before relaxing)
+ .debug_str     0x0006461b       0xf7 obj\debug\robot\matrix.o
                                0x3c87 (size before relaxing)
- .debug_str     0x000646dd     0x1111 obj\debug\robot\robot.o
+ .debug_str     0x00064712     0x1111 obj\debug\robot\robot.o
                               0x62115 (size before relaxing)
- .debug_str     0x000657ee       0xc5 obj\debug\usb app\stm32fxxx_it.o
+ .debug_str     0x00065823       0xc5 obj\debug\usb app\stm32fxxx_it.o
                               0x5e51b (size before relaxing)
- .debug_str     0x000658b3      0x250 obj\debug\usb app\usb_bsp.o
+ .debug_str     0x000658e8      0x250 obj\debug\usb app\usb_bsp.o
                               0x5e255 (size before relaxing)
- .debug_str     0x00065b03      0x10f obj\debug\usb app\usbd_cdc_vcp.o
+ .debug_str     0x00065b38      0x10f obj\debug\usb app\usbd_cdc_vcp.o
                               0x5df6d (size before relaxing)
- .debug_str     0x00065c12      0x2fd obj\debug\usb app\usbd_desc.o
+ .debug_str     0x00065c47      0x2fd obj\debug\usb app\usbd_desc.o
                               0x5df84 (size before relaxing)
- .debug_str     0x00065f0f       0xbc obj\debug\usb app\usbd_usr.o
+ .debug_str     0x00065f44       0xbc obj\debug\usb app\usbd_usr.o
                               0x5db77 (size before relaxing)
- .debug_str     0x00065fcb      0x132 obj\debug\spl\src\misc.o
+ .debug_str     0x00066000      0x132 obj\debug\spl\src\misc.o
                               0x5c977 (size before relaxing)
- .debug_str     0x000660fd      0x177 obj\debug\spl\src\stm32f4xx_gpio.o
+ .debug_str     0x00066132      0x177 obj\debug\spl\src\stm32f4xx_gpio.o
                               0x5ca1f (size before relaxing)
- .debug_str     0x00066274      0xce4 obj\debug\spl\src\stm32f4xx_rcc.o
+ .debug_str     0x000662a9      0xce4 obj\debug\spl\src\stm32f4xx_rcc.o
                               0x5d52c (size before relaxing)
- .debug_str     0x00066f58       0x10 obj\debug\src\main.o
+ .debug_str     0x00066f8d       0x10 obj\debug\src\main.o
                               0x5ff75 (size before relaxing)
- .debug_str     0x00066f68       0xc7 obj\debug\src\system_stm32f4xx.o
+ .debug_str     0x00066f9d       0xc7 obj\debug\src\system_stm32f4xx.o
                               0x5c98e (size before relaxing)
 
 .debug_frame    0x00000000     0x2c4c

@@ -4793,3 +4793,527 @@
 1454778570 source:c:\users\student\desktop\shipitko oleg\robot v2\robot v2\src\system_stm32f4xx.c
 	"stm32f4xx.h"
 
+1416066666 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\adc.c
+	"adc.h"
+	"math.h"
+	"stm32f4xx.h"
+	"robot.h"
+
+1416066674 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\adc.h
+
+1454767564 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\stm32f4xx.h
+	"core_cm4.h"
+	"system_stm32f4xx.h"
+	<stdint.h>
+	"stm32f4xx_conf.h"
+
+1346156060 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core_cm4.h
+	<stdint.h>
+	<core_cmInstr.h>
+	<core_cmFunc.h>
+	<core_cm4_simd.h>
+
+1416072528 c:\users\student\desktop\shipitko oleg\repo\robot v2\cmsis\core_cminstr.h
+	<cmsis_iar.h>
+
+1416072528 c:\users\student\desktop\shipitko oleg\repo\robot v2\cmsis\core_cmfunc.h
+	<cmsis_iar.h>
+
+1416072528 c:\users\student\desktop\shipitko oleg\repo\robot v2\cmsis\core_cm4_simd.h
+	<cmsis_iar.h>
+
+1434360690 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\system_stm32f4xx.h
+
+1319769106 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\stm32f4xx_conf.h
+	"stm32f4xx_adc.h"
+	"stm32f4xx_can.h"
+	"stm32f4xx_crc.h"
+	"stm32f4xx_cryp.h"
+	"stm32f4xx_dac.h"
+	"stm32f4xx_dbgmcu.h"
+	"stm32f4xx_dcmi.h"
+	"stm32f4xx_dma.h"
+	"stm32f4xx_exti.h"
+	"stm32f4xx_flash.h"
+	"stm32f4xx_fsmc.h"
+	"stm32f4xx_hash.h"
+	"stm32f4xx_gpio.h"
+	"stm32f4xx_i2c.h"
+	"stm32f4xx_iwdg.h"
+	"stm32f4xx_pwr.h"
+	"stm32f4xx_rcc.h"
+	"stm32f4xx_rng.h"
+	"stm32f4xx_rtc.h"
+	"stm32f4xx_sdio.h"
+	"stm32f4xx_spi.h"
+	"stm32f4xx_syscfg.h"
+	"stm32f4xx_tim.h"
+	"stm32f4xx_usart.h"
+	"stm32f4xx_wwdg.h"
+	"misc.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_adc.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_can.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_crc.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_cryp.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_dac.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_dbgmcu.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_dcmi.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_dma.h
+	"stm32f4xx.h"
+
+1435568150 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_exti.h
+	"stm32f4xx.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_flash.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_fsmc.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_hash.h
+	"stm32f4xx.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_gpio.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_i2c.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_iwdg.h
+	"stm32f4xx.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_pwr.h
+	"stm32f4xx.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_rcc.h
+	"stm32f4xx.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_rng.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_rtc.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_sdio.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_spi.h
+	"stm32f4xx.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_syscfg.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_tim.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_usart.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_wwdg.h
+	"stm32f4xx.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\misc.h
+	"stm32f4xx.h"
+
+1456141254 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\robot.h
+	"gpio.h"
+
+1416393608 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\gpio.h
+	"stm32f4xx.h"
+	"stm32f4xx_rcc.h"
+	"stm32f4xx_conf.h"
+
+1416397506 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.c
+	"Interrupts.h"
+	"gpio.h"
+	"Regulator.h"
+	"Path.h"
+	"Pins.h"
+	<math.h>
+	"usart.h"
+	"robot.h"
+
+1416069810 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.h
+	"stm32f4xx.h"
+
+1455039998 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.h
+	"stm32f4xx.h"
+	"Path.h"
+
+1416068290 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\path.h
+
+1454514301 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\pins.h
+	"gpio.h"
+
+1453537872 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\usart.h
+	"stm32f4xx.h"
+
+1454778031 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\init.c
+	"init.h"
+	"stm32f4xx.h"
+	"Pins.h"
+	"i2c.h"
+	"Interrupts.h"
+	"usart.h"
+	"tim.h"
+	"adc.h"
+	"Regulator.h"
+
+1416216070 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\init.h
+
+1416066692 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\i2c.h
+	"stm32f4xx.h"
+
+1416066732 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\tim.h
+	"stm32f4xx.h"
+
+1416066732 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\tim.c
+	"tim.h"
+
+1454779120 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\usart.c
+	"usart.h"
+	"robot.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\cdc\src\usbd_cdc_core.c
+	"usbd_cdc_core.h"
+	"usbd_desc.h"
+	"usbd_req.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\cdc\inc\usbd_cdc_core.h
+	"usbd_ioreq.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usbd_ioreq.h
+	"usbd_def.h"
+	"usbd_core.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usbd_def.h
+	"usbd_conf.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usbd_conf.h
+	"usb_conf.h"
+
+1454751371 c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usb_conf.h
+	"stm322xg_eval.h"
+	"stm322xg_eval_lcd.h"
+	"stm32f4xx.h"
+	"stm32f4xx.h"
+	"stm324x9i_eval.h"
+	"stm324x9i_eval_lcd.h"
+	"stm32f10x.h"
+	"stm3210c_eval.h"
+	"stm3210c_eval_lcd.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usbd_core.h
+	"usb_dcd.h"
+	"usbd_def.h"
+	"usbd_conf.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usb_dcd.h
+	"usb_core.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usb_core.h
+	"usb_conf.h"
+	"usb_regs.h"
+	"usb_defines.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usb_regs.h
+	"usb_conf.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usb_defines.h
+	"usb_conf.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usbd_desc.h
+	"usbd_req.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usbd_req.h
+	"usbd_def.h"
+	"usbd_core.h"
+	"usbd_conf.h"
+
+1447311672 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\src\usb_core.c
+	"usb_core.h"
+	"usb_bsp.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usb_bsp.h
+	"usb_core.h"
+
+1447311672 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\src\usb_dcd.c
+	"usb_dcd.h"
+	"usb_bsp.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\src\usb_dcd_int.c
+	"usb_dcd_int.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usb_dcd_int.h
+	"usb_dcd.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\src\usbd_core.c
+	"usbd_core.h"
+	"usbd_req.h"
+	"usbd_ioreq.h"
+	"usb_dcd_int.h"
+	"usb_bsp.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\src\usbd_ioreq.c
+	"usbd_ioreq.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\src\usbd_req.c
+	"usbd_req.h"
+	"usbd_ioreq.h"
+	"usbd_desc.h"
+
+1416068290 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\path.c
+	"Path.h"
+
+1416068290 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\matrix.c
+	"matrix.h"
+	"stdlib.h"
+
+1416068290 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\matrix.h
+
+1456144453 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\robot.c
+	"robot.h"
+	"pins.h"
+	"usart.h"
+	"usbd_cdc_core.h"
+	"usbd_usr.h"
+	"usb_conf.h"
+	"usbd_desc.h"
+	"stm32fxxx_it.h"
+	"usbd_cdc_vcp.h"
+	"string.h"
+	"regulator.h"
+	"interrupts.h"
+	"init.h"
+
+1454751379 c:\users\student\desktop\shipitko oleg\repo\robot v2\library\core\inc\usbd_usr.h
+	"usbd_ioreq.h"
+
+1454751386 c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\stm32fxxx_it.h
+	"usbd_cdc_core.h"
+
+1447069378 c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usbd_cdc_vcp.h
+	"usbd_cdc_core.h"
+	"usbd_conf.h"
+
+1454751414 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\stm32fxxx_it.c
+	"stm32fxxx_it.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usb_bsp.c
+	"usb_bsp.h"
+
+1454758071 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usbd_cdc_vcp.c
+	"usbd_cdc_vcp.h"
+
+1447069378 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usbd_desc.c
+	"usbd_core.h"
+	"usbd_desc.h"
+	"usbd_req.h"
+	"usbd_conf.h"
+	"usb_regs.h"
+
+1454763319 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\usb app\usbd_usr.c
+	"usbd_usr.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\misc.c
+	"misc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_adc.c
+	"stm32f4xx_adc.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_can.c
+	"stm32f4xx_can.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_cec.c
+	"stm32f4xx_cec.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_cec.h
+	"stm32f4xx.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_crc.c
+	"stm32f4xx_crc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_cryp.c
+	"stm32f4xx_cryp.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_cryp_aes.c
+	"stm32f4xx_cryp.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_cryp_des.c
+	"stm32f4xx_cryp.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_cryp_tdes.c
+	"stm32f4xx_cryp.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_dac.c
+	"stm32f4xx_dac.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_dbgmcu.c
+	"stm32f4xx_dbgmcu.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_dcmi.c
+	"stm32f4xx_dcmi.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_dma.c
+	"stm32f4xx_dma.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_dma2d.c
+	"stm32f4xx_dma2d.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_dma2d.h
+	"stm32f4xx.h"
+
+1436260358 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_dsi.c
+	"stm32f4xx_dsi.h"
+
+1440679896 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_dsi.h
+	"stm32f4xx.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_exti.c
+	"stm32f4xx_exti.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_gpio.c
+	"stm32f4xx_gpio.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_hash.c
+	"stm32f4xx_hash.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_hash_md5.c
+	"stm32f4xx_hash.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_hash_sha1.c
+	"stm32f4xx_hash.h"
+
+1434556284 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_i2c.c
+	"stm32f4xx_i2c.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_iwdg.c
+	"stm32f4xx_iwdg.h"
+
+1434556284 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_lptim.c
+	"stm32f4xx_lptim.h"
+
+1434556284 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_lptim.h
+	"stm32f4xx.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_ltdc.c
+	"stm32f4xx_ltdc.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_ltdc.h
+	"stm32f4xx.h"
+
+1434712332 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_pwr.c
+	"stm32f4xx_pwr.h"
+	"stm32f4xx_rcc.h"
+
+1434527060 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_qspi.c
+	"stm32f4xx_qspi.h"
+
+1434527060 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_qspi.h
+	"stm32f4xx.h"
+
+1454778570 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_rcc.c
+	"stm32f4xx_rcc.h"
+
+1434556284 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_rng.c
+	"stm32f4xx_rng.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_rtc.c
+	"stm32f4xx_rtc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_sai.c
+	"stm32f4xx_sai.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_sai.h
+	"stm32f4xx.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_sdio.c
+	"stm32f4xx_sdio.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_spdifrx.c
+	"stm32f4xx_spdifrx.h"
+	"stm32f4xx_rcc.h"
+
+1436430398 c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\inc\stm32f4xx_spdifrx.h
+	"stm32f4xx.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_spi.c
+	"stm32f4xx_spi.h"
+	"stm32f4xx_rcc.h"
+
+1434556284 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_syscfg.c
+	"stm32f4xx_syscfg.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_tim.c
+	"stm32f4xx_tim.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_usart.c
+	"stm32f4xx_usart.h"
+	"stm32f4xx_rcc.h"
+
+1434356474 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\spl\src\stm32f4xx_wwdg.c
+	"stm32f4xx_wwdg.h"
+	"stm32f4xx_rcc.h"
+
+1454758917 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\src\main.c
+	"stm32f4xx_conf.h"
+	"stm32f4xx.h"
+	"init.h"
+	"gpio.h"
+	"Pins.h"
+	"Interrupts.h"
+	"regulator.h"
+	"usart.h"
+	"robot.h"
+	"usbd_cdc_core.h"
+	"usbd_usr.h"
+	"usb_conf.h"
+	"usbd_desc.h"
+	"usbd_cdc_vcp.h"
+
+1416072528 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\src\startup_stm32f4xx.s
+
+1454778570 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\src\system_stm32f4xx.c
+	"stm32f4xx.h"
+
+1456304308 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.c
+	"Regulator.h"
+	"robot.h"
+	"matrix.h"
+	"stdlib.h"
+	"gpio.h"
+	<math.h>
+	"adc.h"
+

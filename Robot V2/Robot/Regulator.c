@@ -19,7 +19,7 @@ float Speed_local_track[3] = {0.0, 0.0, 0.0};  // локальные траекторные скорости
 uint16_t totalPointComplite =0;  //¬сего пройдено точек
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //—тек точек траектории
-                                        {0.0,10.5,1.570, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0,1,0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {-0.5,-0.5,0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {-0.5,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                          {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
