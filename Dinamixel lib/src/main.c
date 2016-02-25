@@ -89,7 +89,7 @@ void soft_delay(long int ticks)
 }
     uint16_t stVal = 0;
     uint16_t finalVal = 300;
-    uint16_t *curTorque = 0;
+    uint16_t curLoad;
 
 
 int main(void)
@@ -102,14 +102,26 @@ int main(void)
     uint8_t ID = 5;
     bool flag = 0;
 
-    setServoTorque(ID, 1023);
+    setServoTorque(ID, 500);
     setServoCWAngleLimit(ID, 0);
     setServoCCWAngleLimit(ID, 0);
     while(1)
     {
+        setServoMovingSpeed(ID, 0, CW);
         setServoMovingSpeed(ID, 1023, CCW);
-        setServoMovingSpeed(ID, 0, CCW);
-        getServoTorque(ID, curTorque);
+        //setServoMovingSpeed(ID, 0, CCW);
+        flag = getCurrentLoad(ID, &curLoad);
+        if (curLoad > 900)
+        {
+            soft_delay(2000000);
+            soft_delay(2000000);
+            soft_delay(2000000);
+            setServoMovingSpeed(ID, 0, CCW);
+            setServoMovingSpeed(ID, 1023, CW);
+            soft_delay(2000000);
+            soft_delay(2000000);
+            soft_delay(2000000);
+        }
         //setServoMovingSpeed(ID, 0);
         //setServoMovingSpeed(ID, 1023, CCW);
         //setServoMovingSpeed(ID, 0);

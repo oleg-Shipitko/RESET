@@ -32,6 +32,7 @@ typedef enum ServoCommand
 #define BLINK_CONDITIONS    0x11
 #define SHUTDOWN_CONDITIONS 0x12
 #define TORQUE              0x22
+#define CURRENT_LOAD        0x28
 #define MOVING_SPEED        0x20
 #define CURRENT_SPEED       0x26
 #define GOAL_ANGLE          0x1e
@@ -70,7 +71,7 @@ bool getServoResponse (void)
 {
     uint16_t retries = 0;
 
-    clearServoReceiveBuffer();setServoMovingSpeed(ID, 1023, CCW);
+    clearServoReceiveBuffer();
 
    while (getServoBytesAvailable() < 4)
     {
@@ -247,6 +248,7 @@ bool setServoTorque (const uint8_t servoId,
     return true;
 }
 
+
 bool getServoTorque (const uint8_t servoId,
                      uint16_t *torqueValue)
 {
@@ -321,6 +323,24 @@ bool getServoCurrentVelocity (const uint8_t servoId,
     *velocityValue = response.params[1];
     *velocityValue <<= 8;
     *velocityValue |= response.params[0];
+
+    return true;
+}
+
+bool getCurrentLoad (const uint8_t servoId,
+                     uint16_t *loadValue)
+{
+    const uint8_t params[2] = {CURRENT_LOAD, 2};  // read two bytes, starting at address TORQUE
+
+    sendServoCommand (servoId, READ, 2, params);
+
+    if (!getAndCheckResponse (servoId))
+        return false;
+
+    *loadValue = response.params[1];
+    *loadValue <<= 8;
+    *loadValue |= response.params[0];
+    *loadValue &= 0x03ff;
 
     return true;
 }

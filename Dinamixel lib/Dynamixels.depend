@@ -535,7 +535,7 @@
 	"stm32f4xx_rcc.h"
 	"stm32f4xx_conf.h"
 
-1456394234 source:c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\dynamixel_control.c
+1456413628 source:c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\dynamixel_control.c
 	"stm32f4xx_conf.h"
 	"stm32f4xx_gpio.h"
 	"stm32f4xx_usart.h"
@@ -670,7 +670,7 @@
 1454498354 c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\spl\inc\misc.h
 	"stm32f4xx.h"
 
-1456395198 c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\dynamixel_control.h
+1456399122 c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\dynamixel_control.h
 	<inttypes.h>
 	<stdbool.h>
 	<stdlib.h>
@@ -787,7 +787,7 @@
 	"stm32f4xx_wwdg.h"
 	"stm32f4xx_rcc.h"
 
-1456395798 source:c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\src\main.c
+1456413952 source:c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\src\main.c
 	"stm32f4xx_conf.h"
 	"stm32f4xx.h"
 	<stdbool.h>
