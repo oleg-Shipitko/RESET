@@ -108,7 +108,7 @@ class robotClass(object):
 					int(self.robot_global[i][1])+160), cv2.FONT_HERSHEY_SIMPLEX,
 					 1, (255,255,255), 3)
 
-		# Coord and slope of the landmarks, in left point syst
+		# Coord and slope of the landmarks, in left point syst, from origin sys
 		self.landmark_coord = self.translation(self.ruler, self.ruler)
 		self.landmark_slope = math.atan2(self.landmark_coord[1][1],
 			self.landmark_coord[1][0])
@@ -193,7 +193,7 @@ class robotClass(object):
 		return robot
 
 	def translation(self, ruler, robot_global):
-		"""Translates robot points from origin coord system, to left point coord
+		"""Translates points from origin coord system, to left point coord
 		system coordnate system. New coord sys is paralel with X and Y axis, 
 		it's just translated and Y is inverted"""
 		robot_local = [(robot_global[i][0] - ruler[0][0], -robot_global[i][1] + 
@@ -218,11 +218,13 @@ start = images[::2]
 end = images[1::2]
 
 file = open('results.txt', 'w')	# Creates file for writing down values
+black_canvas  = np.zeros((500,1250,3), np.uint8)
 d_angle = [] # List for angle diference
 d_x = [] # List for x end position in robot coord sys
 d_y = [] # List for y end position in robot coord sys
 dist = [] # Distance traveled
 it = 0
+
 for i, j in zip(start, end):
 	it += 1
 	robot1 = robotClass(i)
@@ -296,6 +298,19 @@ for i, j in zip(start, end):
  		cv2.LINE_AA)
  	cv2.imwrite('test_blend'+str(it)+'.jpg', combined)
 
+# X axis, Y mark, 1000 mark, value
+cv2.line(black_canvas, (50, 450), (1200, 450) ,(255,255,255), 1, cv2.LINE_AA)
+cv2.line(black_canvas, (50, 450), (50, 100) ,(255,255,255), 1, cv2.LINE_AA)
+cv2.line(black_canvas, (1050, 445), (1050, 455) ,(255,255,255), 1, cv2.LINE_AA)
+cv2.putText(black_canvas, '1000.0', (1025, 470), cv2.FONT_HERSHEY_COMPLEX, 
+				0.5, (255,255,255), 1, cv2.LINE_AA)
+
+# Puts point on the image. Y coord multiplied by 4
+for i in range(len(d_x)):
+	cv2.circle(black_canvas,(int(d_x[i] +50), int(450-d_y[i]*4)), 1, (0,0,255), 3)
+
+cv2.imwrite('dist.jpg',black_canvas)
+
 a_stat = np.array([np.mean(d_angle), np.std(d_angle), np.var(d_angle)])
 x_stat = np.array([np.mean(d_x), np.std(d_x), np.var(d_x)])
 y_stat = np.array([np.mean(d_y), np.std(d_y), np.var(d_y)])
@@ -316,3 +331,4 @@ print data
 np.savetxt(file, data, fmt=['%.3f','%.3f','%.3f','%.3f'])
 
 file.close()
+
