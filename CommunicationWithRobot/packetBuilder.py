@@ -38,7 +38,7 @@ class BuildPacket(object):
 			return self.typeConvertor.IntToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1])
 		elif comand == CommandsList.setDirectionBit or comand == CommandsList.removeDirectionBit:
 			return self.typeConvertor.IntToHex(parameters)
-		elif comand == CommandsList.setMotorVcoordinates:
+		elif comand == CommandsList.setMotorVoltage:
 			return self.typeConvertor.IntToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1])
 		elif comand == CommandsList.setPidParameters:
 			return self.GetByteStringFromFloatList(parameters)
