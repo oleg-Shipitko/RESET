@@ -13,16 +13,12 @@ class BuildPacket(object):
 		self.parameters = self.GetParametersInHexForm(comand, parameters)
 		self.packetLenght = self.typeConvertor.IntToHex(6 + len(self.parameters) / 2)
 		self.crc = self.CalculateCrc()
-
-		return self.GetBytePacket()
+		self.bytearray = self.GetBytePacket()		
 		
 	def CalculateCrc(self):
 		concatinatedString = self.synchronization +  self.adress + self.packetLenght +  self.comand +  self.parameters
 		byteString = bytearray.fromhex(concatinatedString)
-		hexCrc = str(hex(self.crcCalculator.GetCrc32(byteString)))
-		lastBytes = str(hexCrc)[len(hexCrc) - 2:len(hexCrc) + 1]
-		almostLastBytes = str(hexCrc)[len(hexCrc) - 4:len(hexCrc) - 2]
-		return lastBytes + almostLastBytes
+		return self.crcCalculator.GetTwoBytesFromCrc32(byteString)
 		
 
 	def GetBytePacket(self):

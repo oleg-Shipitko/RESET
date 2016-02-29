@@ -28,8 +28,7 @@ class ParsePacket(object):
 	def GetByteArrayFromRecievedString(self):
 		byteString = ""
 		for index in range(0, len(self.string)):
-			hexSymbol = self.typeConvertor.IntToHex(ord(str(self.string[index])))
-			print str(index) + ': ' + hexSymbol
+			hexSymbol = self.typeConvertor.IntToHex(ord(str(self.string[index])))			
  			byteString = byteString + hexSymbol
 		byteString = bytearray.fromhex(byteString)
 		return byteString
