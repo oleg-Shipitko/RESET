@@ -1,6 +1,8 @@
 # Lines starting with '#' are considered comments.
 # Ignore files and derectories
-bin/*
-obj/*
+Robot V2/bin/
+Robot V2/obj/
+Dinamixel lib/bin/
+Dinamixel lib/obj/
 *.o
 *.elay
