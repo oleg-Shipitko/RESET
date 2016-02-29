@@ -4,5 +4,8 @@ Robot V2/bin/
 Robot V2/obj/
 Dinamixel lib/bin/
 Dinamixel lib/obj/
+Sonar_ADC/bin/
+Sonar_ADC/obj/
 *.o
 *.elay
+*.depend
