@@ -211,7 +211,7 @@ class robotClass(object):
 		return map(tuple, product)
 
 # Imports all files from a folder, with the string in its name
-images = glob.glob('*.jpg') 
+images = sorted(glob.glob('*.jpg')) 
 
 #images = ['new1.jpg', 'new2.jpg']
 start = images[::2]
