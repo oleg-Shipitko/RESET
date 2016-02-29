@@ -787,7 +787,7 @@
 	"stm32f4xx_wwdg.h"
 	"stm32f4xx_rcc.h"
 
-1456413952 source:c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\src\main.c
+1456414391 source:c:\users\student\desktop\shipitko oleg\repo\dinamixel lib\src\main.c
 	"stm32f4xx_conf.h"
 	"stm32f4xx.h"
 	<stdbool.h>
