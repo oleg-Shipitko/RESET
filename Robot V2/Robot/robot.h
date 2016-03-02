@@ -29,7 +29,7 @@
 
 #define SYNC_BYTE 0xFA
 #define ADR_BYTE  0xAF
-#define HEADER_SIZE  3
+#define HEADER_SIZE  4
 #define CHECK_SIZE   2
 
 #define ADC_ANALOG_PIN 0

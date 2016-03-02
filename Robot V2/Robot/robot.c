@@ -29,17 +29,6 @@ char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
 InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
 
-char answerPackLen[] = {23,8,8,8, // 01,02,03,04
-                    8,8,0,8,    // 05,06,07,08
-                    8,0,8,8,     // 09,0a,0b,0c
-                    8,8,8,8,     // 0d,0e,0f,10
-                    8,21,18,18,     // 11,12,13,14
-                    8,8,8,26,     // 15,16,17,18
-                    7,16,8,7,     // 19,1a,1b,1c
-                    8,7,16,8,     // 1d,1e,1f,20
-                    7,8,8,8           // 21,22
-                    }; //длинны исходящих пакетов в зависимости от номера команды
-
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
                           BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
 uint32_t  PWM_DIR[10] ={BTN1_DIR_PIN,BTN2_DIR_PIN,
@@ -149,7 +138,7 @@ char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
          //    __disable_irq();
          outData[0] = 0xFA;
          outData[1] = 0xFA;
-         outData[2] = answerPackLen[cmd - 1];
+         outData[2] = paramSize + HEADER_SIZE + CHECK_SIZE;
          outData[3] = cmd;
          memcpy(&outData[4], param, paramSize);
 
