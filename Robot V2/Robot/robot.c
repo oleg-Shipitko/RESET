@@ -153,15 +153,15 @@ char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
          outData[3] = cmd;
          memcpy(&outData[4], param, paramSize);
 
-         *((int16_t*)&outData[paramSize+HEADER_SIZE]) = (int16_t) packetCheck(&outData[0], paramSize + HEADER_SIZE);
-         int _size = paramSize+HEADER_SIZE+CHECK_SIZE  ;
+         *((int16_t*)&outData[paramSize + HEADER_SIZE]) = (int16_t) packetCheck(&outData[0], paramSize + HEADER_SIZE);
+         int _size = paramSize + HEADER_SIZE + CHECK_SIZE  ;
          int i;
          for (i=0; i < _size; i++) putchar(outData[i]);
 
          if (APP_Rx_ptr_in + _size < APP_RX_DATA_SIZE)
          {
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, _size);
-            APP_Rx_ptr_in+=_size;
+            APP_Rx_ptr_in += _size;
          }
          else
          {
@@ -170,7 +170,7 @@ char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, freeSpace);
             APP_Rx_ptr_in = 0;
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], &outData[freeSpace], _size - freeSpace);
-            APP_Rx_ptr_in += _size-freeSpace;
+            APP_Rx_ptr_in += _size - freeSpace;
          }
          //     APP_FOPS.pIf_DataTx((uint8_t*)outData,
          //             paramSize+HEADER_SIZE+CHECK_SIZE);
