@@ -30,7 +30,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRo
 
 //pathPointStr defaultPoint;
 
-char lastPoint=1;// последняя активная точка в стеке
+char lastPoint=0;// последняя активная точка в стеке
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 

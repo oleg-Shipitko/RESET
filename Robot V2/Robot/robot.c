@@ -29,15 +29,15 @@ char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
 InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
 
-char answerPackLen[0x29] = {22,7,7,7, // 01,02,03,04
-                    7,7,0,7,    // 05,06,07,08
-                    7,0,7,7,     // 09,0a,0b,0c
-                    7,7,7,7,     // 0d,0e,0f,10
-                    7,20,17,17,     // 11,12,13,14
-                    7,7,7,25,     // 15,16,17,18
-                    6,15,7,6,     // 19,1a,1b,1c
-                    7,6,15,7,     // 1d,1e,1f,20
-                    6,7,7           // 21,22
+char answerPackLen[] = {23,8,8,8, // 01,02,03,04
+                    8,8,0,8,    // 05,06,07,08
+                    8,0,8,8,     // 09,0a,0b,0c
+                    8,8,8,8,     // 0d,0e,0f,10
+                    8,21,18,18,     // 11,12,13,14
+                    8,8,8,26,     // 15,16,17,18
+                    7,16,8,7,     // 19,1a,1b,1c
+                    8,7,16,8,     // 1d,1e,1f,20
+                    7,8,8,8           // 21,22
                     }; //длинны исходящих пакетов в зависимости от номера команды
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
@@ -111,7 +111,7 @@ void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в 
   {
     if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //проверка длинны пакета
     {
-      checkSum = packetCheck(&inData[0], inData[2]-CHECK_SIZE);
+      checkSum = packetCheck(&inData[0], inData[2] - CHECK_SIZE);
       test = ( uint16_t *) &inData[inData[2] - CHECK_SIZE];
       if (*test == checkSum) // проверка CRC
       {
@@ -153,15 +153,15 @@ char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
          outData[3] = cmd;
          memcpy(&outData[4], param, paramSize);
 
-         *((int16_t*)&outData[paramSize+HEADER_SIZE]) = (int16_t) packetCheck(&outData[0], paramSize + HEADER_SIZE);
-         int _size = paramSize+HEADER_SIZE+CHECK_SIZE  ;
+         *((int16_t*)&outData[paramSize + HEADER_SIZE]) = (int16_t) packetCheck(&outData[0], paramSize + HEADER_SIZE);
+         int _size = paramSize + HEADER_SIZE + CHECK_SIZE  ;
          int i;
          for (i=0; i < _size; i++) putchar(outData[i]);
 
          if (APP_Rx_ptr_in + _size < APP_RX_DATA_SIZE)
          {
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, _size);
-            APP_Rx_ptr_in+=_size;
+            APP_Rx_ptr_in += _size;
          }
          else
          {
@@ -170,7 +170,7 @@ char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, freeSpace);
             APP_Rx_ptr_in = 0;
             memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], &outData[freeSpace], _size - freeSpace);
-            APP_Rx_ptr_in += _size-freeSpace;
+            APP_Rx_ptr_in += _size - freeSpace;
          }
          //     APP_FOPS.pIf_DataTx((uint8_t*)outData,
          //             paramSize+HEADER_SIZE+CHECK_SIZE);
@@ -250,14 +250,6 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
-
-  case 0x24:  //Включить ПИД регуляторы приводов
-  {
-      curState.pidEnabled=1;
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
   case 0x08:  //Установить параметры регулятора
   {
       float *(temp) ={(float*)cmd->param};
@@ -280,14 +272,6 @@ switch(cmd->command)
   {
   	regulatorOut[i] = temp[i];
   }
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x23:  //Выключить ПИД регуляторы приводов
-  {
-      curState.pidEnabled=0;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
@@ -381,14 +365,14 @@ switch(cmd->command)
   case 0x13:  //отправить текущие координаты
   {
 
-      sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord));
+      sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord) + 1);
   }
   break;
     case 0x14:  //отправить текущую скорость
   {
 
 
-      sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord));
+      sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord) + 1);
   }
   break;
   case 0x15:  //Задать скорость движения
@@ -563,6 +547,20 @@ switch(cmd->command)
             reset_pin(V12_PIN[ch]); else
                               set_pin(V12_PIN[ch]);
       }
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+  case 0x23:  //Выключить ПИД регуляторы приводов
+  {
+      curState.pidEnabled=0;
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+  case 0x24:  //Включить ПИД регуляторы приводов
+  {
+      curState.pidEnabled=1;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
