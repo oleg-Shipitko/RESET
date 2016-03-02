@@ -18,24 +18,24 @@ def initPTC():
 	# without waiting for answer)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
 	# If don't get right response, raise exception
-	if recievedPacket.reply == 'Ok':
-		print 'PID controller On'		
-	else:
-		raise Exception('switchOnPid failed')
+	#if recievedPacket.reply == 'Ok':
+	#	print 'PID controller ON'		
+	#else:
+	#	raise Exception('switchOnPid failed')
 
 	packet = packetBuilder.BuildPacket(commands.switchOnTrajectoryRegulator)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
-	if recievedPacket.reply == 'Ok':
-		print 'Trajectory regulator ON'
-	else:
-		raise Exception('switchOnTrajectoryRegulator failed')
+	#if recievedPacket.reply == 'Ok':
+	#	print 'Trajectory regulator ON'
+	#else:
+	#	raise Exception('switchOnTrajectoryRegulator failed')
 
 	packet = packetBuilder.BuildPacket(commands.switchOnKinematicCalculation)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
-	if recievedPacket.reply == 'Ok':
-		print 'Kinematics ON'
-	else:
-		raise Exception('switchOnKinematicCalculation failed')
+	#if recievedPacket.reply == 'Ok':
+	#	print 'Kinematics ON'
+	#else:
+	#	raise Exception('switchOnKinematicCalculation failed')
 
 def port_number():
 	"""Find all ports, and returns one with defined STM values"""	
@@ -58,17 +58,16 @@ def movement():
 	packet = packetBuilder.BuildPacket(commands.addPointToStack, coordinates)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
 	
-	if recievedPacket.reply != 'Ok':
-		raise Exception('add PointToStack failed')
+	#if recievedPacket.reply != 'Ok':
+	#	raise Exception('add PointToStack failed')
 	
-	print 'Get current coodrdinates:'
 	packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
 	#print type(recievedPacket.string)
 	#print type(recievedPacket.byteArray)
 	#print type(recievedPacket.reply)
 	#for i in recievedPacket.reply:
-		#print unichr(i)
+	#	print unichr(i)
 	#print '\nCurrent coordinates: ', recievedPacket.reply
 	
 def setCoord():
@@ -80,8 +79,8 @@ def setCoord():
 
 	packet = packetBuilder.BuildPacket(commands.setCoordinates, coordinates)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
-	if recievedPacket.reply != 'Ok':
-		raise Exception('setCoordinates failed')
+	#if recievedPacket.reply != 'Ok':
+	#	raise Exception('setCoordinates failed')
 
 port = port_number()
 if port:
