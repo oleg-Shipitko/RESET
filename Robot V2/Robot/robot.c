@@ -29,7 +29,7 @@ char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
 InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
 
-char answerPackLen[0x29] = {23,8,8,8, // 01,02,03,04
+char answerPackLen[] = {23,8,8,8, // 01,02,03,04
                     8,8,0,8,    // 05,06,07,08
                     8,0,8,8,     // 09,0a,0b,0c
                     8,8,8,8,     // 0d,0e,0f,10
@@ -37,7 +37,7 @@ char answerPackLen[0x29] = {23,8,8,8, // 01,02,03,04
                     8,8,8,26,     // 15,16,17,18
                     7,16,8,7,     // 19,1a,1b,1c
                     8,7,16,8,     // 1d,1e,1f,20
-                    7,8,8           // 21,22
+                    7,8,8,8           // 21,22
                     }; //длинны исходящих пакетов в зависимости от номера команды
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
@@ -111,7 +111,7 @@ void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в 
   {
     if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //проверка длинны пакета
     {
-      checkSum = packetCheck(&inData[0], inData[2]-CHECK_SIZE);
+      checkSum = packetCheck(&inData[0], inData[2] - CHECK_SIZE);
       test = ( uint16_t *) &inData[inData[2] - CHECK_SIZE];
       if (*test == checkSum) // проверка CRC
       {
@@ -365,14 +365,14 @@ switch(cmd->command)
   case 0x13:  //отправить текущие координаты
   {
 
-      sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord));
+      sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord) + 1);
   }
   break;
     case 0x14:  //отправить текущую скорость
   {
 
 
-      sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord));
+      sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord) + 1);
   }
   break;
   case 0x15:  //Задать скорость движения
