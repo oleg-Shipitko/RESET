@@ -22,8 +22,7 @@ class TypeConvertor(object):
 		return TypeConvertor.InvertStringArray(hexValue[2:len(hexValue)])
 
 	@staticmethod
-	def HexToFloat(hexNumber):
-		print hexNumber		
+	def HexToFloat(hexNumber):		
 		return struct.unpack('!f', hexNumber.decode('hex'))[0]
 
 	# Representation of float numbers in C++ different from representation in python. 
