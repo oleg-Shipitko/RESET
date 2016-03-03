@@ -2,8 +2,8 @@
 # Ignore files and derectories
 Robot V2/bin/
 Robot V2/obj/
-Dinamixel lib/bin/
-Dinamixel lib/obj/
+Dynamixel lib/bin/
+Dynamixel lib/obj/
 Sonar_ADC/bin/
 Sonar_ADC/obj/
 *.o
