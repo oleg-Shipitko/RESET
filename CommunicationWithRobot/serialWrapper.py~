@@ -35,7 +35,8 @@ class SerialWrapper(object) :
 				requestRecieved = True
 
 		if recievedPacket == "" or requestRecieved == False:
-			raise Exception("Reply was not recieved")			
+			print 1				
+		#raise Exception("Reply was not recieved")			
 
 		return recievedPacket
 

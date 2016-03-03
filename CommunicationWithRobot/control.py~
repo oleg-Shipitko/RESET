@@ -18,6 +18,8 @@ def initPTC():
 	# without waiting for answer)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
 	# If don't get right response, raise exception
+	print recievedPacket.reply
+	print len(recievedPacket.reply)	
 	if recievedPacket.reply == 'Ok':
 		print 'PID controller On'		
 	else:
