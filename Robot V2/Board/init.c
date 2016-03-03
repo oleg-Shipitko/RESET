@@ -195,7 +195,7 @@ initRegulators();
   conf_af(RX3_PIN, AF7);
   conf_pin(TX3_PIN, ALTERNATE, PUSH_PULL, LOW_S, PULL_UP);    // TX
   conf_af(TX3_PIN, AF7);
-  uartInit(USART3, 115200);                                      //Включаем USART3
+  uartInit(USART3, 1000000);                                      //Включаем USART3
   NVIC_EnableIRQ(USART3_IRQn);             // Разрешение прерываний для USART3
   USART3->CR3 |= USART_CR3_DMAT;
   //configUsart3DMA();                                 // Настройка DMA для USART3

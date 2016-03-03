@@ -170,6 +170,10 @@
 		<Unit filename="Library\stm32f4xx.h" />
 		<Unit filename="Library\stm32f4xx_conf.h" />
 		<Unit filename="Library\system_stm32f4xx.h" />
+		<Unit filename="Robot\Dynamixel_control.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Robot\Dynamixel_control.h" />
 		<Unit filename="Robot\Extern_variables.h" />
 		<Unit filename="Robot\Path.c">
 			<Option compilerVar="CC" />

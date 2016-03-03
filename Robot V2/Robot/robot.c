@@ -184,6 +184,7 @@ switch(cmd->command)
         }
       }
   break;
+
   case 0x02:  //Установить текущие координаты
   {
       float *(temp) ={(float*)cmd->param};
@@ -203,6 +204,7 @@ switch(cmd->command)
 
   }
   break;
+
   case 0x03: //установить скважность шим
   {
       char  ch = *cmd->param;
@@ -213,6 +215,7 @@ switch(cmd->command)
 
   }
   break;
+
   case 0x04:  //Установить бит направления
   {
       char * ch = cmd->param;
@@ -222,6 +225,7 @@ switch(cmd->command)
 
   }
   break;
+
   case 0x05:  //Снять бит направления
   {
       char * ch = cmd->param;
@@ -230,6 +234,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x06:  //Установить напряжение на двигателе
   {
       char  ch = *cmd->param;
@@ -239,6 +244,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x08:  //Установить параметры регулятора
   {
       float *(temp) ={(float*)cmd->param};
@@ -253,6 +259,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x09:  //Установить требуюему скорость двигателей
   {
       float *(temp) ={(float*)cmd->param};
@@ -265,6 +272,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x0B:  //Включить рассчет кинематики
   {
       curState.kinemEn=1;
@@ -272,6 +280,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x0C:  //Выключить рассчет кинематики
   {
       curState.kinemEn=0;
@@ -279,7 +288,8 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
-    case 0x0D:  //Задать скорости движения
+
+  case 0x0D:  //Задать скорости движения
   {
       float *(temp) ={(float*)cmd->param};
       char i;
@@ -292,13 +302,14 @@ switch(cmd->command)
   }
   break;
 
-    case 0x0E:  //Включить траекторный регулятор
+  case 0x0E:  //Включить траекторный регулятор
   {
       curState.trackEn=1;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x0F:  //Выключить траекторный регулятор
   {
       curState.trackEn=0;
@@ -318,7 +329,8 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
-    case 0x11:  //Добавить точку в стек
+
+  case 0x11:  //Добавить точку в стек
   {
 
       float *(temp) ={(float*)(cmd->param)};
@@ -335,7 +347,8 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
-    case 0x12:  //Состояние стека точек
+
+  case 0x12:  //Состояние стека точек
   {
       char outdata[15];
       float * temp =(float*)(&outdata[3]);
@@ -354,16 +367,18 @@ switch(cmd->command)
   case 0x13:  //отправить текущие координаты
   {
 
-      sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord) + 1);
+      sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord));
   }
   break;
-    case 0x14:  //отправить текущую скорость
+
+  case 0x14:  //отправить текущую скорость
   {
 
 
-      sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord) + 1);
+      sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord));
   }
   break;
+
   case 0x15:  //Задать скорость движения
   {
       float *(temp) ={(float*)(cmd->param)};
@@ -378,9 +393,10 @@ switch(cmd->command)
 
       sendAnswer(cmd->command,str, 3);
   }
-   break;
-     case 0x16:  //установить режим ножки
-  {
+  break;
+
+   case 0x16:  //установить режим ножки
+   {
 
     char ch = (*((char *)(cmd->param))) -1;
     if (ch<10)
@@ -398,18 +414,21 @@ switch(cmd->command)
     }
   }
   break;
-     case 0x17:  //отправить состояние выбранного входа АЦП
+
+  case 0x17:  //отправить состояние выбранного входа АЦП
   {
       char ch = (*((char *)(cmd->param))) -1;
     if (ch<10)
       sendAnswer(cmd->command,(char *)&(adcData[ch]), sizeof(uint16_t));
   }
   break;
-   case 0x18:  //отправить состояние всех АЦП
+
+  case 0x18:  //отправить состояние всех АЦП
   {
       sendAnswer(cmd->command,(char *)adcData, sizeof(adcData));
   }
   break;
+
   case 0x19:  //отправить состояние входа
   {
     char ch = (*((char *)(cmd->param))) -1;
@@ -420,7 +439,8 @@ switch(cmd->command)
     }
   }
   break;
-   case 0x1A:  //отправить состояние всех входов
+
+  case 0x1A:  //отправить состояние всех входов
   {
       char temp[10];
       char i ;
@@ -428,6 +448,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,(char *)temp, sizeof(temp));
   }
   break;
+
   case 0x1B:  //установить состояние выхода
   {
       char ch = (*((char *)(cmd->param))) -1;
@@ -489,6 +510,7 @@ switch(cmd->command)
     }
   }
   break;
+
   case 0x1E:  //отправить состояние входа
   {
     char ch = *((char *)(cmd->param))-1;
@@ -500,7 +522,8 @@ switch(cmd->command)
     }
   }
   break;
-   case 0x1F:  //отправить состояние всех входов
+
+  case 0x1F:  //отправить состояние всех входов
   {
 
       char temp[10];
@@ -509,6 +532,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,(char *)temp, sizeof(temp));
   }
   break;
+
   case 0x20:  //установить состояние выхода
   {
        char ch = *((char *)(cmd->param))-1;
@@ -519,6 +543,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x21:  //отправить текущий режим ножки
   {
     char ch = *((char *)(cmd->param))-1;
@@ -526,6 +551,7 @@ switch(cmd->command)
     sendAnswer(cmd->command,(char *) &(extiType[ch]), sizeof(uint8_t));
   }
   break;
+
   case 0x22:  //установить состояние выхода +12В
   {
       char ch = (*((char *)(cmd->param)))-1;
@@ -540,6 +566,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x23:  //Выключить ПИД регуляторы приводов
   {
       curState.pidEnabled=0;
@@ -547,6 +574,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
+
   case 0x24:  //Включить ПИД регуляторы приводов
   {
       curState.pidEnabled=1;
@@ -555,8 +583,57 @@ switch(cmd->command)
   }
   break;
 
-default:
+  case 0x25:  //set dynamixel angle
+  {
+      uint8_t *(ID) ={(uint8_t*)cmd->param};
+      uint16_t *(angle) ={(uint16_t*)(cmd->param + 1)};
+      if (setServoMovingSpeed(ID, angle))
+      {
+        char * str ="Ok";
+        sendAnswer(cmd->command,str, 3);
+      }
+  }
+  break;
 
+  case 0x26:  //set CW angle limit
+  {
+      uint8_t *(ID) ={(uint8_t*)cmd->param};
+      uint16_t *(limit) ={(uint16_t*)(cmd->param + 1)};
+      if (setServoCWAngleLimit(ID, limit))
+      {
+          char * str ="Ok";
+          sendAnswer(cmd->command,str, 3);
+      }
+  }
+  break;
+
+  case 0x27:  //set CCW angle limit
+  {
+      uint8_t *(ID) ={(uint8_t*)cmd->param};
+      uint16_t *(limit) ={(uint16_t*)(cmd->param + 1)};
+      if (setServoCCWAngleLimit(ID, limit))
+      {
+          char * str ="Ok";
+          sendAnswer(cmd->command,str, 3);
+      }
+  }
+  break;
+
+  case 0x28:  //set servo moving speed
+  {
+      uint8_t *(ID) ={(uint8_t*)cmd->param};
+      uint16_t *(speed) ={(uint16_t*)(cmd->param + 1)};
+      uint16_t *(direction) ={(uint16_t*)(cmd->param + 3)};
+      if (setServoMovingSpeed(ID, speed, direction))
+      {
+          char * str ="Ok";
+          sendAnswer(cmd->command,str, 3);
+      }
+  }
+  break;
+
+
+  default:
   break;
 }
 return 0;

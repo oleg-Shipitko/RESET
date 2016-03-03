@@ -8,17 +8,17 @@
 	</File>
 	<File name="Board\Interrupts.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1472" topLine="62" />
+			<Cursor1 position="881" topLine="15" />
 		</Cursor>
 	</File>
 	<File name="Board\Interrupts.h" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="119" topLine="0" />
+			<Cursor1 position="177" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="Board\Pins.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1364" topLine="0" />
+			<Cursor1 position="5223" topLine="61" />
 		</Cursor>
 	</File>
 	<File name="Board\adc.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -33,7 +33,7 @@
 	</File>
 	<File name="Board\init.c" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3104" topLine="203" />
+			<Cursor1 position="7730" topLine="182" />
 		</Cursor>
 	</File>
 	<File name="Board\init.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -48,7 +48,7 @@
 	</File>
 	<File name="Board\usart.c" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="11562" topLine="244" />
+			<Cursor1 position="12081" topLine="248" />
 		</Cursor>
 	</File>
 	<File name="Board\usart.h" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -96,6 +96,41 @@
 			<Cursor1 position="1267" topLine="3" />
 		</Cursor>
 	</File>
+	<File name="Robot\Dynamixel_control.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="6978" topLine="81" />
+		</Cursor>
+		<Folding>
+			<Collapse line="47" />
+			<Collapse line="70" />
+			<Collapse line="141" />
+			<Collapse line="171" />
+			<Collapse line="185" />
+			<Collapse line="203" />
+			<Collapse line="218" />
+			<Collapse line="234" />
+			<Collapse line="256" />
+			<Collapse line="278" />
+			<Collapse line="302" />
+			<Collapse line="321" />
+			<Collapse line="340" />
+			<Collapse line="360" />
+			<Collapse line="385" />
+			<Collapse line="407" />
+			<Collapse line="430" />
+			<Collapse line="450" />
+			<Collapse line="501" />
+			<Collapse line="509" />
+			<Collapse line="514" />
+			<Collapse line="525" />
+			<Collapse line="534" />
+		</Folding>
+	</File>
+	<File name="Robot\Dynamixel_control.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="2976" topLine="0" />
+		</Cursor>
+	</File>
 	<File name="Robot\Regulator.c" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
 			<Cursor1 position="2057" topLine="54" />
@@ -106,9 +141,9 @@
 			<Cursor1 position="2838" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="Robot\robot.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Robot\robot.c" open="1" top="1" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="5965" topLine="54" />
+			<Cursor1 position="19219" topLine="210" />
 		</Cursor>
 		<Folding>
 			<Collapse line="31" />
@@ -119,11 +154,50 @@
 			<Collapse line="66" />
 			<Collapse line="84" />
 			<Collapse line="92" />
+			<Collapse line="136" />
+			<Collapse line="176" />
+			<Collapse line="188" />
+			<Collapse line="208" />
+			<Collapse line="219" />
+			<Collapse line="229" />
+			<Collapse line="238" />
+			<Collapse line="248" />
+			<Collapse line="252" />
+			<Collapse line="263" />
+			<Collapse line="267" />
+			<Collapse line="276" />
+			<Collapse line="284" />
+			<Collapse line="292" />
+			<Collapse line="296" />
+			<Collapse line="305" />
+			<Collapse line="313" />
+			<Collapse line="321" />
+			<Collapse line="333" />
+			<Collapse line="351" />
+			<Collapse line="367" />
+			<Collapse line="374" />
+			<Collapse line="382" />
+			<Collapse line="398" />
+			<Collapse line="418" />
+			<Collapse line="426" />
+			<Collapse line="432" />
+			<Collapse line="443" />
+			<Collapse line="452" />
+			<Collapse line="463" />
+			<Collapse line="471" />
+			<Collapse line="514" />
+			<Collapse line="526" />
+			<Collapse line="536" />
+			<Collapse line="547" />
+			<Collapse line="555" />
+			<Collapse line="570" />
+			<Collapse line="578" />
+			<Collapse line="586" />
 		</Folding>
 	</File>
-	<File name="Robot\robot.h" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Robot\robot.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1427" topLine="22" />
+			<Cursor1 position="1413" topLine="8" />
 		</Cursor>
 	</File>
 	<File name="USB App\stm32fxxx_it.c" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -143,7 +217,7 @@
 	</File>
 	<File name="USB App\usbd_cdc_vcp.c" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="8846" topLine="238" />
+			<Cursor1 position="7722" topLine="238" />
 		</Cursor>
 	</File>
 	<File name="USB App\usbd_cdc_vcp.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -188,7 +262,7 @@
 	</File>
 	<File name="src\main.c" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1417" topLine="21" />
+			<Cursor1 position="608" topLine="15" />
 		</Cursor>
 	</File>
 	<File name="src\startup_stm32f4xx.S" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">

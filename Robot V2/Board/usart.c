@@ -1,6 +1,7 @@
 #include "usart.h"
-
+#include "Dynamixel_control.h"
 #include "robot.h"
+
 dmaPackStruct dmaData= {-1,-1,0,0,0,0,0,0,0,0};
 char Buffer[BufSize];
 uint8_t usart3Data[6];
@@ -254,7 +255,7 @@ void DMA1_Stream3_IRQHandler(void) // DMA USART2-TX
 //_________________________________USART______________________________________//
 ////////////////////////////////////////////////////////////////////////////////
 
-void USART3_IRQHandler(void)
+/*void USART3_IRQHandler(void)
 {
 char state;
 	state =USART3->SR ;
@@ -271,17 +272,19 @@ char state;
           state =USART3->SR;
 
         }
-        	/*if ((usart3Data[0] ==0xAA) &&(usart3Data[1] ==0x01)) //проверка начала пакета
+
+
+        	if ((usart3Data[0] ==0xAA) &&(usart3Data[1] ==0x01)) //проверка начала пакета
 	{
          encData.adress=   usart3Data[1];
          configUsart3RXDMA(((char *)&encData)+1, sizeof(encData)-1); // запуск DMA для приема основной части пакета
          USART3->CR1&=~USART_CR1_RXNEIE;
 	 USART3->CR3|=USART_CR3_DMAR;
         }
-        else usart3Data[0] = usart3Data[1];*/
+        else usart3Data[0] = usart3Data[1];
      }
 
-}
+}*/
 
 void DMA1_Stream1_IRQHandler(void)
 {
