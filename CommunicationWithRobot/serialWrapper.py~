@@ -40,11 +40,11 @@ class SerialWrapper(object) :
 				#if bytesToRead2 != bytesToRead:
 				#	print 'Difference: ', (bytesToRead2 - bytesToRead)
 				#	raise Exception('Too Slow') 					
-			recievedData = self.SerialPort.read(bytesToRead2)
-			print 'Data: ', recievedData		
-			if len(recievedData) is not 0:			
-				recievedPacket = packetParser.ParsePacket(recievedData)
-				requestRecieved = True
+				recievedData = self.SerialPort.read(bytesToRead2)
+				print 'Data: ', recievedData		
+				if len(recievedData) is not 0:			
+					recievedPacket = packetParser.ParsePacket(recievedData)
+					requestRecieved = True
 
 		if recievedPacket == "" or requestRecieved == False:
 			raise Exception("Reply was not recieved")			

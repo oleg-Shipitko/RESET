@@ -30,7 +30,7 @@ while(True):
     disp = stereo.compute(frameL, frameR).astype(np.float32) / 16.0
     
     cv2.imshow('disparity', (disp-min_disp)/num_disp)
-    #cv2.imshow('frameL',frameL)
+    cv2.imshow('frameL',frameL)
     #cv2.imshow('frameR', frameR)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

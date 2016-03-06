@@ -44,7 +44,7 @@ class ParsePacket(object):
 		byteString = ""
 		for index in range(0, len(self.string)):
 			hexSymbol = self.typeConvertor.IntToHex(ord(str(self.string[index])))
-			print str(index) + ': ' + hexSymbol			
+			#print str(index) + ': ' + hexSymbol			
  			byteString = byteString + hexSymbol
 		byteString = bytearray.fromhex(byteString)
 		print 'end'
