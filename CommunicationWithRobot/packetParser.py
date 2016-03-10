@@ -47,7 +47,7 @@ class ParsePacket(object):
 			#print str(index) + ': ' + hexSymbol			
  			byteString = byteString + hexSymbol
 		byteString = bytearray.fromhex(byteString)
-		print 'end'
+		#print 'end'
 		return byteString
 
  

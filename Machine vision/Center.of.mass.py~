@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 #Initialize videostream from external camera
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 #Set some geometric parameters for further projection
 height = 100
 alpha = np.pi/6

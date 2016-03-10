@@ -47,13 +47,13 @@ def initPTC():
 	else:
 		raise Exception('switchOnKinematicCalculation failed')
 
-def port_number():
+def portNumber():
 	"""Find all ports, and returns one with defined STM values"""	
 	for port in list_ports.comports():
 		if port[2] == 'USB VID:PID=%s:%s SNR=%s' %(VID,PID,SNR):	
 			return port[0]
 
-def movement():
+def globMov():
 	print '\nInput coordinates and speed type'	
 	# Get user input for movement
 	x = float(raw_input('X: '))
@@ -72,6 +72,30 @@ def movement():
 	time.sleep(5)
 	print 'Get current coodrdinates:'
 	packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)
+	recievedPacket = computerPort.sendRequest(packet.bytearray)
+
+def relMov(x = False, y = False, fi = False, speed = False):
+	"""Move robot relative to its current coord"""
+	print '\nInput robot displacement and speed type'
+	if x == False:	
+		x = float(raw_input('X: '))
+	if y == False:	
+		y = float(raw_input('Y: '))
+	if fi == False:		
+		fi = float(raw_input('angle: '))
+	if speed == False:	
+		speed = int(raw_input('speed type (1 = normal, 2 = stop, 3 = stand): '))
+	dsplcmnt = [x, y, fi, speed]
+	#startT = time.time()	
+	oldCoord = getCoord()
+	newCoord = [oldCoord[0] + dsplcmnt[0], oldCoord[1] + dsplcmnt[1], oldCoord[2]
+				 + dsplcmnt[2], speed]
+	#endT = time.time()
+	#print 'Rel Mov ', (endT - startT)	
+	#print 'Displacement: ', dsplcmnt	
+	#print 'Old Coord: ', oldCoord	
+	#print 'New Coord: ', newCoord	
+	packet = packetBuilder.BuildPacket(commands.addPointToStack, newCoord)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
 	
 def setCoord():
@@ -94,8 +118,9 @@ def getCoord():
 	endT = time.time()
 	print 'GetCoord time: ', (endT - startT)	
 	print 'Current robot coordinates: ', recievedPacket.reply
+	return recievedPacket.reply
 
-port = port_number()
+port = portNumber()
 if port:
 	print 'STM32 found on port %s' %port
 else:
@@ -113,19 +138,34 @@ initPTC()
 iteration = 0
 while True:
 	iteration += 1	
-	print '\nList of available commands: \n1 Movement\n2 Get Coordinates',\
-	#		'\n3 Set Coordinates' 	
-	#command = raw_input('Command number: ')
-	#if command == '1':
-	#	movement()
-	#elif command == '2':
-	#	getCoord()
-	#elif command == '3':
-	#	setCoord()	
-	getCoord()
-	print 'Iteration: ', iteration
+	print '\nList of available commands: \n1 Global Movement\n2 Relative Movement'\
+		'\n3 Set Coordinates\n4 Get Coordinates' 	
+	command = raw_input('Command number: ')
+	if command == '1':
+		globMov()
+	elif command == '2':
+		relMov()	
+	elif command == '3':
+		setCoord()
+	elif command == '4':
+		getCoord()	
+	
+	#Communication test	
+	#getCoord()
+	#print 'Iteration: ', iteration
 
-
+#relMov(0.1, 0.1, 1.571, 2)
+#print 'new'
+#relMov(-0.1, -0.1, -1.571, 2)
+#print 'new'
+#relMov(0.1, 0.1, 1.571, 2)
+#print 'new'
+#relMov(-0.1, -0.1, -1.571, 2)
+#print 'new'
+#relMov(0.1, 0.1, 1.571, 2)
+#print 'new'
+#relMov(-0.1, -0.1, -1.571, 2)
+#print 'stop'
 
 	
 	
