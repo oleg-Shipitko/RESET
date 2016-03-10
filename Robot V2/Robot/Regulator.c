@@ -14,15 +14,14 @@ float vTargetGlob[3] = {0,0,0};// вектор глобальных скоростей робота
 PidStruct wheelsPidStruct[4]; //структура ѕ»ƒ регул€торов колес
 PidStruct radSpeed; // структура ѕ»ƒ регул€тора уголовой скорости
 PidStruct ortoPos;  // структура ѕ»ƒ отклонени€ от траектории
-float Coord_local_track[3] = {0.0, 0.0, 0.0}; // локальные координаты в системе св€занной с текущим участком траектории
-float Speed_local_track[3] = {0.0, 0.0, 0.0};  // локальные траекторные скорости
+
 uint16_t totalPointComplite =0;  //¬сего пройдено точек
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //—тек точек траектории
-                                        {0.0,1,0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {-0.5,-0.5,0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {-0.5,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                         {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0,0.0,3.14/2.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0,0.0, 4.0,  NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                         {0.0,0.0,0.0,  NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0,-0.5,1.57, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {-0.5,-0.5,3.14, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {-0.5,0.0,4.71, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -33,13 +32,18 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0,0.0,0.0, NULL,NULL,0,stopVel,stopRo
 char lastPoint=0;// последн€€ активна€ точка в стеке
 Path curPath; //параметры активной пр€мой дл€ траекторного регул€тора
 
+//vSt    = (*parameters);     normal speed
+//vStart = (*(parameters+1)); minimum speed at the start
+//vEnd   = (*(parameters+2)); minimum speed at the end
+//acc    = (*(parameters+3)); acceleration
+//decc   = (*(parameters+4));  deceleration
 
-float normalVel[5]= {0.6,0.1,0.1,2.0,0.7};//V_уст, V_нач, V_кон, ј_уск, ј_торм  //непрерывное движение
-float stopVel[5]={0.6,0.1,-0.2,2.0,2.5}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVel[5]={4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положени€
+float normalVel[5]= {0.6,0.2,0.2,4.0,2.0};//V_уст, V_нач, V_кон, ј_уск, ј_торм  //непрерывное движение
+float stopVel[5]={0.6,0.2,-0.2,4.0,4.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVel[5]={0.6,0.6,-0.6,1.0,2.5};                                       //удержание заданного положени€
 
-float normalRot[5]= {0.6,0.2,0.2,1.0,1.3};//V_уст, V_нач, V_кон, ј_уск, ј_торм  //непрерывное движение
-float stopRot[5]= {1.2,0.4,-0.4,1.6,1.8}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float normalRot[5]= {3.0,1.0,0.2,4.0,4.0};//V_уст, V_нач, V_кон, ј_уск, ј_торм  //непрерывное движение
+float stopRot[5]= {3.0,1.0,-1.0,4.0,4.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
 float standRot[5]={4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положени€
 
 float * speedType[3] = {normalVel,stopVel,standVel};                            // типы  линейный скоростей
@@ -292,23 +296,24 @@ t_alph_zad[0][1] =  sinAlphZad;
 t_alph_zad[1][0] = -sinAlphZad;
 t_alph_zad[1][1] =  cosAlphZad;
 
-matrixMultiplyM2M(&t_alph_zad[0][0], 2, 2, SpeedCur, 2, 1, &Speed_local_track[0]);
-matrixMultiplyM2M(&t_alph_zad[0][0], 2, 2, &buf1[0], 2, 1, &Coord_local_track[0]);//
-Coord_local_track[2] = robotCoord[2]-cur->coordCenter[2];
-
+matrixMultiplyM2M(&t_alph_zad[0][0], 2, 2, SpeedCur, 2, 1, &(cur->Speed_local_track[0]));
+matrixMultiplyM2M(&t_alph_zad[0][0], 2, 2, &buf1[0], 2, 1, &(cur->Coord_local_track[0]));//
+cur->Coord_local_track[2] = (robotCoord[2]-cur->coordCenter[2])*cur->phiDir;
+if (cur->Coord_local_track[2]<0) cur->Coord_local_track[2]+=2.0*PI;
 //if(Coord_local_track[0]<0)
 //	tracer=fabs(Coord_local_track[0]);
 //else
 //	tracer=Coord_local_track[0];
 
-Moving(Coord_local_track[0],(cur->lengthTrace),(cur->traceVel),&velFromEt[0]);
-Moving(buf1[2],(cur->phiZad),(cur->omegaVel),&velFromEt[1]);
 
+Moving(cur->Coord_local_track[0],(cur->lengthTrace),(cur->traceVel),&velFromEt[0]);
+RotMoving((cur->coordCenter[2]), robotCoord[2],(cur->phiZad),(cur->omegaVel),&velFromEt[1]);
+//velFromEt[1]= velFromEt[1]*cur->phiDir;
 //LOCALCOORD(3,1)=(phiZad-CURCOORD(3,1));
 
 
 //VELOCITY=regulate(LOCALCOORD,vEt);
-Regulate(&Coord_local_track[0],&Speed_local_track[0],&t_alph_zad[0][0],&velFromEt[0],&(cur->alphZad), &velocity[0]);
+Regulate(&(cur->Coord_local_track[0]),&(cur->Speed_local_track[0]),&t_alph_zad[0][0],&velFromEt[0],&(cur->alphZad), &velocity[0]);
 matrixCopy(&velocity[0], 3, 1, &V[0]);
 }////////////////////////////////////////////////////////////////////////////////
 float linars(float *x, float *x0, float *x1)
@@ -316,7 +321,51 @@ float linars(float *x, float *x0, float *x1)
   float out = (((*x - (*x0)) / (*x1 - *(x0))) * (*(x1+1) - (*(x0+1)))) + (*(x0+1));
   return out;
 }
+void rangeAngle(float * angle)
+{
+  *angle    = fmod(*angle,2.0*PI);
+  if (*angle<-PI) *angle+=2.0*PI;
+  if (*angle>PI) *angle-=2.0*PI;
+}
 
+
+void RotMoving(float Start_a, float Coord_a_cur, float Coord_a_targ, float* parameters, float* v_out) //расчет скорости в зависимости от пройденного пути
+{
+float vStart, vSt, vEnd, acc, decc;
+float vAcc, vDecc; // уравнени€ пр€мых
+float out;
+//static float vStLast = 0; // ƒл€ флага переключени€ траекторий
+
+vSt    = (*parameters); //V_уст, V_нач, V_кон, ј_уск, ј_торм
+vStart = (*(parameters+1));
+vEnd   = (*(parameters+2));
+acc    = (*(parameters+3));
+decc   = (*(parameters+4));
+
+float distfromstart = Coord_a_cur-Start_a;
+rangeAngle(&distfromstart) ;
+float angleErr = Coord_a_targ- Coord_a_cur;
+rangeAngle(&angleErr) ;
+float sign ;
+
+  // Equation of acceleration
+vAcc = acc*fabs(distfromstart) + vStart;
+  // of decceleration
+vDecc = decc*(fabs(angleErr));
+
+out = vSt;
+if (vAcc < out)
+  out = vAcc;
+if (vDecc < out)
+{
+  if (vDecc < vEnd)
+  out = vEnd;
+  else
+    out = vDecc;
+}
+if (angleErr<0) out=-out;
+*v_out = out;
+}
 //float stopVel[5]={0.02,0.1,-0.1,0.7,0.9};
 ////////////////////////////////////////////////////////////////////////////////
 void Moving(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_out) //расчет скорости в зависимости от пройденного пути
@@ -421,7 +470,7 @@ int16_t motorSpeedBuf[4];
     motorSpeed[i] =  motorSpeedBuf[i]*DISKR_TO_REAL/PID_PERIOD;
     motorCoord[i] += motorSpeed[i]*PID_PERIOD;
   }
-  #endif
+   #endif
   float realRad =  -robotCoord[2];
   float J_inv[4][4];
   //  float MLineSpeed[4][3] = { 1.0,  0.0, 0.0,  // матрица расчета линейных скоростей
@@ -455,6 +504,8 @@ float Mrot[2][2]={ cos(realRad),   sin(realRad),
   robotCoord[0] += robotSpeed[0]*PID_PERIOD;
   robotCoord[1] += robotSpeed[1]*PID_PERIOD;
   robotCoord[2] += robotSpeed[2]*PID_PERIOD;
+  rangeAngle(&robotCoord[2]);
+
 }
 ///////////////////////////////////////////////////////////////////////////////
 void pidLowLevel(void) //вычисление ѕ»ƒ регул€тора колес
@@ -519,10 +570,12 @@ void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out)
      delta_x = next_point->center[0]-cur_point->center[0];
      delta_y = next_point->center[1]-cur_point->center[1];
      delta_phi = next_point->center[2]-cur_point->center[2];
-
+    // if (delta_phi<0 ) delta_phi+=2.0*PI;
+     rangeAngle( &delta_phi);
+     rangeAngle( &(next_point->center[2]));
   out->coordCenter[0] = cur_point->center[0];
   out->coordCenter[1] = cur_point->center[1];
-  out->coordCenter[2] = cur_point->center[2];;//cur_point[2];
+  out->coordCenter[2] = cur_point->center[2];
   if (delta_x<0)
           out->alphZad = atan(delta_y/delta_x)+PI;
   else
@@ -546,9 +599,11 @@ void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out)
         if (delta_x>0)
           out->alphZad = atan(delta_y/delta_x);
 
-  out->phiZad =delta_phi;
+ //if (next_point->rotateDir>0) out->phiZad =(delta_phi);
+ // if (next_point->rotateDir<0) out->phiZad =fmod(2.0*PI-fabs(delta_phi),2.0*PI);
+  out->phiZad =next_point->center[2];
   out->lengthTrace = sqrt((delta_x*delta_x)+(delta_y*delta_y));
-
+  //out->phiDir = next_point->rotateDir;
 if (out->lengthTrace == 0)
    out->traceVel=&standVel[0];
 else

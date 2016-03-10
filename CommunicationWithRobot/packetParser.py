@@ -27,14 +27,10 @@ class ParsePacket(object):
 		if self.listOfComands.getCurentCoordinates == self.command:
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
-			print invertedParametersString
 			coordinatesList = []
  			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[16:24]))
  			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[8:16]))
  			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[0:8]))
-			print coordinatesList[0]
-			print coordinatesList[1]
-			print coordinatesList[2]
 			return coordinatesList
 
 		return self.byteArray[4:len(self.byteArray) - 2][:-1]
@@ -48,7 +44,7 @@ class ParsePacket(object):
 		byteString = ""
 		for index in range(0, len(self.string)):
 			hexSymbol = self.typeConvertor.IntToHex(ord(str(self.string[index])))
-			print str(index) + ': ' + hexSymbol			
+			#print str(index) + ': ' + hexSymbol			
  			byteString = byteString + hexSymbol
 		byteString = bytearray.fromhex(byteString)
 		print 'end'

@@ -28,7 +28,7 @@ void TIM2_IRQHandler(void)
   //USB_OTG_BSP_TimerIRQ();
 }
 ////////////////////////////////////////////////////////////////////////////////
-void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регуляторов колес
+void TIM6_DAC_IRQHandler() // 100Hz  // Р Р°СЃСЃС‡РµС‚ РџРР” СЂРµРіСѓР»СЏС‚РѕСЂРѕРІ РєРѕР»РµСЃ
 {
 //static char i=0; // Divider by 2 to get 10Hz frequency
    //   set_pin(PWM_DIR[8]);
@@ -36,9 +36,9 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регуляторов колес
 
   TIM6->SR = 0;
   NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
-  GetDataForRegulators(); // обновление входных данных для ПИД
+  GetDataForRegulators(); // РѕР±РЅРѕРІР»РµРЅРёРµ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С… РґР»СЏ РџРР”
   NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
-  pidLowLevel();       // рассчет ПИД
+  pidLowLevel();       // СЂР°СЃСЃС‡РµС‚ РџРР”
    //   reset_pin(PWM_DIR[8]);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,34 +56,34 @@ void TIM7_IRQHandler() // 33kHz
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного регулятора
+void TIM8_UP_TIM13_IRQHandler() // СЂР°СЃСЃС‡РµС‚ С‚СЂР°РµРєС‚РѕСЂРЅРѕРіРѕ СЂРµРіСѓР»СЏС‚РѕСЂР°
 {
    // set_pin(PWM_DIR[8]);
 
   TIM13->SR = 0;
- NVIC_DisableIRQ(TIM6_DAC_IRQn);  //отключение ПИД на время расчета
+ NVIC_DisableIRQ(TIM6_DAC_IRQn);  //РѕС‚РєР»СЋС‡РµРЅРёРµ РџРР” РЅР° РІСЂРµРјСЏ СЂР°СЃС‡РµС‚Р°
 
 
 
-  if ((fabs(fabs(curPath.lengthTrace) - fabs(Coord_local_track[0])) < 0.02) && // достигнута заданная точка по положению и углу
-     (fabs(fabs(curPath.phiZad)-fabs(Coord_local_track[2])) < 0.02))
+  if ((fabs(fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0])) < 0.02) && // РґРѕСЃС‚РёРіРЅСѓС‚Р° Р·Р°РґР°РЅРЅР°СЏ С‚РѕС‡РєР° РїРѕ РїРѕР»РѕР¶РµРЅРёСЋ Рё СѓРіР»Сѓ
+     (fabs((curPath.phiZad)-(robotCoord[2])) < 0.02))
         {
-          traceFlag = 1;  // точка достигнута
+          traceFlag = 1;  // С‚РѕС‡РєР° РґРѕСЃС‚РёРіРЅСѓС‚Р°
         }
   else traceFlag =0;
  if (!movFlag)
-    if (points[0].movTask) movFlag=(points[0].movTask)(); else movFlag =1; // действие в процессе движения
+    if (points[0].movTask) movFlag=(points[0].movTask)(); else movFlag =1; // РґРµР№СЃС‚РІРёРµ РІ РїСЂРѕС†РµСЃСЃРµ РґРІРёР¶РµРЅРёСЏ
  if (traceFlag&&movFlag&&(!endFlag))
-    if (points[0].endTask) endFlag = ((char (*)(float))(points[0].endTask))(points[0].endTaskP1); else endFlag =1; // действие в конечной точке
+    if (points[0].endTask) endFlag = ((char (*)(float))(points[0].endTask))(points[0].endTaskP1); else endFlag =1; // РґРµР№СЃС‚РІРёРµ РІ РєРѕРЅРµС‡РЅРѕР№ С‚РѕС‡РєРµ
     if (traceFlag&&movFlag&&endFlag)
         {
-          if (lastPoint >0) //Остались ли точки в стеке
+          if (lastPoint >0) //РћСЃС‚Р°Р»РёСЃСЊ Р»Рё С‚РѕС‡РєРё РІ СЃС‚РµРєРµ
           {
             totalPointComplite++;
-            CreatePath(&points[1],&points[0],&curPath); // задать новый участок
+            CreatePath(&points[1],&points[0],&curPath); // Р·Р°РґР°С‚СЊ РЅРѕРІС‹Р№ СѓС‡Р°СЃС‚РѕРє
           }
 
-          removePoint(&points[0],&lastPoint); //удалить ткущую точку
+          removePoint(&points[0],&lastPoint); //СѓРґР°Р»РёС‚СЊ С‚РєСѓС‰СѓСЋ С‚РѕС‡РєСѓ
 
           endFlag=0;
           movFlag=0;
@@ -97,12 +97,12 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного регулятора
 
  if (curState.trackEn)
 {
-   TrackRegulator(&robotCoord[0],&robotSpeed[0], (&curPath),&vTargetGlob[0]); // расчет глобальных скоростей
+   TrackRegulator(&robotCoord[0],&robotSpeed[0], (&curPath),&vTargetGlob[0]); // СЂР°СЃС‡РµС‚ РіР»РѕР±Р°Р»СЊРЅС‹С… СЃРєРѕСЂРѕСЃС‚РµР№
 }
-   if (curState.kinemEn) FunctionalRegulator(&vTargetGlob[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
+   if (curState.kinemEn) FunctionalRegulator(&vTargetGlob[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // СЂР°СЃСЃС‡РµС‚  РєРёРЅРµРјР°С‚РёРєРё Рё РЅР°СЃС‹С‰РµРЅРёСЏ
 
   ////////////////////////////////////////////////////////////////////////////////
-  NVIC_EnableIRQ(TIM6_DAC_IRQn); //включение ПИД
+  NVIC_EnableIRQ(TIM6_DAC_IRQn); //РІРєР»СЋС‡РµРЅРёРµ РџРР”
     // reset_pin(PWM_DIR[8]);
 }
 
@@ -114,7 +114,7 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного регулятора
 
 
 
-//#define EXTI2_PIN               pin_id(PORTD,0)         //Разъем EXTI2//
+//#define EXTI2_PIN               pin_id(PORTD,0)         //Р Р°Р·СЉРµРј EXTI2//
 void EXTI0_IRQHandler(void)
 {
   EXTI->PR=0x1;
@@ -123,7 +123,7 @@ void EXTI0_IRQHandler(void)
   sendAnswer(0x1E,&temp, 1);
 }
 
-//#define EXTI5_PIN               pin_id(PORTD,1)         //Разъем EXTI5//
+//#define EXTI5_PIN               pin_id(PORTD,1)         //Р Р°Р·СЉРµРј EXTI5//
 void EXTI1_IRQHandler(void)
 {
   EXTI->PR=0x2;
@@ -132,7 +132,7 @@ void EXTI1_IRQHandler(void)
   sendAnswer(0x1E,&temp, 1);
 }
 
-//#define EXTI4_PIN               pin_id(PORTD,2)         //Разъем EXTI4//
+//#define EXTI4_PIN               pin_id(PORTD,2)         //Р Р°Р·СЉРµРј EXTI4//
 void EXTI2_IRQHandler(void)
 {
   EXTI->PR=0x4;
@@ -141,7 +141,7 @@ void EXTI2_IRQHandler(void)
   sendAnswer(0x1E,&temp, 1);
 }
 
-//#define EXTI6_PIN               pin_id(PORTD,3)         //Разъем EXTI6//
+//#define EXTI6_PIN               pin_id(PORTD,3)         //Р Р°Р·СЉРµРј EXTI6//
 void EXTI3_IRQHandler(void)
 {
   EXTI->PR=0x8;
@@ -151,7 +151,7 @@ void EXTI3_IRQHandler(void)
 
 }
 
-//#define EXTI9_PIN               pin_id(PORTE,4)         //Разъем EXTI9//
+//#define EXTI9_PIN               pin_id(PORTE,4)         //Р Р°Р·СЉРµРј EXTI9//
 void EXTI4_IRQHandler(void)
 {
   EXTI->PR=0x10;
@@ -161,8 +161,8 @@ void EXTI4_IRQHandler(void)
 
 }
 
-//#define EXTI7_PIN               pin_id(PORTD,6)         //Разъем EXTI7//
-//#define EXTI8_PIN               pin_id(PORTD,7)         //Разъем EXTI8//
+//#define EXTI7_PIN               pin_id(PORTD,6)         //Р Р°Р·СЉРµРј EXTI7//
+//#define EXTI8_PIN               pin_id(PORTD,7)         //Р Р°Р·СЉРµРј EXTI8//
 void EXTI9_5_IRQHandler(void)
 {
   if (EXTI->PR&(1<<6))
@@ -183,9 +183,9 @@ void EXTI9_5_IRQHandler(void)
 }
 
 
-//#define EXTI3_PIN               pin_id(PORTC,12)        //Разъем EXTI3//
-//#define EXTI10_PIN              pin_id(PORTC,13)        //Разъем EXTI10//*/
-//#define EXTI1_PIN               pin_id(PORTA,15)        //Разъем EXTI1///
+//#define EXTI3_PIN               pin_id(PORTC,12)        //Р Р°Р·СЉРµРј EXTI3//
+//#define EXTI10_PIN              pin_id(PORTC,13)        //Р Р°Р·СЉРµРј EXTI10//*/
+//#define EXTI1_PIN               pin_id(PORTA,15)        //Р Р°Р·СЉРµРј EXTI1///
 void EXTI15_10_IRQHandler(void)
 {
   if (EXTI->PR&(1<<12))

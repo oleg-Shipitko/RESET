@@ -48,7 +48,6 @@ int main(void)
 
    initAll();
 
-
       USBD_Init(&USB_OTG_dev,
 #ifdef USE_USB_OTG_HS
             USB_OTG_HS_CORE_ID,

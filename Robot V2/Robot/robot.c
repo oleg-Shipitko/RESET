@@ -14,23 +14,23 @@
 #include "init.h"
 
 
-float robotCoordTarget[3] = {0,0,0}; // Целевые координаты робота в глоб сис-ме координат
-float robotSpeedTarget[3] = {0,0,0}; // Целевые скорости робота в глоб сис-ме координат
-float motorSpeed[4];                // скорости моторов
-float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
-float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
-float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1,1,1};    // состояние регуляторов активен-1/неактвен -0
-encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
+float robotCoordTarget[3] = {0,0,0}; // Р¦РµР»РµРІС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ СЂРѕР±РѕС‚Р° РІ РіР»РѕР± СЃРёСЃ-РјРµ РєРѕРѕСЂРґРёРЅР°С‚
+float robotSpeedTarget[3] = {0,0,0}; // Р¦РµР»РµРІС‹Рµ СЃРєРѕСЂРѕСЃС‚Рё СЂРѕР±РѕС‚Р° РІ РіР»РѕР± СЃРёСЃ-РјРµ РєРѕРѕСЂРґРёРЅР°С‚
+float motorSpeed[4];                // СЃРєРѕСЂРѕСЃС‚Рё РјРѕС‚РѕСЂРѕРІ
+float motorCoord[4] = {0,0,0};      // РѕР±С‰РёР№ РїСЂРѕР№РґРµРЅРЅС‹Р№ РєРѕР»РµСЃРѕРј РїСѓС‚СЊ
+float robotCoord[3] = {0,0,0};       // РљРѕРѕСЂРґРёРЅР°С‚С‹ СЂРѕР±РѕС‚Р° РїРѕ РїРѕРєР°Р·Р°РЅРёСЏРј РёР·РјРµСЂРёС‚РµР»СЊРЅРѕР№ С‚РµР»РµР¶РєРё
+float robotSpeed[3] = {0,0,0};       // СЃРєРѕСЂРѕСЃС‚СЊ СЂРѕР±РѕС‚Р° РїРѕ РїРѕРєР°Р·Р°РЅРёСЏРј РёР·РјРµСЂРёС‚РµР»СЊРЅРѕР№ С‚РµР»РµР¶РєРё
+robStateStruct curState = {1,1,1};    // СЃРѕСЃС‚РѕСЏРЅРёРµ СЂРµРіСѓР»СЏС‚РѕСЂРѕРІ Р°РєС‚РёРІРµРЅ-1/РЅРµР°РєС‚РІРµРЅ -0
+encOutPackStruct outEnc;              //Р±СѓС„РµСЂ РґР°РЅРЅС‹С… РѕС‚РїСЂР°РІР»СЏРµРјС‹С… РёР·РјРµСЂРёС‚РµР»СЊРЅРѕР№ С‚РµР»РµР¶РєРµ
 
-char param[30] ;                      //буфер параметров входящих команд
-char inData[64];                      //Входной буфер данных
-char outData[30];                     //Выходной буфер данных
-char dataIndex;                       //счетчик количества байт во входящем пакете
-InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
+char param[30] ;                      //Р±СѓС„РµСЂ РїР°СЂР°РјРµС‚СЂРѕРІ РІС…РѕРґСЏС‰РёС… РєРѕРјР°РЅРґ
+char inData[64];                      //Р’С…РѕРґРЅРѕР№ Р±СѓС„РµСЂ РґР°РЅРЅС‹С…
+char outData[30];                     //Р’С‹С…РѕРґРЅРѕР№ Р±СѓС„РµСЂ РґР°РЅРЅС‹С…
+char dataIndex;                       //СЃС‡РµС‚С‡РёРє РєРѕР»РёС‡РµСЃС‚РІР° Р±Р°Р№С‚ РІРѕ РІС…РѕРґСЏС‰РµРј РїР°РєРµС‚Рµ
+InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //СЃС‚СЂСѓРєС‚СѓСЂР° РІС…РѕРґСЏС‰РµРіРѕ РїР°РєРµС‚Р°
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
-                          BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
+                          BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //СЂРµРіРёСЃС‚СЂС‹ СЃСЂР°РІРЅРµРЅРёСЏ РєР°РЅР°Р»РѕРІ РЁРРњ
 uint32_t  PWM_DIR[10] ={BTN1_DIR_PIN,BTN2_DIR_PIN,
                           BTN3_DIR_PIN,BTN4_DIR_PIN,
                           BTN5_DIR_PIN,BTN6_DIR_PIN,
@@ -50,9 +50,9 @@ uint32_t  V12_PIN[6] ={PIN5_12V,PIN6_12V,
                             PIN3_12V,PIN4_12V,
                             PIN5_12V,PIN6_12V};
 
-uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
+uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT};  //РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№ РЅР° СЃС‡РµС‚С‡РёРєРё СЌРЅРєРѕРґРµСЂРѕРІ РєРѕР»РµСЃ
 
-char  WHEELS[4]= {WHEEL1_CH,WHEEL2_CH,WHEEL3_CH,WHEEL4_CH}; //каналы подкючения колес
+char  WHEELS[4]= {WHEEL1_CH,WHEEL2_CH,WHEEL3_CH,WHEEL4_CH}; //РєР°РЅР°Р»С‹ РїРѕРґРєСЋС‡РµРЅРёСЏ РєРѕР»РµСЃ
 
 uint16_t adcData[10];
 uint8_t pinType[10];
@@ -63,7 +63,7 @@ uint16_t extiFlag;
 
 extern CDC_IF_Prop_TypeDef  APP_FOPS;
 
-char setVoltage(char ch, float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
+char setVoltage(char ch, float duty) // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РЅР°РїСЂСЏР¶РµРЅРёРµ РЅР° РІС‹С…РѕРґРµ СѓРїСЂР°РІР»РµРЅРёСЏ РґРІРёРіР°С‚РµР»РµРј -1,0 .. 1,0
 {
     if (duty>1 )duty=1;
     if (duty<-1 )duty=-1;
@@ -81,7 +81,7 @@ char setVoltage(char ch, float duty) // установить напряжение на выходе управлен
     return 0;
 }
 
-char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,0
+char setPWM(char ch, float duty) // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ Р·Р°РїРѕР»РЅРµРЅРёРµ РЅР° РІС‹С…РѕРґРµ РЁРРњ  0 .. 1,0
 {
     if (duty>1 )duty=1;
     if (duty<0 )duty=0;
@@ -89,26 +89,26 @@ char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,
     return 0;
 }
 
-void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в потоке данных
+void pushByte(char inByte) // РїРѕРёСЃРє, С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ Рё РїСЂРѕРІРµСЂРєР° РІС…РѕРґСЏС‰РµРіРѕ РїР°РєРµС‚Р° РІ РїРѕС‚РѕРєРµ РґР°РЅРЅС‹С…
 {
   char j;
   uint16_t checkSum;
   uint16_t * test;
   inData[dataIndex++] = inByte;
 
-  if((inData[0] == SYNC_BYTE) && (inData[1] == ADR_BYTE))  //поиск заголовка
+  if((inData[0] == SYNC_BYTE) && (inData[1] == ADR_BYTE))  //РїРѕРёСЃРє Р·Р°РіРѕР»РѕРІРєР°
   {
-    if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //проверка длинны пакета
+    if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //РїСЂРѕРІРµСЂРєР° РґР»РёРЅРЅС‹ РїР°РєРµС‚Р°
     {
       checkSum = packetCheck(&inData[0], inData[2] - CHECK_SIZE);
       test = ( uint16_t *) &inData[inData[2] - CHECK_SIZE];
-      if (*test == checkSum) // проверка CRC
+      if (*test == checkSum) // РїСЂРѕРІРµСЂРєР° CRC
       {
         inCommand.packLen = inData[2];
-        for (j=0; j < inCommand.packLen - CHECK_SIZE - HEADER_SIZE; j++)  //Копирование параметров
+        for (j=0; j < inCommand.packLen - CHECK_SIZE - HEADER_SIZE; j++)  //РљРѕРїРёСЂРѕРІР°РЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ
                       *(inCommand.param + j) = inData[4 + j];
         inCommand.command = inData[3];
-        execCommand(&inCommand);     //выполнение команды
+        execCommand(&inCommand);     //РІС‹РїРѕР»РЅРµРЅРёРµ РєРѕРјР°РЅРґС‹
       }
       dataIndex = 0;
       inData[0] = 0;
@@ -133,7 +133,7 @@ extern uint32_t APP_Rx_ptr_in;    /* Increment this pointer or roll it back to
                                      start address when writing received data
                                      in the buffer APP_Rx_Buffer. */
 
-char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
+char sendAnswer(char cmd, char * param, int paramSize) // РѕС‚РїСЂР°РІРёС‚СЊ РѕС‚РІРµС‚ РїРѕ USB
 {
          //    __disable_irq();
          outData[0] = 0xFA;
@@ -168,12 +168,12 @@ char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
          return paramSize + HEADER_SIZE + CHECK_SIZE;
 }
 
-char execCommand(InPackStruct* cmd) //обработать входящую команду
+char execCommand(InPackStruct* cmd) //РѕР±СЂР°Р±РѕС‚Р°С‚СЊ РІС…РѕРґСЏС‰СѓСЋ РєРѕРјР°РЅРґСѓ
 {
 
 switch(cmd->command)
 {
-  case 0x01: //Эхо
+  case 0x01: //Р­С…Рѕ
     {
      char *key=  cmd->param;
 
@@ -185,7 +185,7 @@ switch(cmd->command)
       }
   break;
 
-  case 0x02:  //Установить текущие координаты
+  case 0x02:  //РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РµРєСѓС‰РёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹
   {
       float *(temp) ={(float*)cmd->param};
       robotCoord[0]= temp[0];
@@ -205,7 +205,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x03: //установить скважность шим
+  case 0x03: //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРєРІР°Р¶РЅРѕСЃС‚СЊ С€РёРј
   {
       char  ch = *cmd->param;
       float  temp =*((float*)(cmd->param+1));
@@ -216,7 +216,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x04:  //Установить бит направления
+  case 0x04:  //РЈСЃС‚Р°РЅРѕРІРёС‚СЊ Р±РёС‚ РЅР°РїСЂР°РІР»РµРЅРёСЏ
   {
       char * ch = cmd->param;
       set_pin(PWM_DIR[(*ch)-1]);
@@ -226,7 +226,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x05:  //Снять бит направления
+  case 0x05:  //РЎРЅСЏС‚СЊ Р±РёС‚ РЅР°РїСЂР°РІР»РµРЅРёСЏ
   {
       char * ch = cmd->param;
       reset_pin(PWM_DIR[(*ch)-1]);
@@ -235,7 +235,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x06:  //Установить напряжение на двигателе
+  case 0x06:  //РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РЅР°РїСЂСЏР¶РµРЅРёРµ РЅР° РґРІРёРіР°С‚РµР»Рµ
   {
       char  ch = *cmd->param;
       float temp = *((float*)(cmd->param+1));
@@ -245,7 +245,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x08:  //Установить параметры регулятора
+  case 0x08:  //РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїР°СЂР°РјРµС‚СЂС‹ СЂРµРіСѓР»СЏС‚РѕСЂР°
   {
       float *(temp) ={(float*)cmd->param};
       char i;
@@ -260,7 +260,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x09:  //Установить требуюему скорость двигателей
+  case 0x09:  //РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚СЂРµР±СѓСЋРµРјСѓ СЃРєРѕСЂРѕСЃС‚СЊ РґРІРёРіР°С‚РµР»РµР№
   {
       float *(temp) ={(float*)cmd->param};
       char i;
@@ -273,7 +273,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x0B:  //Включить рассчет кинематики
+  case 0x0B:  //Р’РєР»СЋС‡РёС‚СЊ СЂР°СЃСЃС‡РµС‚ РєРёРЅРµРјР°С‚РёРєРё
   {
       curState.kinemEn=1;
       char * str ="Ok";
@@ -281,7 +281,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x0C:  //Выключить рассчет кинематики
+  case 0x0C:  //Р’С‹РєР»СЋС‡РёС‚СЊ СЂР°СЃСЃС‡РµС‚ РєРёРЅРµРјР°С‚РёРєРё
   {
       curState.kinemEn=0;
       char * str ="Ok";
@@ -289,7 +289,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x0D:  //Задать скорости движения
+  case 0x0D:  //Р—Р°РґР°С‚СЊ СЃРєРѕСЂРѕСЃС‚Рё РґРІРёР¶РµРЅРёСЏ
   {
       float *(temp) ={(float*)cmd->param};
       char i;
@@ -302,7 +302,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x0E:  //Включить траекторный регулятор
+  case 0x0E:  //Р’РєР»СЋС‡РёС‚СЊ С‚СЂР°РµРєС‚РѕСЂРЅС‹Р№ СЂРµРіСѓР»СЏС‚РѕСЂ
   {
       curState.trackEn=1;
       char * str ="Ok";
@@ -310,7 +310,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x0F:  //Выключить траекторный регулятор
+  case 0x0F:  //Р’С‹РєР»СЋС‡РёС‚СЊ С‚СЂР°РµРєС‚РѕСЂРЅС‹Р№ СЂРµРіСѓР»СЏС‚РѕСЂ
   {
       curState.trackEn=0;
       char * str ="Ok";
@@ -318,7 +318,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x10:  //очистить стек точек
+  case 0x10:  //РѕС‡РёСЃС‚РёС‚СЊ СЃС‚РµРє С‚РѕС‡РµРє
   {
       while(lastPoint>0) removePoint(&points[0],&lastPoint);
       points[0].center[0]= robotCoord[0];
@@ -330,7 +330,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x11:  //Добавить точку в стек
+  case 0x11:  //Р”РѕР±Р°РІРёС‚СЊ С‚РѕС‡РєСѓ РІ СЃС‚РµРє
   {
 
       float *(temp) ={(float*)(cmd->param)};
@@ -341,14 +341,14 @@ switch(cmd->command)
       points[lastPoint].center[1] = temp[1];
       points[lastPoint].center[2] = temp[2];
       points[lastPoint].speedVelTipe = speedType[*ch];
-      points[lastPoint].speedRotTipe = speedType[*(ch)];
+      points[lastPoint].speedRotTipe = rotType[*(ch)];
       points[lastPoint].endTask=NULL;
       points[lastPoint].movTask =NULL;
       sendAnswer(cmd->command,str, 3);
   }
   break;
 
-  case 0x12:  //Состояние стека точек
+  case 0x12:  //РЎРѕСЃС‚РѕСЏРЅРёРµ СЃС‚РµРєР° С‚РѕС‡РµРє
   {
       char outdata[15];
       float * temp =(float*)(&outdata[3]);
@@ -364,14 +364,14 @@ switch(cmd->command)
   }
   break;
 
-  case 0x13:  //отправить текущие координаты
+  case 0x13:  //РѕС‚РїСЂР°РІРёС‚СЊ С‚РµРєСѓС‰РёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹
   {
 
       sendAnswer(cmd->command,(char *)robotCoord, sizeof(robotCoord));
   }
   break;
 
-  case 0x14:  //отправить текущую скорость
+  case 0x14:  //РѕС‚РїСЂР°РІРёС‚СЊ С‚РµРєСѓС‰СѓСЋ СЃРєРѕСЂРѕСЃС‚СЊ
   {
 
 
@@ -379,7 +379,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x15:  //Задать скорость движения
+  case 0x15:  //Р—Р°РґР°С‚СЊ СЃРєРѕСЂРѕСЃС‚СЊ РґРІРёР¶РµРЅРёСЏ
   {
       float *(temp) ={(float*)(cmd->param)};
       char i;
@@ -395,7 +395,7 @@ switch(cmd->command)
   }
   break;
 
-   case 0x16:  //установить режим ножки
+   case 0x16:  //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СЂРµР¶РёРј РЅРѕР¶РєРё
    {
 
     char ch = (*((char *)(cmd->param))) -1;
@@ -415,7 +415,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x17:  //отправить состояние выбранного входа АЦП
+  case 0x17:  //РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РІС…РѕРґР° РђР¦Рџ
   {
       char ch = (*((char *)(cmd->param))) -1;
     if (ch<10)
@@ -423,13 +423,13 @@ switch(cmd->command)
   }
   break;
 
-  case 0x18:  //отправить состояние всех АЦП
+  case 0x18:  //РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІСЃРµС… РђР¦Рџ
   {
       sendAnswer(cmd->command,(char *)adcData, sizeof(adcData));
   }
   break;
 
-  case 0x19:  //отправить состояние входа
+  case 0x19:  //РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІС…РѕРґР°
   {
     char ch = (*((char *)(cmd->param))) -1;
     if (ch<10)
@@ -440,7 +440,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x1A:  //отправить состояние всех входов
+  case 0x1A:  //РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІСЃРµС… РІС…РѕРґРѕРІ
   {
       char temp[10];
       char i ;
@@ -449,7 +449,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x1B:  //установить состояние выхода
+  case 0x1B:  //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІС‹С…РѕРґР°
   {
       char ch = (*((char *)(cmd->param))) -1;
       if (ch<10)
@@ -460,7 +460,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x1C:  //отправить текущий режим ножки
+  case 0x1C:  //РѕС‚РїСЂР°РІРёС‚СЊ С‚РµРєСѓС‰РёР№ СЂРµР¶РёРј РЅРѕР¶РєРё
   {
     char ch = (*((char *)(cmd->param))) -1;
     if (ch<10)
@@ -468,7 +468,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x1D:  //установить режим ножки EXTI
+  case 0x1D:  //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СЂРµР¶РёРј РЅРѕР¶РєРё EXTI
   {
 
     char ch = (*((char *)(cmd->param))) -1;
@@ -511,7 +511,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x1E:  //отправить состояние входа
+  case 0x1E:  //РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІС…РѕРґР°
   {
     char ch = *((char *)(cmd->param))-1;
     if ((ch)<10)
@@ -523,7 +523,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x1F:  //отправить состояние всех входов
+  case 0x1F:  //РѕС‚РїСЂР°РІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІСЃРµС… РІС…РѕРґРѕРІ
   {
 
       char temp[10];
@@ -533,7 +533,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x20:  //установить состояние выхода
+  case 0x20:  //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІС‹С…РѕРґР°
   {
        char ch = *((char *)(cmd->param))-1;
       if (ch<10)
@@ -544,7 +544,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x21:  //отправить текущий режим ножки
+  case 0x21:  //РѕС‚РїСЂР°РІРёС‚СЊ С‚РµРєСѓС‰РёР№ СЂРµР¶РёРј РЅРѕР¶РєРё
   {
     char ch = *((char *)(cmd->param))-1;
     if (ch<10)
@@ -552,7 +552,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x22:  //установить состояние выхода +12В
+  case 0x22:  //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІС‹С…РѕРґР° +12Р’
   {
       char ch = (*((char *)(cmd->param)))-1;
       if (ch<6)
@@ -567,7 +567,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x23:  //Выключить ПИД регуляторы приводов
+  case 0x23:  //Р’С‹РєР»СЋС‡РёС‚СЊ РџРР” СЂРµРіСѓР»СЏС‚РѕСЂС‹ РїСЂРёРІРѕРґРѕРІ
   {
       curState.pidEnabled=0;
       char * str ="Ok";
@@ -575,7 +575,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x24:  //Включить ПИД регуляторы приводов
+  case 0x24:  //Р’РєР»СЋС‡РёС‚СЊ РџРР” СЂРµРіСѓР»СЏС‚РѕСЂС‹ РїСЂРёРІРѕРґРѕРІ
   {
       curState.pidEnabled=1;
       char * str ="Ok";

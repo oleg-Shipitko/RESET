@@ -20,24 +20,36 @@ class SerialWrapper(object) :
 		return self.SerialPort.readline()
 
 	# send data and recieve answer
-	def sendRequest(self, dataToSend, timeout = 5):	
-		# read all previous answers (clean buffer)
-		self.SerialPort.readline()
+	def sendRequest(self, dataToSend, timeout = 0.01):	
+		# read all previous answers (clean buffer)		
+		self.SerialPort.flushInput()
+		self.SerialPort.flushOutput()			
 		self.SerialPort.write(dataToSend)
 		sendRequestTime = time.time()
 		requestRecieved = False
 		recievedPacket = ""
-		
-		while (requestRecieved == False and (time.time() - sendRequestTime) < timeout):
-			recievedData = self.SerialPort.readline()			
+
+		startT1 = time.time()
+		while (requestRecieved == False): # and (time.time() - sendRequestTime) < timeout):
+			bytesToRead = self.SerialPort.inWaiting()
+			print 'First bytes: ', bytesToRead
+			if bytesToRead > 0:
+				time.sleep(0.01)
+				bytesToRead2 = self.SerialPort.inWaiting()	
+				print 'Second bytes: ', bytesToRead2
+				#if bytesToRead2 != bytesToRead:
+				#	print 'Difference: ', (bytesToRead2 - bytesToRead)
+				#	raise Exception('Too Slow') 					
+			recievedData = self.SerialPort.read(bytesToRead2)
+			print 'Data: ', recievedData		
 			if len(recievedData) is not 0:			
 				recievedPacket = packetParser.ParsePacket(recievedData)
 				requestRecieved = True
 
 		if recievedPacket == "" or requestRecieved == False:
-			print 1				
-		#raise Exception("Reply was not recieved")			
-
+			raise Exception("Reply was not recieved")			
+		endT1 = time.time()
+		print 'While loop ', (endT1 - startT1)
 		return recievedPacket
 
 

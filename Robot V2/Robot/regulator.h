@@ -4,8 +4,8 @@
 #include "stm32f4xx.h"
 #include "Path.h"
 
-#define MAX_WHEEL_SPEED	    0.6// м/с
-#define MAX_RAD_SPEED       2.7 // рад/с
+#define MAX_WHEEL_SPEED	    0.6// Рј/СЃ
+#define MAX_RAD_SPEED       2.7 // СЂР°Рґ/СЃ
 #define LINE_SPEED_WEIGHT   0.8
 #define ROTATE_SPEED_WEIGHT 1-LINE_SPEED_WEIGHT
 
@@ -15,14 +15,14 @@
 #define PHI_RAD             0.5236
 #define distA	 	    0.31819
 #define distB		    0.2625
-#define RO                  (0.024)           // Радиус колес
-#define L                   (0.14)         // Расстояние от центра робота до плоскости колеса энкодера
+#define RO                  (0.024)           // Р Р°РґРёСѓСЃ РєРѕР»РµСЃ
+#define L                   (0.14)         // Р Р°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ С†РµРЅС‚СЂР° СЂРѕР±РѕС‚Р° РґРѕ РїР»РѕСЃРєРѕСЃС‚Рё РєРѕР»РµСЃР° СЌРЅРєРѕРґРµСЂР°
 #define JOYST_RAD_VEL_KOFF  MAX_RAD_SPEED/128.0 //(MAX_WHEEL_SPEED/distA/128.0/5.0)
 #define DISKR_TO_REAL       (2.0*PI*RO/2800.0)
 #define ONE_RO_COS_PHI      1.0                   // 23.0947
 //#define COFF_TO_RAD         (2.0*PI/(4658.346666667))
-#define MAX_CAPACITANCE     0.6 //(120.0*DISKR_TO_REAL/PID_PERIOD)*1.5   // Максимальный вектор задания на ПИДЫ
-#define KOFF_ORTO_TRACE     0.9    // Коэффициент траекторной ошибки траекторного регулятора
+#define MAX_CAPACITANCE     0.6 //(120.0*DISKR_TO_REAL/PID_PERIOD)*1.5   // РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ РІРµРєС‚РѕСЂ Р·Р°РґР°РЅРёСЏ РЅР° РџРР”Р«
+#define KOFF_ORTO_TRACE     0.9    // РљРѕСЌС„С„РёС†РёРµРЅС‚ С‚СЂР°РµРєС‚РѕСЂРЅРѕР№ РѕС€РёР±РєРё С‚СЂР°РµРєС‚РѕСЂРЅРѕРіРѕ СЂРµРіСѓР»СЏС‚РѕСЂР°
 #define PID_PERIOD          (1.0/100.0)
 
 #define ENC_SET_CUR_POS   1
@@ -35,19 +35,19 @@
 
 typedef struct
 {
-  float p_k; //П коэфициент
-  float i_k; //И коэфициент
-  float d_k; //Д коэфициент
-  float target; //Целевое значение
-  float current; //Текущее (необходимо обновлять извне перед каждым расчетом)
-  float prev_error; //Предыдущее значение ошибки (для Д регелятора)
-  float sum_error; //Суммарная ошибка (для И регулятора)
-  float max_sum_error; //Максимальная суммарная ошибка (что бы И регулятор не уходил до максимума если невозможно добиться требуемого значения)
-  float max_output; //Максимальный выход, что бы поправка не выходила за рамки
+  float p_k; //Рџ РєРѕСЌС„РёС†РёРµРЅС‚
+  float i_k; //Р РєРѕСЌС„РёС†РёРµРЅС‚
+  float d_k; //Р” РєРѕСЌС„РёС†РёРµРЅС‚
+  float target; //Р¦РµР»РµРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+  float current; //РўРµРєСѓС‰РµРµ (РЅРµРѕР±С…РѕРґРёРјРѕ РѕР±РЅРѕРІР»СЏС‚СЊ РёР·РІРЅРµ РїРµСЂРµРґ РєР°Р¶РґС‹Рј СЂР°СЃС‡РµС‚РѕРј)
+  float prev_error; //РџСЂРµРґС‹РґСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ РѕС€РёР±РєРё (РґР»СЏ Р” СЂРµРіРµР»СЏС‚РѕСЂР°)
+  float sum_error; //РЎСѓРјРјР°СЂРЅР°СЏ РѕС€РёР±РєР° (РґР»СЏ Р СЂРµРіСѓР»СЏС‚РѕСЂР°)
+  float max_sum_error; //РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ СЃСѓРјРјР°СЂРЅР°СЏ РѕС€РёР±РєР° (С‡С‚Рѕ Р±С‹ Р СЂРµРіСѓР»СЏС‚РѕСЂ РЅРµ СѓС…РѕРґРёР» РґРѕ РјР°РєСЃРёРјСѓРјР° РµСЃР»Рё РЅРµРІРѕР·РјРѕР¶РЅРѕ РґРѕР±РёС‚СЊСЃСЏ С‚СЂРµР±СѓРµРјРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ)
+  float max_output; //РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ РІС‹С…РѕРґ, С‡С‚Рѕ Р±С‹ РїРѕРїСЂР°РІРєР° РЅРµ РІС‹С…РѕРґРёР»Р° Р·Р° СЂР°РјРєРё
   float min_output;
   float cut_output;
-  float output; //Поправка, результат работы ПИД
-  char pid_on; //Вкл/Выкл ПИД если выкл то output всегда равен 0, однако все остальное продолжает расчитываться
+  float output; //РџРѕРїСЂР°РІРєР°, СЂРµР·СѓР»СЊС‚Р°С‚ СЂР°Р±РѕС‚С‹ РџРР”
+  char pid_on; //Р’РєР»/Р’С‹РєР» РџРР” РµСЃР»Рё РІС‹РєР» С‚Рѕ output РІСЃРµРіРґР° СЂР°РІРµРЅ 0, РѕРґРЅР°РєРѕ РІСЃРµ РѕСЃС‚Р°Р»СЊРЅРѕРµ РїСЂРѕРґРѕР»Р¶Р°РµС‚ СЂР°СЃС‡РёС‚С‹РІР°С‚СЊСЃСЏ
   char pid_finish;
   float error_dir;
   float pid_error_end;
@@ -68,14 +68,14 @@ typedef struct
 }pathPointStr;
 
 extern Path curPath;
-extern float Coord_local_track[3];
+//extern float Coord_local_track[3];
 extern pathPointStr points[POINT_STACK_SIZE];
 extern char lastPoint;
-extern float normalVel[5];//V_уст, V_нач, V_кон, А_уск, А_торм
+extern float normalVel[5];//V_СѓСЃС‚, V_РЅР°С‡, V_РєРѕРЅ, Рђ_СѓСЃРє, Рђ_С‚РѕСЂРј
 extern float stopVel[5]; //{0.2,0.1,-0.05,0.2,0.7};
 extern float standVel[5];
 
-extern float normalRot[5];//V_уст, V_нач, V_кон, А_уск, А_торм
+extern float normalRot[5];//V_СѓСЃС‚, V_РЅР°С‡, V_РєРѕРЅ, Рђ_СѓСЃРє, Рђ_С‚РѕСЂРј
 extern float stopRot[5]; //{0.2,0.1,-0.1,0.3,0.6};
 extern float standRot[5];
 extern float * speedType[3];
@@ -85,10 +85,10 @@ extern float regulatorOut[4];
 extern uint16_t totalPointComplite;
 
 
-void pidCalc(PidStruct *pid_control); //Расчитать ПИД, в качестве параметра - указатель на структуру
+void pidCalc(PidStruct *pid_control); //Р Р°СЃС‡РёС‚Р°С‚СЊ РџРР”, РІ РєР°С‡РµСЃС‚РІРµ РїР°СЂР°РјРµС‚СЂР° - СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЃС‚СЂСѓРєС‚СѓСЂСѓ
 void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur, float *V_out);
-void pidWheelsFinishWait(void); // Ожидание окончания регулирования пидов колес
-void pidLowLevel(void); // Пид нижнего уровня - колеса
+void pidWheelsFinishWait(void); // РћР¶РёРґР°РЅРёРµ РѕРєРѕРЅС‡Р°РЅРёСЏ СЂРµРіСѓР»РёСЂРѕРІР°РЅРёСЏ РїРёРґРѕРІ РєРѕР»РµСЃ
+void pidLowLevel(void); // РџРёРґ РЅРёР¶РЅРµРіРѕ СѓСЂРѕРІРЅСЏ - РєРѕР»РµСЃР°
 void GetDataForRegulators(void);
 void infnormvect(float *a,char rows,float *b);
 void Cost(float *inpMatr,char rows,float cost,float *outKoff);
@@ -97,6 +97,8 @@ void TrackRegulator(float *Coord_cur, float* speedCur, Path *cur, float *V);//vo
 //void TrackRegulator(float *Coord_cur,Path *cur, float *V);
 float linars(float *x, float *x0, float *x1);
 void Moving(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_out);
+void RotMoving(float Start_a, float Coord_a_cur, float Coord_a_targ, float* parameters, float* v_out) ;//Г°Г Г±Г·ГҐГІ Г±ГЄГ®Г°Г®Г±ГІГЁ Гў Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ Г®ГІ ГЇГ°Г®Г©Г¤ГҐГ­Г­Г®ГЈГ® ГЇГіГІГЁ
+
 void initRegulators(void);
 void vectorAngle(float x, float y, float* angle);
 void moving2(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_out);
