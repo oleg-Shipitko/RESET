@@ -17,15 +17,15 @@ void adcConfig()
   ADC1->SQR1 |= ADC1_NUMB << 20;
   ADC1->SQR3 |= 9  | (8 << 5)  | (7 << 10)  | (6 << 15) | (5 << 20) | (4 << 25);
   ADC1->SQR2 |= 3| (2 << 5)  | (12 << 10)  | (11 << 15) ;
-  
+
 //  ADC1->SMPR2 |= (7 << 12) | (7 << 15) | (7 << 24) | (7 << 27);
 //  ADC1->SMPR1 |= (7 << 3) | (7 << 6) | (7 << 9);
-  
-  ADC1->CR1 |= ADC_SCAN_MODE ; //Режим сканирования. Разрешение 12 бит. 
-  ADC1->CR2 |= ADC_CR2_DMA|ADC_CR2_CONT|ADC_CR2_DDS; //Разрешаем использование 
+
+  ADC1->CR1 |= ADC_SCAN_MODE ; //Режим сканирования. Разрешение 12 бит.
+  ADC1->CR2 |= ADC_CR2_DMA|ADC_CR2_CONT|ADC_CR2_DDS; //Разрешаем использование
   //режима DMA. АЦП будет формировать запрос DMA после каждого преобразования.
 
-  DMA2_Stream0->CR |= 0 << 25;        //Выбираем channel 0 
+  DMA2_Stream0->CR |= 0 << 25;        //Выбираем channel 0
   DMA2_Stream0->PAR |= (uint32_t) &ADC1->DR;//Задаем адрес периферии - регистр результата преобразования АЦП для регулярных каналов.
   DMA2_Stream0->M0AR |= (uint32_t) &adcData; //Задаем адрес памяти - базовый адрес массива в RAM.
   DMA2_Stream0->CR &= ~DMA_SxCR_DIR; //Направление передачи данных - чтение из периферии, запись в память.
@@ -41,16 +41,5 @@ void adcConfig()
   DMA2_Stream0->CR |= DMA_SxCR_EN | DMA_SxCR_TCIE; //Разрешаем работу канала 1 DMA
   ADC1->CR2 |= ADC_CR2_ADON; //Включаем АЦП
   ADC1->CR2 |= ADC_CR2_SWSTART;
-}
-////////////////////////////////////////////////////////////////////////////////
-float getLowDist(int value) 
-{
-  double volts;
-  float cm;
-
-  volts = (double)value * VOLTS_PER_UNIT; // ("proxSens" is from analog read)
-  cm = 31.5 * pow(volts,-1.1904);     // same in cm
-  if (cm < 10.05) cm = -1.0;        // out of range 
-  return cm;
 }
 ////////////////////////////////////////////////////////////////////////////////

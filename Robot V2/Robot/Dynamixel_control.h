@@ -29,6 +29,29 @@ on an STM32F4 chip.
 #define CW  0x0400
 #define CCW 0x0000
 
+#define RETURN_DELAY        0x05
+#define BLINK_CONDITIONS    0x11
+#define SHUTDOWN_CONDITIONS 0x12
+#define TORQUE              0x22
+#define CURRENT_LOAD        0x28
+#define MOVING_SPEED        0x20
+#define CURRENT_SPEED       0x26
+#define GOAL_ANGLE          0x1e
+#define CURRENT_ANGLE       0x24
+#define CW_ANGLE_LIMIT      0x06
+#define CCW_ANGLE_LIMIT     0x08
+
+typedef enum ServoCommand
+{
+    PING = 1,
+    READ = 2,
+    WRITE = 3
+} ServoCommand;
+
+volatile uint8_t receiveBuffer[REC_BUFFER_LEN];
+volatile uint8_t* volatile receiveBufferStart = receiveBuffer;
+volatile uint8_t* volatile receiveBufferEnd = receiveBuffer;
+
 extern uint8_t servoErrorCode;
 
 

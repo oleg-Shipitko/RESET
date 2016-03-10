@@ -17,30 +17,6 @@ uint8_t servoErrorCode = 0;
 
 ServoResponse response;
 
-volatile uint8_t receiveBuffer[REC_BUFFER_LEN];
-volatile uint8_t* volatile receiveBufferStart = receiveBuffer;
-volatile uint8_t* volatile receiveBufferEnd = receiveBuffer;
-
-typedef enum ServoCommand
-{
-    PING = 1,
-    READ = 2,
-    WRITE = 3
-} ServoCommand;
-
-#define RETURN_DELAY        0x05
-#define BLINK_CONDITIONS    0x11
-#define SHUTDOWN_CONDITIONS 0x12
-#define TORQUE              0x22
-#define CURRENT_LOAD        0x28
-#define MOVING_SPEED        0x20
-#define CURRENT_SPEED       0x26
-#define GOAL_ANGLE          0x1e
-#define CURRENT_ANGLE       0x24
-#define CW_ANGLE_LIMIT      0x06
-#define CCW_ANGLE_LIMIT     0x08
-
-
 void sendServoCommand (const uint8_t servoId,
                        const ServoCommand commandByte,
                        const uint8_t numParams,
@@ -531,19 +507,4 @@ uint8_t getServoByte (void)
     return *receiveBufferStart;
 }
 
-void USART3_IRQHandler (void)
-{
-	// check if the USART3 receive interrupt flag was set
-	if (USART_GetITStatus (USART3, USART_IT_RXNE))
-	{
-		const uint8_t byte = (uint8_t)USART_ReceiveData (USART3); // grab the byte from the data register
-
-        receiveBufferEnd++;
-        if (receiveBufferEnd >= receiveBuffer + REC_BUFFER_LEN)
-            receiveBufferEnd = receiveBuffer;
-
-        *receiveBufferEnd = byte;
-	}
-
-}
 

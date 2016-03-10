@@ -4793,7 +4793,7 @@
 1454778570 source:c:\users\student\desktop\shipitko oleg\robot v2\robot v2\src\system_stm32f4xx.c
 	"stm32f4xx.h"
 
-1416066666 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\adc.c
+1457614050 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\adc.c
 	"adc.h"
 	"math.h"
 	"stm32f4xx.h"
@@ -4938,7 +4938,7 @@
 	"stm32f4xx_rcc.h"
 	"stm32f4xx_conf.h"
 
-1457190886 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.c
+1457614310 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.c
 	"Interrupts.h"
 	"gpio.h"
 	"Regulator.h"
@@ -4947,6 +4947,7 @@
 	<math.h>
 	"usart.h"
 	"robot.h"
+	"dynamixel_control.h"
 
 1416069810 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.h
 	"stm32f4xx.h"
@@ -5087,7 +5088,7 @@
 
 1416068290 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\matrix.h
 
-1457189873 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\robot.c
+1457191291 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\robot.c
 	"robot.h"
 	"pins.h"
 	"usart.h"
@@ -5318,13 +5319,13 @@
 	<math.h>
 	"adc.h"
 
-1457007396 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\dynamixel_control.c
+1457614277 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\dynamixel_control.c
 	"stm32f4xx_conf.h"
 	"stm32f4xx_gpio.h"
 	"stm32f4xx_usart.h"
 	"Dynamixel_control.h"
 
-1457007394 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\dynamixel_control.h
+1457614150 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\dynamixel_control.h
 	<inttypes.h>
 	<stdbool.h>
 	<stdlib.h>
