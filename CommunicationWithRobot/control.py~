@@ -59,7 +59,7 @@ def globMov():
 	x = float(raw_input('X: '))
 	y = float(raw_input('Y: '))
 	fi = float(raw_input('angle: '))
-	speed = int(raw_input('speed type (1 = normal, 2 = stop, 3 = stand): '))
+	speed = int(raw_input('speed type (0 = normal, 1 = stop, 2 = stand): '))
 	coordinates = [x, y, fi, speed]
 	print 'Movement command: ', coordinates
 	
@@ -84,7 +84,7 @@ def relMov(x = False, y = False, fi = False, speed = False):
 	if fi == False:		
 		fi = float(raw_input('angle: '))
 	if speed == False:	
-		speed = int(raw_input('speed type (1 = normal, 2 = stop, 3 = stand): '))
+		speed = int(raw_input('speed type (0 = normal, 1 = stop, 2 = stand): '))
 	dsplcmnt = [x, y, fi, speed]
 	#startT = time.time()	
 	oldCoord = getCoord()
