@@ -4,7 +4,7 @@
 
 dmaPackStruct dmaData= {-1,-1,0,0,0,0,0,0,0,0};
 char Buffer[BufSize];
-uint8_t usart3Data[6];
+uint8_t usart1Data[6];
 encInPackStruct encData = {0xAA,0x01,0.0,0.0,0.0,0.0,0.0,0.0}; //входящие данные с энкодера
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,10 +28,7 @@ uint32_t packetCheck(char* dataToCheck, char size) //проверить пакет
  CRC->CR=1;
  char i;
  for ( i = 0; i < (size ); i++)
- CRC->DR= *(dataToCheck + i);
-
-
-
+ CRC->DR = *(dataToCheck + i);
 
 return CRC->DR;
 }
@@ -42,7 +39,7 @@ void usartSendByte(USART_TypeDef *USART,uint8_t byte)
 	USART->DR = byte;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void DMA1_Stream5_IRQHandler(void)
+void DMA1_Stream5_IRQHandler(void)     //????????????
 {
   DMA1->HIFCR = DMA_HIFCR_CTCIF5;
 }
@@ -80,43 +77,40 @@ void uartInit(USART_TypeDef* USARTx, uint32_t USART_BaudRate)   // инициализация
   USARTx->CR1 = USART_CR1_RXNEIE | USART_CR1_TE |  USART_CR1_RE |  USART_CR1_UE;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void configUsart3TXDMA(char * usart3Data, int count)
+void configUsart1TXDMA(char * usart1Data, int count)
 {
-  DMA1_Stream3->CR &=~ DMA_SxCR_EN;
-  DMA1_Stream3->CR |= 4 << 25;        //Выбираем channel 4
-  DMA1_Stream3->PAR = (uint32_t) &USART3->DR;//Задаем адрес периферии - регистр результата преобразования АЦП для регулярных каналов.
-  DMA1_Stream3->M0AR = (uint32_t) usart3Data; //Задаем адрес памяти - базовый адрес массива в RAM.
-  DMA1_Stream3->CR &= ~DMA_SxCR_DIR; //Направление передачи данных - чтение из периферии, запись в память.
-  DMA1_Stream3->CR |= DMA_SxCR_DIR_0; //Направление передачи данных - чтение из периферии, запись в память.
-  DMA1_Stream3->NDTR = count;
-  DMA1_Stream3->CR &= ~DMA_SxCR_PINC; //Адрес периферии не инкрементируется после каждой пересылки.
-  DMA1_Stream3->CR |= DMA_SxCR_MINC; //Адрес памяти инкрементируется после каждой пересылки.
- // DMA1_Stream3->CR |= DMA_SxCR_CIRC; //Circular mode
-  DMA1_Stream3->CR |= DMA_SxCR_PL; //Приоритет
-  DMA1_Stream3->CR |= DMA_SxCR_TCIE; // прерывание в конце передачи
-  USART3->SR&=~(USART_SR_TC);
-  DMA1->LIFCR = DMA_LIFCR_CTCIF3;
-  DMA1_Stream3->CR |= DMA_SxCR_EN;
-  NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+  DMA2_Stream7->CR &=~ DMA_SxCR_EN;
+  DMA2_Stream7->CR |= 4 << 25;        //Выбираем channel 4
+  DMA2_Stream7->PAR = (uint32_t) &USART1->DR;//Задаем адрес периферии - регистр результата преобразования АЦП для регулярных каналов.
+  DMA2_Stream7->M0AR = (uint32_t) usart1Data; //Задаем адрес памяти - базовый адрес массива в RAM.
+  DMA2_Stream7->CR &= ~DMA_SxCR_DIR; //Направление передачи данных - чтение из периферии, запись в память.
+  DMA2_Stream7->CR |= DMA_SxCR_DIR_0; //Направление передачи данных - чтение из периферии, запись в память.
+  DMA2_Stream7->NDTR = count;
+  DMA2_Stream7->CR &= ~DMA_SxCR_PINC; //Адрес периферии не инкрементируется после каждой пересылки.
+  DMA2_Stream7->CR |= DMA_SxCR_MINC; //Адрес памяти инкрементируется после каждой пересылки.
+  DMA2_Stream7->CR |= DMA_SxCR_PL; //Приоритет
+  DMA2_Stream7->CR |= DMA_SxCR_TCIE; // прерывание в конце передачи
+  USART1->SR&=~(USART_SR_TC);
+  DMA2->LIFCR = DMA_LIFCR_CTCIF3;
+  DMA2_Stream7->CR |= DMA_SxCR_EN;
+  NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void configUsart3RXDMA(char * usart3Data, int count)
+void configUsart1RXDMA(char * usart1Data, int count)
 {
-  DMA1_Stream1->CR &= ~DMA_SxCR_EN;
-  DMA1_Stream1->CR |= 4 << 25;        //Выбираем channel 4
-  DMA1_Stream1->PAR = (uint32_t) &USART3->DR;//Задаем адрес периферии - регистр результата преобразования АЦП для регулярных каналов.
-  DMA1_Stream1->M0AR = (uint32_t) usart3Data; //Задаем адрес памяти - базовый адрес массива в RAM.
-  DMA1_Stream1->CR &= ~DMA_SxCR_DIR; //Направление передачи данных - чтение из периферии, запись в память.
-  DMA1_Stream1->NDTR = count; //Количество пересылаемых значений
-  DMA1_Stream1->CR &= ~DMA_SxCR_PINC; //Адрес периферии не инкрементируется после каждой пересылки.
-  DMA1_Stream1->CR |= DMA_SxCR_MINC; //Адрес памяти инкрементируется после каждой пересылки.
- // DMA1_Stream1->CR |= DMA_SxCR_CIRC; //Circular mode
-  DMA1_Stream1->CR |= DMA_SxCR_PL; //Приоритет
-  DMA1_Stream1->CR |= DMA_SxCR_TCIE; // прерывание в конце передачи
-
-  DMA1->LIFCR = DMA_LIFCR_CTCIF1;
-  DMA1_Stream1->CR |= DMA_SxCR_EN;
-  NVIC_EnableIRQ(DMA1_Stream1_IRQn);
+  DMA2_Stream2->CR &= ~DMA_SxCR_EN;
+  DMA2_Stream2->CR |= 4 << 25;        //Выбираем channel 4
+  DMA2_Stream2->PAR = (uint32_t) &USART1->DR;//Задаем адрес периферии - регистр результата преобразования АЦП для регулярных каналов.
+  DMA2_Stream2->M0AR = (uint32_t) usart1Data; //Задаем адрес памяти - базовый адрес массива в RAM.
+  DMA2_Stream2->CR &= ~DMA_SxCR_DIR; //Направление передачи данных - чтение из периферии, запись в память.
+  DMA2_Stream2->NDTR = count; //Количество пересылаемых значений
+  DMA2_Stream2->CR &= ~DMA_SxCR_PINC; //Адрес периферии не инкрементируется после каждой пересылки.
+  DMA2_Stream2->CR |= DMA_SxCR_MINC; //Адрес памяти инкрементируется после каждой пересылки.
+  DMA2_Stream2->CR |= DMA_SxCR_PL; //Приоритет
+  DMA2_Stream2->CR |= DMA_SxCR_TCIE; // прерывание в конце передачи
+  DMA2->LIFCR = DMA_LIFCR_CTCIF1;
+  DMA2_Stream2->CR |= DMA_SxCR_EN;
+  NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +144,7 @@ if (!(dmaData.stDmaBusy)) //если DMA свободен
     dmaData.dmaAdr=Buffer+dmaData.dmaStartByte; // адрес передаваемого буфера
 
     dmaData.stDmaBusy = 1;    //DMA занят
-    configUsart3TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
+    configUsart1TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
     dmaData.allDMA+=dmaData.dmaCount;
     dmaData.stDmainit =1;
 
@@ -173,7 +167,7 @@ if (!(dmaData.stDmaBusy)) //если DMA свободен
     }
 
     dmaData.stDmaBusy = 1;    //DMA занят
-    configUsart3TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
+    configUsart1TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
     dmaData.stDmainit =2;
     dmaData.allDMA+=dmaData.dmaCount;
 
@@ -212,7 +206,7 @@ void DMA1_Stream3_IRQHandler(void) // DMA USART2-TX
 
         dmaData.stDmaBusy = 1;    //DMA занят
 
-        configUsart3TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
+        configUsart1TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
         dmaData.stDmainit =3;
         dmaData.allDMA+=dmaData.dmaCount;
         return;
@@ -236,7 +230,7 @@ void DMA1_Stream3_IRQHandler(void) // DMA USART2-TX
         }
         dmaData.stDmaBusy = 1;    //DMA занят
         dmaData.allDMA+=dmaData.dmaCount;
-    configUsart3TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
+        configUsart1TXDMA( dmaData.dmaAdr,(dmaData.dmaCount));
         dmaData.stDmainit =4;
         return;
       }
@@ -255,44 +249,40 @@ void DMA1_Stream3_IRQHandler(void) // DMA USART2-TX
 //_________________________________USART______________________________________//
 ////////////////////////////////////////////////////////////////////////////////
 
-/*void USART3_IRQHandler(void)
+void USART1_IRQHandler(void)
 {
-char state;
-	state =USART3->SR ;
-          USART3->SR =0;//&=~USART_SR_RXNE;
-     if (state&USART_SR_RXNE||state&USART_SR_ORE)  //получен байт
+     char state;
+	 state =USART1->SR ;
+     USART1->SR =0;//&=~USART_SR_RXNE;
+     if (state & USART_SR_RXNE || state & USART_SR_ORE)  //получен байт
      {
-	usart3Data[1] = USART3->DR;
-	pushByte(usart3Data[1]);
-        state =USART3->SR;
-        if (state&USART_SR_ORE)
-        {
-          usart3Data[1] = USART3->DR;
-          pushByte(usart3Data[1]);
-          state =USART3->SR;
-
-        }
-
-
-        	if ((usart3Data[0] ==0xAA) &&(usart3Data[1] ==0x01)) //проверка начала пакета
-	{
-         encData.adress=   usart3Data[1];
-         configUsart3RXDMA(((char *)&encData)+1, sizeof(encData)-1); // запуск DMA для приема основной части пакета
-         USART3->CR1&=~USART_CR1_RXNEIE;
-	 USART3->CR3|=USART_CR3_DMAR;
-        }
-        else usart3Data[0] = usart3Data[1];
+	 usart1Data[1] = USART1->DR;
+	 pushByte(usart1Data[1]);
+     state = USART1->SR;
+     if (state & USART_SR_ORE)
+     {
+          usart1Data[1] = USART1->DR;
+          pushByte(usart1Data[1]);
+          state = USART1->SR;
      }
+     if ((usart1Data[0] == 0xAA) && (usart1Data[1] == 0x01)) //проверка начала пакета
+     {
+         encData.adress = usart1Data[1];
+         configUsart1RXDMA(((char *)&encData)+1, sizeof(encData)-1); // запуск DMA для приема основной части пакета
+         USART1->CR1&=~USART_CR1_RXNEIE;
+	     USART1->CR3|=USART_CR3_DMAR;
+    }
+    else usart1Data[0] = usart1Data[1];
+    }
+}
 
-}*/
-
-void DMA1_Stream1_IRQHandler(void)
+void DMA2_Stream2_IRQHandler(void)
 {
   uint16_t checkSum;
-  DMA1_Stream1->CR &=~ DMA_SxCR_EN;
-   DMA1->LIFCR |= DMA_LIFCR_CTCIF1;
+  DMA2_Stream2->CR &=~ DMA_SxCR_EN;
+ DMA2->LIFCR |= DMA_LIFCR_CTCIF1;
 
-  USART3->CR1|=USART_CR1_RXNEIE;
+  USART1->CR1 |= USART_CR1_RXNEIE;
   checkSum  = packetCheck((char * )&encData,sizeof(encData)-2);
   if  (checkSum == encData.checkSum )  //Проверка CRC принятого пакета
   {

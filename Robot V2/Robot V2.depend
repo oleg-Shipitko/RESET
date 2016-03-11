@@ -4986,7 +4986,7 @@
 1416066732 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\tim.c
 	"tim.h"
 
-1457000473 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\usart.c
+1457623871 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\usart.c
 	"usart.h"
 	"Dynamixel_control.h"
 	"robot.h"
@@ -5310,7 +5310,7 @@
 1454778570 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\src\system_stm32f4xx.c
 	"stm32f4xx.h"
 
-1457190507 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.c
+1457694805 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.c
 	"Regulator.h"
 	"robot.h"
 	"matrix.h"
