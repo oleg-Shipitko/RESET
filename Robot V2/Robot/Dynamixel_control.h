@@ -48,9 +48,7 @@ typedef enum ServoCommand
     WRITE = 3
 } ServoCommand;
 
-volatile uint8_t receiveBuffer[REC_BUFFER_LEN];
-volatile uint8_t* volatile receiveBufferStart = receiveBuffer;
-volatile uint8_t* volatile receiveBufferEnd = receiveBuffer;
+
 
 extern uint8_t servoErrorCode;
 

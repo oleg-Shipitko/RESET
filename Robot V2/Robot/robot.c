@@ -27,7 +27,7 @@ char param[30] ;                      //буфер параметров вход
 char inData[64];                      //Входной буфер данных
 char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
-InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
+InPackStruct inCommand ={0xFA, 0xAF, 0x00, 0x00, &param[0]}; //структура входящего пакета
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
                           BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
@@ -335,7 +335,6 @@ switch(cmd->command)
 
       float *(temp) ={(float*)(cmd->param)};
       char * ch = cmd->param+12;
-      char * str ="Ok";
       lastPoint++;
       points[lastPoint].center[0] = temp[0];
       points[lastPoint].center[1] = temp[1];
@@ -344,6 +343,7 @@ switch(cmd->command)
       points[lastPoint].speedRotTipe = rotType[*(ch)];
       points[lastPoint].endTask=NULL;
       points[lastPoint].movTask =NULL;
+      char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
   break;
@@ -631,15 +631,23 @@ switch(cmd->command)
 
   case 0x29:  //switch off kinematics and stop all motors
   {
-      curState.kinemEn = 0;
       char i;
+      curState.trackEn = 0;
       for (i = 0; i<=3; i++)
       {
         regulatorOut[i] = 0;
       }
+      for (i = 0; i<=2; i++)
+      {
+        vTargetGlob[i] = 0;
+      }
+      points[lastPoint].center[0] = robotCoord[0];
+      points[lastPoint].center[1] = robotCoord[1];
+      points[lastPoint].center[2] = robotCoord[2];
+      curState.trackEn = 1;
+
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-
   }
   break;
 

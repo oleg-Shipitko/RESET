@@ -7,10 +7,9 @@
 #include <math.h>
 #include "usart.h"
 #include "robot.h"
-#include "dynamixel_control.h"
 
 int indexSpeeds = 0, indexDists = 0;
- char traceFlag,movFlag,endFlag;
+char traceFlag, movFlag, endFlag;
 
 int16_t int_cnt=0;
 
@@ -223,27 +222,6 @@ void delay(__IO uint32_t nCount)
 void DMA2_Stream0_IRQHandler(void)
 {
 DMA2->LIFCR |= DMA_LIFCR_CTCIF0;
-
-}
-////////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////////
-//___________________________________USART____________________________________//
-////////////////////////////////////////////////////////////////////////////////
-void USART3_IRQHandler (void)
-{
-	// check if the USART3 receive interrupt flag was set
-	if (USART_GetITStatus (USART3, USART_IT_RXNE))
-	{
-		const uint8_t byte = (uint8_t)USART_ReceiveData (USART3); // grab the byte from the data register
-
-        receiveBufferEnd++;
-        if (receiveBufferEnd >= receiveBuffer + REC_BUFFER_LEN)
-            receiveBufferEnd = receiveBuffer;
-
-        *receiveBufferEnd = byte;
-	}
 
 }
 ////////////////////////////////////////////////////////////////////////////////

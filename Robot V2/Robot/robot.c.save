@@ -27,7 +27,7 @@ char param[30] ;                      //буфер параметров вход
 char inData[64];                      //Входной буфер данных
 char outData[30];                     //Выходной буфер данных
 char dataIndex;                       //счетчик количества байт во входящем пакете
-InPackStruct inCommand ={0xFA,0xAF,0x00,0x00,&param[0]}; //структура входящего пакета
+InPackStruct inCommand ={0xFA, 0xAF, 0x00, 0x00, &param[0]}; //структура входящего пакета
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
                           BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
@@ -280,7 +280,7 @@ switch(cmd->command)
       sendAnswer(cmd->command,str, 3);
   }
   break;
-
+char * str ="Ok";
   case 0x0C:  //Выключить рассчет кинематики
   {
       curState.kinemEn = 0;
@@ -290,7 +290,7 @@ switch(cmd->command)
   break;
 
   case 0x0D:  //Задать скорости движения
-  {
+  {char * str ="Ok";
       float *(temp) ={(float*)cmd->param};
       char i;
    for (i = 0; i<=2; i++)
@@ -335,7 +335,6 @@ switch(cmd->command)
 
       float *(temp) ={(float*)(cmd->param)};
       char * ch = cmd->param+12;
-      char * str ="Ok";
       lastPoint++;
       points[lastPoint].center[0] = temp[0];
       points[lastPoint].center[1] = temp[1];
@@ -344,6 +343,7 @@ switch(cmd->command)
       points[lastPoint].speedRotTipe = rotType[*(ch)];
       points[lastPoint].endTask=NULL;
       points[lastPoint].movTask =NULL;
+      char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
   break;
@@ -629,13 +629,18 @@ switch(cmd->command)
   }
   break;
 
-  case 0x29:  //set servo moving speed
+  case 0x29:  //switch off kinematics and stop all motors
   {
-      curState.kinemEn = 0;
-      
+      curState.trackEn = 0;
+      char i;
+      for (i = 0; i<=3; i++)
+      {
+        vTargetGlob[i] = 0;
+      }
+      curState.trackEn = 1;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-    
+
   }
   break;
 
