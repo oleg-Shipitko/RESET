@@ -136,7 +136,7 @@ void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur,
 
   float localVelocity[3];
   //float Radian       = (*(V_target+2));
-  float realRad        = robotCoord[2];
+  float realRad = robotCoord[2];
 
   //float Ml[4][2]     = {(sinus+cosinus), (cosinus-sinus), (cosinus-sinus), -(sinus+cosinus), (cosinus-sinus), -(sinus+cosinus), (sinus+cosinus), (cosinus-sinus)};
  // float Mfi[4]       = {-(0.14), -(0.14),-(0.14), -(0.14)};  //матрица расчета угловой скорости

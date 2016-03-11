@@ -251,7 +251,7 @@ switch(cmd->command)
       char i;
    for (i = 0; i<=3; i++)
   {
-  	wheelsPidStruct[i].p_k = temp[0];
+        wheelsPidStruct[i].p_k = temp[0];
         wheelsPidStruct[i].i_k = temp[1];
         wheelsPidStruct[i].d_k = temp[2];
   }
@@ -283,8 +283,8 @@ switch(cmd->command)
 
   case 0x0C:  //Выключить рассчет кинематики
   {
-      curState.kinemEn=0;
-      char * str ="Ok";
+      curState.kinemEn = 0;
+      char * str = "Ok";
       sendAnswer(cmd->command,str, 3);
   }
   break;
@@ -373,8 +373,6 @@ switch(cmd->command)
 
   case 0x14:  //отправить текущую скорость
   {
-
-
       sendAnswer(cmd->command,(char *)robotSpeed, sizeof(robotCoord));
   }
   break;
@@ -385,12 +383,11 @@ switch(cmd->command)
       char i;
       for (i = 0; i<=4; i++)
         normalVel[i]= temp[i];
-     for (i = 0; i<=4; i++)
+      for (i = 0; i<=4; i++)
         stopVel[i]= temp[i];
-         stopVel[2]=-0.2;
-      char * str ="Ok";
+      stopVel[2]=-0.2;
 
-
+      char * str = "Ok";
       sendAnswer(cmd->command,str, 3);
   }
   break;
@@ -632,6 +629,19 @@ switch(cmd->command)
   }
   break;
 
+  case 0x29:  //switch off kinematics and stop all motors
+  {
+      curState.kinemEn = 0;
+      char i;
+      for (i = 0; i<=3; i++)
+      {
+        regulatorOut[i] = 0;
+      }
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+
+  }
+  break;
 
   default:
   break;
