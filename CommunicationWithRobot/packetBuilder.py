@@ -123,6 +123,7 @@ class CommandsList(object):
 	set12VState = 0x22 #expected parameters: int[1]
 	switchOffPid = 0x23
 	switchOnPid = 0x24
+	stopAllMotors = 0x29
 
 	# TODO: implement commands listed below
 	setManipulatorState = 0x25

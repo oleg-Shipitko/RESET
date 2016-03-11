@@ -120,6 +120,11 @@ def getCoord():
 	print 'Current robot coordinates: ', recievedPacket.reply
 	return recievedPacket.reply
 
+def stopMotors():
+	packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)
+	recievedPacket = computerPort.sendRequest(packet.bytearray)
+	return recievedPacket.reply
+	
 port = portNumber()
 if port:
 	print 'STM32 found on port %s' %port
@@ -139,7 +144,7 @@ iteration = 0
 while True:
 	iteration += 1	
 	print '\nList of available commands: \n1 Global Movement\n2 Relative Movement'\
-		'\n3 Set Coordinates\n4 Get Coordinates' 	
+		'\n3 Set Coordinates\n4 Get Coordinates\n5 Stop Movement' 	
 	command = raw_input('Command number: ')
 	if command == '1':
 		globMov()
@@ -149,7 +154,9 @@ while True:
 		setCoord()
 	elif command == '4':
 		getCoord()	
-	
+	elif command == '5':
+		stopMotors()
+
 	#Communication test	
 	#getCoord()
 	#print 'Iteration: ', iteration
