@@ -9,3 +9,6 @@ Sonar_ADC/obj/
 *.o
 *.elay
 *.depend
+*.hex
+*.out
+*.map

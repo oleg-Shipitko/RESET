@@ -59,8 +59,6 @@ uint8_t pinType[10];
 uint8_t extiType[10];
 uint16_t extiFlag;
 
- char * str ="Ok";
-
 extern CDC_IF_Prop_TypeDef  APP_FOPS;
 
 char setVoltage(char ch, float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
@@ -318,7 +316,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x10:  //очистить стек точек
+  case 0x10:  //очистить очередь точек
   {
       while(lastPoint>0) removePoint(&points[0],&lastPoint);
       points[0].center[0]= robotCoord[0];
@@ -330,25 +328,25 @@ switch(cmd->command)
   }
   break;
 
-  case 0x11:  //Добавить точку в стек
+  case 0x11:  //Добавить точку в очередь
   {
 
       float *(temp) ={(float*)(cmd->param)};
-      char * ch = cmd->param+12;
+      char * ch = cmd->param + 12;
       lastPoint++;
       points[lastPoint].center[0] = temp[0];
       points[lastPoint].center[1] = temp[1];
       points[lastPoint].center[2] = temp[2];
       points[lastPoint].speedVelTipe = speedType[*ch];
       points[lastPoint].speedRotTipe = rotType[*(ch)];
-      points[lastPoint].endTask=NULL;
-      points[lastPoint].movTask =NULL;
+      points[lastPoint].endTask = NULL;
+      points[lastPoint].movTask = NULL;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
   break;
 
-  case 0x12:  //Состояние стека точек
+  case 0x12:  //Состояние очереди точек
   {
       char outdata[15];
       float * temp =(float*)(&outdata[3]);
@@ -629,21 +627,21 @@ switch(cmd->command)
   }
   break;
 
-  case 0x29:  //switch off kinematics and stop all motors
+  case 0x29:  //stop all motors if kinematics is ON
   {
       char i;
       curState.trackEn = 0;
-      for (i = 0; i<=3; i++)
-      {
-        regulatorOut[i] = 0;
-      }
+
       for (i = 0; i<=2; i++)
       {
         vTargetGlob[i] = 0;
       }
-      points[lastPoint].center[0] = robotCoord[0];
-      points[lastPoint].center[1] = robotCoord[1];
-      points[lastPoint].center[2] = robotCoord[2];
+
+      points[0].center[0] = robotCoord[0];
+      points[0].center[1] = robotCoord[1];
+      points[0].center[2] = robotCoord[2];
+      CreatePath(&points[0], &robotCoord[0], &curPath);
+
       curState.trackEn = 1;
 
       char * str ="Ok";
@@ -654,6 +652,7 @@ switch(cmd->command)
   default:
   break;
 }
+
 return 0;
 }
 
