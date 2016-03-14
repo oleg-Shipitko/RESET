@@ -30,7 +30,8 @@
 
 #define SEND_STATE   3
 
-#define POINT_STACK_SIZE 20
+#define POINT_STACK_SIZE 30
+
 
 
 typedef struct

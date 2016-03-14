@@ -70,22 +70,18 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
     if (points[0].movTask) movFlag=(points[0].movTask)(); else movFlag =1; // действие в процессе движения
  if (traceFlag&&movFlag&&(!endFlag))
     if (points[0].endTask) endFlag = ((char (*)(float))(points[0].endTask))(points[0].endTaskP1); else endFlag =1; // действие в конечной точке
-    if (traceFlag&&movFlag&&endFlag)
+    if (traceFlag && movFlag && endFlag)
         {
-          if (lastPoint >0) //Остались ли точки в стеке
+          if (lastPoint > 0) //Остались ли точки в стеке
           {
             totalPointComplite++;
-            CreatePath(&points[1],&points[0],&curPath); // задать новый участок
+            CreatePath(&points[1], &points[0], &curPath); // задать новый участок
           }
-
           removePoint(&points[0],&lastPoint); //удалить ткущую точку
-
           endFlag=0;
           movFlag=0;
           traceFlag=0;
         }
-
-
 
 
 //////////////////////////// COMPUTING SPEEDS /////////////////////////////////

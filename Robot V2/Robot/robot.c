@@ -627,25 +627,15 @@ switch(cmd->command)
   }
   break;
 
-  case 0x29:  //stop all motors if kinematics is ON
+  case 0x29:  //add a point to the beginning of Queue
   {
-      char i;
-      curState.trackEn = 0;
-
-      for (i = 0; i<=2; i++)
-      {
-        vTargetGlob[i] = 0;
-      }
-
-      points[0].center[0] = robotCoord[0];
-      points[0].center[1] = robotCoord[1];
-      points[0].center[2] = robotCoord[2];
+      float *(temp) = (float*)(cmd->param);
+      char * ch = cmd->param + 12;
+      addPointInFrontOfQueue(&points[0], &temp[0], &ch, &lastPoint);
       CreatePath(&points[0], &robotCoord[0], &curPath);
 
-      curState.trackEn = 1;
-
       char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
+      sendAnswer(cmd->command, str, 3);
   }
   break;
 

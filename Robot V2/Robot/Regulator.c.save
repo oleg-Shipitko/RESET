@@ -9,27 +9,27 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-float regulatorOut[4] = {0,0,0,0};  //выход обратной кинематики, рассчетные скорости двигателей
-float vTargetGlob[3] = {0,0,0};// вектор глобальных скоростей робота
+float regulatorOut[4] = {0, 0, 0, 0};  //выход обратной кинематики, рассчетные скорости двигателей
+float vTargetGlob[3] = {0, 0, 0};// вектор глобальных скоростей робота
 PidStruct wheelsPidStruct[4]; //структура ПИД регуляторов колес
 PidStruct radSpeed; // структура ПИД регулятора уголовой скорости
 PidStruct ortoPos;  // структура ПИД отклонения от траектории
 
-uint16_t totalPointComplite =0;  //Всего пройдено точек
+uint16_t totalPointComplite = 0;  //Всего пройдено точек
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
                                         {0.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0,  NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {1.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {1.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0,  NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {-0.5,-0.5,3.14, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {-0.5,0.0,4.71, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0,0.0,6.28, NULL,NULL,0,stopVel,stopRot,0,1 },};
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },};
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 1;// последняя активная точка в стеке
+char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 //vSt    = (*parameters);     normal speed
@@ -39,32 +39,46 @@ Path curPath; //параметры активной прямой для траекторного регулятора
 //decc   = (*(parameters+4));  deceleration
 
 float normalVel[5]= {0.6,0.2,0.2,4.0,2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVel[5]={0.6,0.2,-0.2,4.0,4.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float stopVel[5]={0.6,0.2,-0.2,3.0,2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
 float standVel[5]={0.6,0.6,-0.6,1.0,2.5};                                       //удержание заданного положения
 
 float normalRot[5]= {3.0,1.0,0.2,4.0,4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopRot[5]= {3.0,1.0,-1.0,4.0,4.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float stopRot[5]= {3.0,1.0,-1.0,4.0,3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
 float standRot[5]={4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положения
 
 float * speedType[3] = {normalVel,stopVel,standVel};                            // типы  линейный скоростей
 float * rotType[3] = {normalRot,stopRot,standRot};                              // типы угловых скоростей
 //______________________________________________________________________________
 ////////////////////////////////////////////////////////////////////////////////
-void removePoint(pathPointStr * points,char *lastPoint)  // удаление точки из стека
+void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из очереди
 {
   char i,j;
-  for (i=0; i < *lastPoint; i++)
+  for (i = 0; i < *lastPoint; i++)
   {
-    for (j=0; j <sizeof(pathPointStr);j++)
-      *(((char *)(&points[i]))+j) = *(((char *)(&points[i+1]))+j);
+    for (j = 0; j < sizeof(pathPointStr); j++)
+      *(((char *)(&points[i])) + j) = *(((char *)(&points[i+1])) + j);
 
   }
    if (*lastPoint>0)
    {
-      for (j=0;j<sizeof(pathPointStr);j++)
-      *(((char *)(&points[*lastPoint]))+j) = 0;
+      for (j=0; j < sizeof(pathPointStr); j++)
+      *(((char *)(&points[*lastPoint])) + j) = 0;
      (*lastPoint)--;
    }
+}
+
+void addPointInFrontOfQueue(pathPointStr * points, float *newPoint, char *ch, char *lastPoint) // добавление точки в начало очереди
+{
+  char i, j;
+  for (i = *lastPoint; i >= 0; i--)
+  {
+      if (!((i + 1) > POINT_STACK_SIZE))
+      {
+          for (j = 0; j < sizeof(pathPointStr); j++)
+            *(((char *)(&points[i + 1])) + j) = *(((char *)(&points[i])) + j);
+      }
+  }
+  lastPoint++;
 }
 
 void initRegulators(void)  // инициализация регуляторов
@@ -114,7 +128,7 @@ void Cost(float *inpMatr,char rows,float cost,float *outKoff)
     *outKoff = 0;
   else
     if ((infnorm > 0) && (infnorm < cost))
-      *outKoff=1;
+      *outKoff = 1;
   else
     *outKoff=cost/(infnorm);
 }
@@ -444,7 +458,6 @@ void pidCalc(PidStruct *pid_control)  //рассчет ПИД
   }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //Get data from encoders
 void GetDataForRegulators(void)
@@ -617,3 +630,62 @@ else
 
 
 ////////////////////////////////////////////////////////////////////////////////
+void SpeedFiltration(TObject *Sender)
+  {
+        MAX_ACCEL = float(ScrollBar2->Position)/100.0 ;
+        MAX_ACCEL_INC = float(ScrollBar1->Position)/100.0 ;
+
+        float ACCEL_INC =pow(mod(subtraction(CurSpeed,TargSpeed))*10.0,2)/10.0+0.001+mod(CurAccel)/2.0;
+        if (ACCEL_INC>MAX_ACCEL_INC) { ACCEL_INC =MAX_ACCEL_INC; }
+        if (ACCEL_INC<-MAX_ACCEL_INC) { ACCEL_INC =-MAX_ACCEL_INC; }
+
+        TVector accelInc =normalization(subtraction(subtraction(TargSpeed,CurSpeed),CurAccel),ACCEL_INC);
+        TVector accelDec =normalization(subtraction(CurAccel,subtraction(TargSpeed,CurSpeed)),ACCEL_INC);
+
+
+        TVector newAccelInc = addition(CurAccel,accelInc);
+        TVector newAccelDec = addition(CurAccel,accelDec);
+
+        TVector newSpeedInc =addition(CurSpeed,newAccelInc);
+        TVector newSpeedDec =addition(CurSpeed,newAccelDec);
+        TVector newSpeedZer =addition(CurSpeed,CurAccel);
+        float timeToStop;
+        if (mod(accelInc)>0)
+			 timeToStop = abs(mod(CurAccel)/mod(accelInc))/2.0+0.50 ;
+        else timeToStop=1;
+            float incErr = mod(subtraction(TargSpeed,addition(newSpeedInc,
+											addition(scale(newAccelInc,timeToStop),
+													scale(accelInc,timeToStop*timeToStop/2.0)))));
+            float decErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+											addition(scale(newAccelDec,timeToStop),
+													scale(accelDec,timeToStop*timeToStop/2.0)))));
+            float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+											scale(newAccelDec,timeToStop))));
+        if (incErr>decErr) {
+            if (decErr<zerErr) {
+                AccelInc1=accelDec;
+                CurSpeed =newSpeedDec;
+                CurAccel= newAccelDec;
+            } else
+            {
+                AccelInc1.x=0;
+                AccelInc1.y = 0;
+
+                CurSpeed =newSpeedZer;
+            }
+
+        } else
+        {
+            if (incErr<zerErr) {
+                AccelInc1=accelInc;
+                CurSpeed =newSpeedInc;
+                CurAccel= newAccelInc;
+            }else{
+                AccelInc1.x = 0;
+                AccelInc1.y = 0;
+                CurSpeed =newSpeedZer;
+            }
+        }
+        if (mod(CurAccel)>MAX_ACCEL)
+   			   CurAccel=normalization( CurAccel,MAX_ACCEL);
+  }

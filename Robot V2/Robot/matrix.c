@@ -4,24 +4,24 @@
 void matrixCopy(float *m, char rows, char columns, float *new_m)
 {
   char i,j;
-  
+
     for(i = 0; i < rows; i++)
         for(j = 0; j < columns; j++)
           *(new_m+columns*i+j) = *(m+columns*i+j);
 }
 
 //Забить в ячейку значение val
-void matrixSetCell(float *m, char rows, char columns, char row, char column, float val) 
-{  
+void matrixSetCell(float *m, char rows, char columns, char row, char column, float val)
+{
   *(m+columns*(row-1)+column-1) = val;
 }
 
 
 //Забить все ячейки значением val
-void matrixFill(float *m, char rows, char columns, float val) 
-{  
+void matrixFill(float *m, char rows, char columns, float val)
+{
 char i,j;
-  
+
 for(i = 0; i < rows; i++)
    for(j = 0; j < columns; j++)
       *(m+columns*i+j) = val;
@@ -29,23 +29,23 @@ for(i = 0; i < rows; i++)
 
 
 //Получить значение ячейки
-float matrixGetCell(float *m, char rows, char columns, char row, char column) 
+float matrixGetCell(float *m, char rows, char columns, char row, char column)
 {
   return *(m+columns*(row-1)+column-1);
 }
 
 //Операция перемножения матриц
-void matrixMultiplyM2M(float *m1, char rows1, char columns1, float *m2, char rows2, char columns2, float *new_m) 
+void matrixMultiplyM2M(float *m1, char rows1, char columns1, float *m2, char rows2, char columns2, float *new_m)
 {
 float Sum;
 char i,j,k;
-  
+
   if (columns1 != rows2)
       *new_m = 0;
   else
-    {      
+    {
       for(i = 0; i < rows1; i++)
-        for (j = 0; j < columns2; j++) 
+        for (j = 0; j < columns2; j++)
         {
             Sum = 0;
             for(k = 0; k < columns1; k++)
@@ -57,7 +57,7 @@ char i,j,k;
 
 
 //Умножение числа(скаляра S) на матрицу
-void matrixMultiplyS2M(float *m, char rows, char columns, float s, float *new_m) 
+void matrixMultiplyS2M(float *m, char rows, char columns, float s, float *new_m)
 {
 char i,j;
 
@@ -68,7 +68,7 @@ for(i = 0; i < rows; i++)
 
 
 //Сложение/вычитание матриц
-void matrixPlusMinus(float *m1, float *m2, char rows, char columns, signed char sign,float *new_m) 
+void matrixPlusMinus(float *m1, float *m2, char rows, char columns, signed char sign,float *new_m)
 {
 char i,j;
 
@@ -86,8 +86,8 @@ else
   }
 }
 
- 
-void matrixTranspose(float *m, char rows, char columns, float *new_m) 
+
+void matrixTranspose(float *m, char rows, char columns, float *new_m)
 {
 char i,j;
 for(i = 0; i < rows; i++)
@@ -103,7 +103,7 @@ void matrixCofactor(float *m, char size, float *new_m)
   float *buf1=(float*)bufxx;
 char i=0,j=0,k=0,l=0, c=0, d=0;
 signed char sign;
-         
+
 while (i<size)
   {
     j = 0;
@@ -115,8 +115,8 @@ while (i<size)
           sign = 1;
         else
           sign = -1;
-        
-        
+
+
         while (k<(size-1))
           {
             if (c == i)
@@ -178,7 +178,7 @@ for (i = 0; i < n; i++)
   temp *= *(LU+i*n+i);
 *out=temp;
 }
-                                 
+
 void matrixInverse(float *m, char size, float *new_m)
 {
 float buf1[4][4];// = malloc(sizeof(float) * size * size);
@@ -201,4 +201,45 @@ for (i = 1; i <= size; i++)
 matrixTranspose(&buf3[0][0], size, size, new_m);
 }
 
+TVector subtraction(TVector a, TVector b)
+{
+  TVector temp;
+  temp.x =a.x-b.x;
+  temp.y =a.y-b.y;
+  return temp;
+}
 
+TVector addition(TVector a, TVector b)
+{
+  TVector temp;
+  temp.x =a.x+b.x;
+  temp.y =a.y+b.y;
+  return temp;
+}
+
+TVector normalization(TVector a, float len)
+{
+  float mod = pow(a.x*a.x+a.y*a.y,0.5) ;
+  TVector temp={0,0};
+  if (mod>0) {
+	float k = len/mod;
+
+	 temp.x =a.x *k;
+	 temp.y =a.y*k;
+  }
+
+  return temp;
+}
+
+TVector scale(TVector a, float k)
+{
+  TVector temp;
+  temp.x =a.x *k;
+  temp.y =a.y*k;
+  return temp;
+}
+
+float mod(TVector a)
+{
+  return pow(a.x*a.x+a.y*a.y,0.5);
+}

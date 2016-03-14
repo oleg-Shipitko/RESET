@@ -29,7 +29,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stop
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 8;// последняя активная точка в очереди
+char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 //vSt    = (*parameters);     normal speed
@@ -38,13 +38,13 @@ Path curPath; //параметры активной прямой для траекторного регулятора
 //acc    = (*(parameters+3)); acceleration
 //decc   = (*(parameters+4));  deceleration
 
-float normalVel[5]= {0.6,0.2,0.2,4.0,2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVel[5]={0.6,0.2,-0.2,3.0,2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVel[5]={0.6,0.6,-0.6,1.0,2.5};                                       //удержание заданного положения
+float normalVel[5] = {0.6,0.2,0.2,4.0,2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVel[5] = {0.6,0.2,-0.2,3.0,2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVel[5] = {0.6,0.6,-0.6,1.0,2.5};                                       //удержание заданного положения
 
-float normalRot[5]= {3.0,1.0,0.2,4.0,4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopRot[5]= {3.0,1.0,-1.0,4.0,3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
-float standRot[5]={4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положения
+float normalRot[5] = {3.0,1.0,0.2,4.0,4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopRot[5] = {3.0,1.0,-1.0,4.0,3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRot[5] = {4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положения
 
 float * speedType[3] = {normalVel,stopVel,standVel};                            // типы  линейный скоростей
 float * rotType[3] = {normalRot,stopRot,standRot};                              // типы угловых скоростей
@@ -61,27 +61,32 @@ void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из о
   }
    if (*lastPoint>0)
    {
-      for (j=0;j<sizeof(pathPointStr);j++)
-      *(((char *)(&points[*lastPoint]))+j) = 0;
+      for (j=0; j < sizeof(pathPointStr); j++)
+      *(((char *)(&points[*lastPoint])) + j) = 0;
      (*lastPoint)--;
    }
 }
 
-void addPointInFrontOfQueue(pathPointStr * points, float *newPoint, char *lastPoint) // добавление точки в начало очереди
+void addPointInFrontOfQueue(pathPointStr *points, float *newPoint, char *ch, char *lastPoint) // добавление точки в начало очереди
 {
-  char i,j;
-  for (i = 0; i < *lastPoint; i++)
+  char j;
+  int8_t i;
+  for (i = *lastPoint; i >= 0; i--)
   {
-    for (j = 0; j < sizeof(pathPointStr); j++)
-      *(((char *)(&points[i])) + j) = *(((char *)(&points[i+1])) + j);
-
+      if (!((i + 1) > POINT_STACK_SIZE))
+      {
+          for (j = 0; j < sizeof(pathPointStr); j++)
+            *(((char *)(&points[i + 1])) + j) = *(((char *)(&points[i])) + j);
+      }
   }
-   if (*lastPoint>0)
-   {
-      for (j=0;j<sizeof(pathPointStr);j++)
-      *(((char *)(&points[*lastPoint]))+j) = 0;
-     (*lastPoint)--;
-   }
+  points[0].center[0] = *newPoint;
+  points[0].center[1] = *(newPoint + 1);
+  points[0].center[2] = *(newPoint + 2);
+  points[0].speedVelTipe = speedType[*ch];
+  points[0].speedRotTipe = rotType[*ch];
+  points[0].endTask = NULL;
+  points[0].movTask = NULL;
+  (*lastPoint)++;
 }
 
 void initRegulators(void)  // инициализация регуляторов
@@ -131,7 +136,7 @@ void Cost(float *inpMatr,char rows,float cost,float *outKoff)
     *outKoff = 0;
   else
     if ((infnorm > 0) && (infnorm < cost))
-      *outKoff=1;
+      *outKoff = 1;
   else
     *outKoff=cost/(infnorm);
 }
@@ -296,7 +301,7 @@ uE = ortoPos.output;
   matrixMultiplyM2M(&buf[0][0],2,2,&buf3[0][0],2,1,V_local);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void TrackRegulator(float* Coord_cur, float* SpeedCur, Path *cur, float *V)
+void TrackRegulator(float *Coord_cur, float *SpeedCur, Path *cur, float *V)
 {
 float velocity[3] = {0.0, 0.0, 0.0};
 float cosAlphZad = cosf(cur->alphZad), sinAlphZad = sinf(cur->alphZad);
@@ -323,28 +328,29 @@ if (cur->Coord_local_track[2]<0) cur->Coord_local_track[2]+=2.0*PI;
 //	tracer=Coord_local_track[0];
 
 
-Moving(cur->Coord_local_track[0],(cur->lengthTrace),(cur->traceVel),&velFromEt[0]);
-RotMoving((cur->coordCenter[2]), robotCoord[2],(cur->phiZad),(cur->omegaVel),&velFromEt[1]);
+Moving(cur->Coord_local_track[0], (cur->lengthTrace), (cur->traceVel), &velFromEt[0]);
+RotMoving((cur->coordCenter[2]), robotCoord[2], (cur->phiZad), (cur->omegaVel), &velFromEt[1]);
 //velFromEt[1]= velFromEt[1]*cur->phiDir;
 //LOCALCOORD(3,1)=(phiZad-CURCOORD(3,1));
 
 
 //VELOCITY=regulate(LOCALCOORD,vEt);
-Regulate(&(cur->Coord_local_track[0]),&(cur->Speed_local_track[0]),&t_alph_zad[0][0],&velFromEt[0],&(cur->alphZad), &velocity[0]);
+Regulate(&(cur->Coord_local_track[0]), &(cur->Speed_local_track[0]), &t_alph_zad[0][0], &velFromEt[0], &(cur->alphZad), &velocity[0]);
 matrixCopy(&velocity[0], 3, 1, &V[0]);
 }////////////////////////////////////////////////////////////////////////////////
+
 float linars(float *x, float *x0, float *x1)
 {
   float out = (((*x - (*x0)) / (*x1 - *(x0))) * (*(x1+1) - (*(x0+1)))) + (*(x0+1));
   return out;
 }
+
 void rangeAngle(float * angle)
 {
   *angle    = fmod(*angle,2.0*PI);
   if (*angle<-PI) *angle+=2.0*PI;
   if (*angle>PI) *angle-=2.0*PI;
 }
-
 
 void RotMoving(float Start_a, float Coord_a_cur, float Coord_a_targ, float* parameters, float* v_out) //расчет скорости в зависимости от пройденного пути
 {
@@ -385,6 +391,7 @@ if (angleErr<0) out=-out;
 }
 //float stopVel[5]={0.02,0.1,-0.1,0.7,0.9};
 ////////////////////////////////////////////////////////////////////////////////
+
 void Moving(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_out) //расчет скорости в зависимости от пройденного пути
 {
 float vStart, vSt, vEnd, acc, decc;
@@ -631,5 +638,70 @@ else
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
+/*void SpeedFiltration()
+  {
+        TVector CurSpeed={0,0};
+        TVector CurAccel={0,0};
+        TVector AccelInc1 ={0,0};
+        TVector AccelInc2 ={0,0};
+        TVector TargSpeed={0,0};
+
+        float MAX_ACCEL = 0.5;
+        float MAX_ACCEL_INC = 0.1;
+        float ACCEL_INC = 0.2;
+
+        float ACCEL_INC = pow(mod(subtraction(CurSpeed,TargSpeed)) * 10.0, 2)/10.0 + 0.001 + mod(CurAccel)/2.0;
+        if (ACCEL_INC>MAX_ACCEL_INC) { ACCEL_INC = MAX_ACCEL_INC;}
+        if (ACCEL_INC<-MAX_ACCEL_INC) { ACCEL_INC = -MAX_ACCEL_INC;}
+
+        TVector accelInc = normalization(subtraction(subtraction(TargSpeed,CurSpeed),CurAccel),ACCEL_INC);
+        TVector accelDec = normalization(subtraction(CurAccel,subtraction(TargSpeed,CurSpeed)),ACCEL_INC);
+
+
+        TVector newAccelInc = addition(CurAccel,accelInc);
+        TVector newAccelDec = addition(CurAccel,accelDec);
+
+        TVector newSpeedInc = addition(CurSpeed,newAccelInc);
+        TVector newSpeedDec = addition(CurSpeed,newAccelDec);
+        TVector newSpeedZer = addition(CurSpeed,CurAccel);
+        float timeToStop;
+        if (mod(accelInc) > 0)
+			 timeToStop = abs(mod(CurAccel)/mod(accelInc))/2.0 + 0.50;
+        else timeToStop = 1;
+            float incErr = mod(subtraction(TargSpeed,addition(newSpeedInc,
+											addition(scale(newAccelInc,timeToStop),
+													scale(accelInc,timeToStop*timeToStop/2.0)))));
+            float decErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+											addition(scale(newAccelDec,timeToStop),
+													scale(accelDec,timeToStop*timeToStop/2.0)))));
+            float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+											scale(newAccelDec,timeToStop))));
+        if (incErr > decErr) {
+            if (decErr < zerErr) {
+                AccelInc1 = accelDec;
+                CurSpeed = newSpeedDec;
+                CurAccel = newAccelDec;
+            } else
+            {
+                AccelInc1.x = 0;
+                AccelInc1.y = 0;
+
+                CurSpeed =newSpeedZer;
+            }
+
+        } else
+        {
+            if (incErr<zerErr) {
+                AccelInc1=accelInc;
+                CurSpeed =newSpeedInc;
+                CurAccel= newAccelInc;
+            }else{
+                AccelInc1.x = 0;
+                AccelInc1.y = 0;
+                CurSpeed =newSpeedZer;
+            }
+        }
+        if (mod(CurAccel)>MAX_ACCEL)
+   			   CurAccel=normalization( CurAccel, MAX_ACCEL);
+  }*/

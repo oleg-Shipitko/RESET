@@ -1,6 +1,11 @@
 #ifndef __MATR
 #define __MATR
 
+typedef struct{
+	float x;
+	float y;
+} TVector;
+
 void matrixCopy(float *m, char rows, char columns, float *new_m);
 float matrixGetCell(float *m, char rows, char columns, char row, char column);
 void matrixMultiplyM2M(float *m1, char rows1, char columns1, float *m2, char rows2, char columns2, float *new_m);
@@ -12,4 +17,4 @@ void matrixCofactor(float *m, char size, float *new_m);
 void matrixInverse(float *m, char size, float *new_m);
 void matrixFill(float *m, char rows, char columns, float val);
 
-#endif 
+#endif
