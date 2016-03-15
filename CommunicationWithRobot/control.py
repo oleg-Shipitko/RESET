@@ -121,9 +121,24 @@ def getCoord():
 	return recievedPacket.reply
 
 def stopMotors():
-	packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)
+	coord = getCoord()
+	print coord
+	print type(coord[0])
+	coord.append(0)
+	print coord
+	#coord = [3.0, -2.0, 0.0, 1]
+	packet = packetBuilder.BuildPacket(commands.stopAllMotors, coord)
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
+	#print 'hi'	
+	time.sleep(5)
+	coord = [5.0, 0.0, 0.0, 1]
+	packet = packetBuilder.BuildPacket(commands.stopAllMotors, coord)
+	recievedPacket = computerPort.sendRequest(packet.bytearray)	
+	
 	return recievedPacket.reply
+
+	#packet = packetBuilder.BuildPacket(commands.switchOnKinematicCalculation)
+	#recievedPacket = computerPort.sendRequest(packet.bytearray)
 	
 port = portNumber()
 if port:

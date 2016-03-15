@@ -67,7 +67,7 @@ class BuildPacket(object):
 		elif comand == CommandsList.set12VState:
 			return self.typeConvertor.IntToHex(parameters)
 		elif comand == CommandsList.stopAllMotors:
-			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.IntToHex(parameters[3])		
+			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.IntToHex(parameters[3]		
 		return ""
 
 	def GetByteStringFormString(self, parameters):

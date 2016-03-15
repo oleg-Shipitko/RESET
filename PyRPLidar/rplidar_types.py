@@ -103,7 +103,8 @@ class RPLidarFrame(object):
         self.distance = deque(maxlen = maxlen)
         self.x = deque(maxlen = maxlen)
         self.y = deque(maxlen = maxlen)
-        
+        self.iter = 0		        
+		
     def add_point(self, point):
         """add a parsed point into the deques
         
@@ -117,11 +118,14 @@ class RPLidarFrame(object):
         distance = point.distance_q2 / 4.0
         #print 'distance: ', distance
         #self.angle_d.append(angle_d)
+        if point.byte0.sync_quality > 40:
+            self.iter += 1
+            print'strength: ', point.byte0.sync_quality, self.iter        
         self.angle_r.append(angle_r)
         self.distance.append(distance)
         self.x.append(distance * np.sin(angle_r))
         self.y.append(distance * np.cos(angle_r))
-
+        #print len(self.x)
 
 class RPLidarPoint(object):
     

@@ -49,26 +49,26 @@ from rplidar_protocol  import *
 from rplidar_cmd import *
 
 
-class RPLidarRawFrame(object):
-    """Raw frame from the RPLidar scan.
-    
-    Save the timestamp and raw points of a complete frame. This is for archiving
-    the data.
-    
-    Attibutes:
-        timestamp: when the frame is initiated and recorded.
-
-        raw_points: a list of points (in raw RPLidar binary format) of a 
-        complete frame, starting from the point with syncbit == 1.
-    """
-    
-    def __init__(self):
-        self.timestamp = time.time()
-        self.raw_points = list()
-    
-    def add_raw_point(self, raw_point):
-        """append new raw_point to the points list."""
-        self.raw_points.append(raw_point)
+#class RPLidarRawFrame(object):
+#    """Raw frame from the RPLidar scan.
+#    
+#    Save the timestamp and raw points of a complete frame. This is for archiving
+#    the data.
+#    
+#    Attibutes:
+#        timestamp: when the frame is initiated and recorded.
+#
+#        raw_points: a list of points (in raw RPLidar binary format) of a 
+#        complete frame, starting from the point with syncbit == 1.
+#    """
+#    
+#    def __init__(self):
+#        self.timestamp = time.time()
+#        self.raw_points = list()
+#    
+#    def add_raw_point(self, raw_point):
+#        """append new raw_point to the points list."""
+#        self.raw_points.append(raw_point)
 
 
 class RPLidarFrame(object):
@@ -98,7 +98,7 @@ class RPLidarFrame(object):
     def __init__(self, maxlen=360):
 
         #self.updated = False
-        self.angle_d = deque(maxlen = maxlen)
+        #self.angle_d = deque(maxlen = maxlen)
         self.angle_r = deque(maxlen = maxlen)
         self.distance = deque(maxlen = maxlen)
         self.x = deque(maxlen = maxlen)
@@ -116,12 +116,14 @@ class RPLidarFrame(object):
         angle_r = np.radians(angle_d)
         distance = point.distance_q2 / 4.0
         #print 'distance: ', distance
-        self.angle_d.append(angle_d)
+        #self.angle_d.append(angle_d)
+        if point.byte0.sync_quality > 40:
+            print'strength: ', point.byte0.sync_quality        
         self.angle_r.append(angle_r)
         self.distance.append(distance)
         self.x.append(distance * np.sin(angle_r))
         self.y.append(distance * np.cos(angle_r))
-
+        #print len(self.x)
 
 class RPLidarPoint(object):
     
