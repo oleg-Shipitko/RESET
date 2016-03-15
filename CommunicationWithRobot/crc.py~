@@ -1,0 +1,45 @@
+import numpy
+import sys
+
+class CrcCalculator(object):
+
+	def __init__(self):
+		self.crcPoly = numpy.uint64(0x4C11DB7)
+		#print 'self.crcPoly size is ' + str(sys.getsizeof(self.crcPoly))
+		self.crcTable = [numpy.uint32(0)]*512		
+
+	def GetTwoBytesFromCrc32(self, data):		 
+		fullCRC = str(hex(self.GetCrc32(data)))
+		lastBytes = str(fullCRC)[len(fullCRC) - 2:len(fullCRC) + 1]
+		almostLastBytes = str(fullCRC)[len(fullCRC) - 4:len(fullCRC) - 2]
+		return lastBytes + almostLastBytes
+
+	def GetCrc32(self, data):
+		crc = numpy.uint32(0xFFFFFFFF)
+		#print 'crc size is ??' + str(sys.getsizeof(crc))
+		for i in range(len(data)):
+			#print 'Data: ' + hex(data[i])
+			crc = self.RecountCrc(data[i], crc)
+			print 'crc size is !!' + str(sys.getsizeof(sys.getsizeof(crc)))
+			#print 'CRC #' + str(i) + ' ' + str(crc)
+		print 'HEX CRC32: ' + str(crc)
+		return crc
+
+	def RecountCrc(self, byte, crcOld):
+		crc = numpy.uint32(crcOld) ^ numpy.uint32(byte)
+		print 'Bin: ' + bin(crc & numpy.uint32(0x80000000))
+		#print 'crc size is !' + str(sys.getsizeof(crc))
+		#print 'crc ' + str(crc) + ' type: ' + str(type(crc))
+		for i in range(32):
+			#print 'numpy.uint32(0x80000000) size is ' + str(sys.getsizeof(numpy.uint32(0x80000000)))
+			if (crc & numpy.uint32(0x80000000)) is 0:
+				crc = (crc << numpy.uint32(1))&numpy.uint32(0xFFFFFFFF)
+				print bin(crc)
+				#print 'numpy.uint32(1) size is ' + str(sys.getsizeof(numpy.uint32(1)))
+				#print 'numpy.uint32(0xFFFFFFFF) size is ' + str(sys.getsizeof(numpy.uint32(0xFFFFFFFF)))
+			else:
+				crc = ((crc << numpy.uint32(1))&numpy.uint32(0xFFFFFFFF)) ^ numpy.uint32(self.crcPoly)
+		return crc
+
+			
+		
