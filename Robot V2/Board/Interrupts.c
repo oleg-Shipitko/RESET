@@ -65,7 +65,7 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
         {
           traceFlag = 1;  // точка достигнута
         }
-  else traceFlag =0;
+  else traceFlag = 0;
  if (!movFlag)
     if (points[0].movTask) movFlag=(points[0].movTask)(); else movFlag =1; // действие в процессе движения
  if (traceFlag&&movFlag&&(!endFlag))

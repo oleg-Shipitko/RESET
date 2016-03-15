@@ -38,16 +38,16 @@ Path curPath; //параметры активной прямой для траекторного регулятора
 //acc    = (*(parameters+3)); acceleration
 //decc   = (*(parameters+4));  deceleration
 
-float normalVel[5] = {0.6,0.2,0.2,4.0,2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVel[5] = {0.6,0.2,-0.2,3.0,2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVel[5] = {0.6,0.6,-0.6,1.0,2.5};                                       //удержание заданного положения
+float normalVel[5] = {0.6, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVel[5] = {0.6, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVel[5] = {0.6, 0.6, -0.6, 1.0, 2.5};                                       //удержание заданного положения
 
-float normalRot[5] = {3.0,1.0,0.2,4.0,4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopRot[5] = {3.0,1.0,-1.0,4.0,3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
-float standRot[5] = {4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положения
+float normalRot[5] = {3.0, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopRot[5] = {3.0, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRot[5] = {4.0, 4.0, -1.0, 1.0, 2.5};                                       //удержание заданного положения
 
-float * speedType[3] = {normalVel,stopVel,standVel};                            // типы  линейный скоростей
-float * rotType[3] = {normalRot,stopRot,standRot};                              // типы угловых скоростей
+float * speedType[3] = {normalVel, stopVel, standVel};                            // типы  линейный скоростей
+float * rotType[3] = {normalRot, stopRot, standRot};                              // типы угловых скоростей
 //______________________________________________________________________________
 ////////////////////////////////////////////////////////////////////////////////
 void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из очереди
@@ -67,7 +67,7 @@ void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из о
    }
 }
 
-void addPointInFrontOfQueue(pathPointStr *points, float *newPoint, char *ch, char *lastPoint) // добавление точки в начало очереди
+void addPointInFrontOfQueue(pathPointStr *pointsArray, float *newPoint, char *ch, char *lastPoint) // добавление точки в начало очереди
 {
   char j;
   int8_t i;
@@ -144,10 +144,10 @@ void Cost(float *inpMatr,char rows,float cost,float *outKoff)
 void MaxValue(float *a,char rows,float *b)
 {
   char i;
-  *b=fabs(*a);
-  for (i = 0; (i<=rows-1); i++)
-    if ( (*b) < fabs(*(a+i)))
-      *b=fabs(*(a+i));
+  *b = fabs(*a);
+  for (i = 0; (i <= rows - 1); i++)
+    if ((*b) < fabs(*(a+i)))
+      *b = fabs(*(a + i));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -677,31 +677,37 @@ else
 													scale(accelDec,timeToStop*timeToStop/2.0)))));
             float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
 											scale(newAccelDec,timeToStop))));
-        if (incErr > decErr) {
-            if (decErr < zerErr) {
+        if (incErr > decErr)
+        {
+            if (decErr < zerErr)
+            {
                 AccelInc1 = accelDec;
                 CurSpeed = newSpeedDec;
                 CurAccel = newAccelDec;
-            } else
+            }
+            else
             {
                 AccelInc1.x = 0;
                 AccelInc1.y = 0;
 
-                CurSpeed =newSpeedZer;
+                CurSpeed = newSpeedZer;
             }
 
-        } else
+        }
+        else
         {
-            if (incErr<zerErr) {
-                AccelInc1=accelInc;
-                CurSpeed =newSpeedInc;
-                CurAccel= newAccelInc;
-            }else{
+            if (incErr < zerErr) {
+                AccelInc1 = accelInc;
+                CurSpeed = newSpeedInc;
+                CurAccel = newAccelInc;
+            }
+            else
+            {
                 AccelInc1.x = 0;
                 AccelInc1.y = 0;
                 CurSpeed =newSpeedZer;
             }
         }
-        if (mod(CurAccel)>MAX_ACCEL)
-   			   CurAccel=normalization( CurAccel, MAX_ACCEL);
+        if (mod(CurAccel) > MAX_ACCEL)
+   			   CurAccel = normalization(CurAccel, MAX_ACCEL);
   }*/
