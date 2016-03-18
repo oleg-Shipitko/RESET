@@ -85,6 +85,7 @@ typedef struct {
   char pidEnabled;
   char trackEn;
   char kinemEn;
+  char filtering;
 } robStateStruct;
 
 extern float robotCoordTarget[3];

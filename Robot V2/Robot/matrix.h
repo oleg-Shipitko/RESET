@@ -1,10 +1,10 @@
 #ifndef __MATR
 #define __MATR
 
-typedef struct{
+  struct TVector {
 	float x;
 	float y;
-} TVector;
+} ;
 
 void matrixCopy(float *m, char rows, char columns, float *new_m);
 float matrixGetCell(float *m, char rows, char columns, char row, char column);

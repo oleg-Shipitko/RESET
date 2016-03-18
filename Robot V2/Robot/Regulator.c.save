@@ -17,6 +17,15 @@ PidStruct ortoPos;  // структура ПИД отклонения от траектории
 
 uint16_t totalPointComplite = 0;  //Всего пройдено точек
 
+float MAX_ACCEL = 0.5;
+float MAX_ACCEL_INC = 0.1;
+float ACCEL_INC = 0.2;
+struct TVector CurSpeed = {0, 0};
+struct TVector CurAccel = {0, 0};
+struct TVector AccelInc1 = {0, 0};
+struct TVector AccelInc2 = {0, 0};
+struct TVector TargSpeed = {0, 0};
+
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
                                         {0.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {1.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -38,16 +47,16 @@ Path curPath; //параметры активной прямой для траекторного регулятора
 //acc    = (*(parameters+3)); acceleration
 //decc   = (*(parameters+4));  deceleration
 
-float normalVel[5]= {0.6,0.2,0.2,4.0,2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVel[5]={0.6,0.2,-0.2,3.0,2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVel[5]={0.6,0.6,-0.6,1.0,2.5};                                       //удержание заданного положения
+float normalVel[5] = {0.6, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVel[5] = {0.6, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVel[5] = {0.6, 0.6, -0.6, 1.0, 2.5};                                       //удержание заданного положения
 
-float normalRot[5]= {3.0,1.0,0.2,4.0,4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopRot[5]= {3.0,1.0,-1.0,4.0,3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
-float standRot[5]={4.0,4.0,-1.0,1.0,2.5};                                       //удержание заданного положения
+float normalRot[5] = {3.0, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopRot[5] = {3.0, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRot[5] = {4.0, 4.0, -1.0, 1.0, 2.5};                                       //удержание заданного положения
 
-float * speedType[3] = {normalVel,stopVel,standVel};                            // типы  линейный скоростей
-float * rotType[3] = {normalRot,stopRot,standRot};                              // типы угловых скоростей
+float * speedType[3] = {normalVel, stopVel, standVel};                            // типы  линейный скоростей
+float * rotType[3] = {normalRot, stopRot, standRot};                              // типы угловых скоростей
 //______________________________________________________________________________
 ////////////////////////////////////////////////////////////////////////////////
 void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из очереди
@@ -67,9 +76,10 @@ void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из о
    }
 }
 
-void addPointInFrontOfQueue(pathPointStr * points, float *newPoint, char *ch, char *lastPoint) // добавление точки в начало очереди
+void addPointInFrontOfQueue(pathPointStr *pointsArray, float *newPoint, char *ch, char *lastPoint) // добавление точки в начало очереди
 {
-  char i, j;
+  char j;
+  int8_t i;
   for (i = *lastPoint; i >= 0; i--)
   {
       if (!((i + 1) > POINT_STACK_SIZE))
@@ -78,7 +88,14 @@ void addPointInFrontOfQueue(pathPointStr * points, float *newPoint, char *ch, ch
             *(((char *)(&points[i + 1])) + j) = *(((char *)(&points[i])) + j);
       }
   }
-  lastPoint++;
+  points[0].center[0] = *newPoint;
+  points[0].center[1] = *(newPoint + 1);
+  points[0].center[2] = *(newPoint + 2);
+  points[0].speedVelTipe = speedType[*ch];
+  points[0].speedRotTipe = rotType[*ch];
+  points[0].endTask = NULL;
+  points[0].movTask = NULL;
+  (*lastPoint)++;
 }
 
 void initRegulators(void)  // инициализация регуляторов
@@ -136,10 +153,10 @@ void Cost(float *inpMatr,char rows,float cost,float *outKoff)
 void MaxValue(float *a,char rows,float *b)
 {
   char i;
-  *b=fabs(*a);
-  for (i = 0; (i<=rows-1); i++)
-    if ( (*b) < fabs(*(a+i)))
-      *b=fabs(*(a+i));
+  *b = fabs(*a);
+  for (i = 0; (i <= rows - 1); i++)
+    if ((*b) < fabs(*(a+i)))
+      *b = fabs(*(a + i));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -293,7 +310,7 @@ uE = ortoPos.output;
   matrixMultiplyM2M(&buf[0][0],2,2,&buf3[0][0],2,1,V_local);
 }
 ////////////////////////////////////////////////////////////////////////////////
-void TrackRegulator(float* Coord_cur, float* SpeedCur, Path *cur, float *V)
+void TrackRegulator(float *Coord_cur, float *SpeedCur, Path *cur, float *V)
 {
 float velocity[3] = {0.0, 0.0, 0.0};
 float cosAlphZad = cosf(cur->alphZad), sinAlphZad = sinf(cur->alphZad);
@@ -320,28 +337,30 @@ if (cur->Coord_local_track[2]<0) cur->Coord_local_track[2]+=2.0*PI;
 //	tracer=Coord_local_track[0];
 
 
-Moving(cur->Coord_local_track[0],(cur->lengthTrace),(cur->traceVel),&velFromEt[0]);
-RotMoving((cur->coordCenter[2]), robotCoord[2],(cur->phiZad),(cur->omegaVel),&velFromEt[1]);
+Moving(cur->Coord_local_track[0], (cur->lengthTrace), (cur->traceVel), &velFromEt[0]);
+RotMoving((cur->coordCenter[2]), robotCoord[2], (cur->phiZad), (cur->omegaVel), &velFromEt[1]);
 //velFromEt[1]= velFromEt[1]*cur->phiDir;
 //LOCALCOORD(3,1)=(phiZad-CURCOORD(3,1));
 
 
 //VELOCITY=regulate(LOCALCOORD,vEt);
-Regulate(&(cur->Coord_local_track[0]),&(cur->Speed_local_track[0]),&t_alph_zad[0][0],&velFromEt[0],&(cur->alphZad), &velocity[0]);
+Regulate(&(cur->Coord_local_track[0]), &(cur->Speed_local_track[0]), &t_alph_zad[0][0], &velFromEt[0], &(cur->alphZad), &velocity[0]);
 matrixCopy(&velocity[0], 3, 1, &V[0]);
+
 }////////////////////////////////////////////////////////////////////////////////
+
 float linars(float *x, float *x0, float *x1)
 {
   float out = (((*x - (*x0)) / (*x1 - *(x0))) * (*(x1+1) - (*(x0+1)))) + (*(x0+1));
   return out;
 }
+
 void rangeAngle(float * angle)
 {
   *angle    = fmod(*angle,2.0*PI);
   if (*angle<-PI) *angle+=2.0*PI;
   if (*angle>PI) *angle-=2.0*PI;
 }
-
 
 void RotMoving(float Start_a, float Coord_a_cur, float Coord_a_targ, float* parameters, float* v_out) //расчет скорости в зависимости от пройденного пути
 {
@@ -382,6 +401,7 @@ if (angleErr<0) out=-out;
 }
 //float stopVel[5]={0.02,0.1,-0.1,0.7,0.9};
 ////////////////////////////////////////////////////////////////////////////////
+
 void Moving(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_out) //расчет скорости в зависимости от пройденного пути
 {
 float vStart, vSt, vEnd, acc, decc;
@@ -628,64 +648,80 @@ else
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-void SpeedFiltration(TObject *Sender)
+void SpeedFiltration(float *V)
   {
-        MAX_ACCEL = float(ScrollBar2->Position)/100.0 ;
-        MAX_ACCEL_INC = float(ScrollBar1->Position)/100.0 ;
+        TargSpeed.x = V[0];
+        TargSpeed.y = V[1];
 
-        float ACCEL_INC =pow(mod(subtraction(CurSpeed,TargSpeed))*10.0,2)/10.0+0.001+mod(CurAccel)/2.0;
-        if (ACCEL_INC>MAX_ACCEL_INC) { ACCEL_INC =MAX_ACCEL_INC; }
-        if (ACCEL_INC<-MAX_ACCEL_INC) { ACCEL_INC =-MAX_ACCEL_INC; }
+        struct TVector temp;
+        subtraction(CurSpeed,TargSpeed, &temp);
+        ACCEL_INC = pow(mod(temp) * 10.0, 2) / 10.0 + 0.001 + mod(CurAccel) / 2.0;
+        // ACCEL_INC = pow(mod(subtraction(CurSpeed,TargSpeed)) * 10.0, 2)/10.0 + 0.001 + mod(CurAccel)/2.0;
+        if (ACCEL_INC > MAX_ACCEL_INC) { ACCEL_INC = MAX_ACCEL_INC;}
+        if (ACCEL_INC < -MAX_ACCEL_INC) { ACCEL_INC = -MAX_ACCEL_INC;}
+        struct TVector accelInc;
+        subtraction(TargSpeed, CurSpeed, &temp);
+        subtraction(temp, CurAccel, &temp);
+        normalization(temp, ACCEL_INC, &temp);
+        accelInc = temp;
+        subtraction(TargSpeed, CurSpeed, &temp);
+        subtraction(CurAccel, temp, &temp);
+        normalization(temp, ACCEL_INC, &temp);
+        struct TVector accelDec = temp;
 
-        TVector accelInc =normalization(subtraction(subtraction(TargSpeed,CurSpeed),CurAccel),ACCEL_INC);
-        TVector accelDec =normalization(subtraction(CurAccel,subtraction(TargSpeed,CurSpeed)),ACCEL_INC);
-
-
-        TVector newAccelInc = addition(CurAccel,accelInc);
-        TVector newAccelDec = addition(CurAccel,accelDec);
-
-        TVector newSpeedInc =addition(CurSpeed,newAccelInc);
-        TVector newSpeedDec =addition(CurSpeed,newAccelDec);
-        TVector newSpeedZer =addition(CurSpeed,CurAccel);
+        struct TVector newAccelInc, newAccelDec;
+        addition(CurAccel, accelInc, newAccelInc);
+        addition(CurAccel,accelDec, newAccelDec);
+sss
+        struct TVector newSpeedInc = addition(CurSpeed,newAccelInc);
+        struct TVector newSpeedDec = addition(CurSpeed,newAccelDec);
+        struct TVector newSpeedZer = addition(CurSpeed,CurAccel);
         float timeToStop;
-        if (mod(accelInc)>0)
-			 timeToStop = abs(mod(CurAccel)/mod(accelInc))/2.0+0.50 ;
-        else timeToStop=1;
+        if (mod(accelInc) > 0)
+			 timeToStop = abs(mod(CurAccel)/mod(accelInc))/2.0 + 0.50;
+        else timeToStop = 1;
             float incErr = mod(subtraction(TargSpeed,addition(newSpeedInc,
 											addition(scale(newAccelInc,timeToStop),
 													scale(accelInc,timeToStop*timeToStop/2.0)))));
-            float decErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+        float decErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
 											addition(scale(newAccelDec,timeToStop),
 													scale(accelDec,timeToStop*timeToStop/2.0)))));
-            float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+        float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
 											scale(newAccelDec,timeToStop))));
-        if (incErr>decErr) {
-            if (decErr<zerErr) {
-                AccelInc1=accelDec;
-                CurSpeed =newSpeedDec;
-                CurAccel= newAccelDec;
-            } else
+        if (incErr > decErr)
+        {
+            if (decErr < zerErr)
             {
-                AccelInc1.x=0;
+                AccelInc1 = accelDec;
+                CurSpeed = newSpeedDec;
+                CurAccel = newAccelDec;
+            }
+            else
+            {
+                AccelInc1.x = 0;
                 AccelInc1.y = 0;
 
-                CurSpeed =newSpeedZer;
+                CurSpeed = newSpeedZer;
             }
 
-        } else
+        }
+        else
         {
-            if (incErr<zerErr) {
-                AccelInc1=accelInc;
-                CurSpeed =newSpeedInc;
-                CurAccel= newAccelInc;
-            }else{
+            if (incErr < zerErr) {
+                AccelInc1 = accelInc;
+                CurSpeed = newSpeedInc;
+                CurAccel = newAccelInc;
+            }
+            else
+            {
                 AccelInc1.x = 0;
                 AccelInc1.y = 0;
                 CurSpeed =newSpeedZer;
             }
         }
-        if (mod(CurAccel)>MAX_ACCEL)
-   			   CurAccel=normalization( CurAccel,MAX_ACCEL);
+        if (mod(CurAccel) > MAX_ACCEL)
+   			   CurAccel = normalization(CurAccel, MAX_ACCEL);
+        V[0] = CurSpeed.x;
+        V[1] = CurSpeed.y;
   }

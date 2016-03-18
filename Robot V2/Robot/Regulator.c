@@ -17,6 +17,15 @@ PidStruct ortoPos;  // структура ПИД отклонения от траектории
 
 uint16_t totalPointComplite = 0;  //Всего пройдено точек
 
+float MAX_ACCEL = 0.5;
+float MAX_ACCEL_INC = 0.1;
+float ACCEL_INC = 0.2;
+struct TVector CurSpeed = {0, 0};
+struct TVector CurAccel = {0, 0};
+struct TVector AccelInc1 = {0, 0};
+struct TVector AccelInc2 = {0, 0};
+struct TVector TargSpeed = {0, 0};
+
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
                                         {0.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {1.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -337,6 +346,7 @@ RotMoving((cur->coordCenter[2]), robotCoord[2], (cur->phiZad), (cur->omegaVel), 
 //VELOCITY=regulate(LOCALCOORD,vEt);
 Regulate(&(cur->Coord_local_track[0]), &(cur->Speed_local_track[0]), &t_alph_zad[0][0], &velFromEt[0], &(cur->alphZad), &velocity[0]);
 matrixCopy(&velocity[0], 3, 1, &V[0]);
+
 }////////////////////////////////////////////////////////////////////////////////
 
 float linars(float *x, float *x0, float *x1)
@@ -639,32 +649,34 @@ else
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/*void SpeedFiltration()
+void SpeedFiltration(float *V)
   {
-        TVector CurSpeed={0,0};
-        TVector CurAccel={0,0};
-        TVector AccelInc1 ={0,0};
-        TVector AccelInc2 ={0,0};
-        TVector TargSpeed={0,0};
+        TargSpeed.x = V[0];
+        TargSpeed.y = V[1];
 
-        float MAX_ACCEL = 0.5;
-        float MAX_ACCEL_INC = 0.1;
-        float ACCEL_INC = 0.2;
+        struct TVector temp;
+        subtraction(CurSpeed,TargSpeed, &temp);
+        ACCEL_INC = pow(mod(temp) * 10.0, 2) / 10.0 + 0.001 + mod(CurAccel) / 2.0;
+        if (ACCEL_INC > MAX_ACCEL_INC) { ACCEL_INC = MAX_ACCEL_INC;}
+        if (ACCEL_INC < -MAX_ACCEL_INC) { ACCEL_INC = -MAX_ACCEL_INC;}
+        struct TVector accelInc;
+        subtraction(TargSpeed, CurSpeed, &temp);
+        subtraction(temp, CurAccel, &temp);
+        normalization(temp, ACCEL_INC, &temp);
+        accelInc = temp;
+        subtraction(TargSpeed, CurSpeed, &temp);
+        subtraction(CurAccel, temp, &temp);
+        normalization(temp, ACCEL_INC, &temp);
+        struct TVector accelDec = temp;
 
-        float ACCEL_INC = pow(mod(subtraction(CurSpeed,TargSpeed)) * 10.0, 2)/10.0 + 0.001 + mod(CurAccel)/2.0;
-        if (ACCEL_INC>MAX_ACCEL_INC) { ACCEL_INC = MAX_ACCEL_INC;}
-        if (ACCEL_INC<-MAX_ACCEL_INC) { ACCEL_INC = -MAX_ACCEL_INC;}
+        struct TVector newAccelInc, newAccelDec;
+        addition(CurAccel, accelInc, &newAccelInc);
+        addition(CurAccel, accelDec, &newAccelDec);
 
-        TVector accelInc = normalization(subtraction(subtraction(TargSpeed,CurSpeed),CurAccel),ACCEL_INC);
-        TVector accelDec = normalization(subtraction(CurAccel,subtraction(TargSpeed,CurSpeed)),ACCEL_INC);
-
-
-        TVector newAccelInc = addition(CurAccel,accelInc);
-        TVector newAccelDec = addition(CurAccel,accelDec);
-
-        TVector newSpeedInc = addition(CurSpeed,newAccelInc);
-        TVector newSpeedDec = addition(CurSpeed,newAccelDec);
-        TVector newSpeedZer = addition(CurSpeed,CurAccel);
+        struct TVector newSpeedInc, newSpeedDec, newSpeedZer;
+        addition(CurSpeed, newAccelInc, &newSpeedInc);
+        addition(CurSpeed, newAccelDec, &newSpeedDec);
+        addition(CurSpeed, CurAccel, &newSpeedZer);
         float timeToStop;
         if (mod(accelInc) > 0)
 			 timeToStop = abs(mod(CurAccel)/mod(accelInc))/2.0 + 0.50;
@@ -672,10 +684,10 @@ else
             float incErr = mod(subtraction(TargSpeed,addition(newSpeedInc,
 											addition(scale(newAccelInc,timeToStop),
 													scale(accelInc,timeToStop*timeToStop/2.0)))));
-            float decErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+        float decErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
 											addition(scale(newAccelDec,timeToStop),
 													scale(accelDec,timeToStop*timeToStop/2.0)))));
-            float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
+        float zerErr = mod(subtraction(TargSpeed,addition(newSpeedDec,
 											scale(newAccelDec,timeToStop))));
         if (incErr > decErr)
         {
@@ -709,5 +721,7 @@ else
             }
         }
         if (mod(CurAccel) > MAX_ACCEL)
-   			   CurAccel = normalization(CurAccel, MAX_ACCEL);
-  }*/
+   			    normalization(CurAccel, MAX_ACCEL, &CurAccel);
+        V[0] = CurSpeed.x;
+        V[1] = CurSpeed.y;
+  }
