@@ -3,7 +3,7 @@ import cv2
 from matplotlib import pyplot as plt
 from math import sin, cos, tan, sqrt, pi, atan
 
-cap = cv2.VideoCapture(0)#Set some geometric parameters for further projection
+cap = cv2.VideoCapture(1)#Set some geometric parameters for further projection
 
 #Set some geometric parameters for further projection
 h = 0.4 #the vertical distance from the ground to camera [in meters]
@@ -47,12 +47,11 @@ while(True):
 
     a = len (keypoints)
 
-    if (a==0):
-        print "None"
+    points = []
 
-    if (a==1):
-        x0 = keypoints[0].pt[0] #i is the index of the blob you want to get the position
-        y0 = keypoints[0].pt[1]
+    for keypoint in keypoints:
+        x0 = keypoint.pt[0] #i is the index of the blob you want to get the position
+        y0 = keypoint.pt[1]
         cx = x0
         cy = y0
         ksiE = cx*ksim/Nx
@@ -76,146 +75,21 @@ while(True):
         X = int(X*100)
         Y = int(Y*100)
         R0 = int(R0*100)
+        points.append((X, Y, R0))
 
-    if (a==2):
-        x0 = keypoints[0].pt[0] #i is the index of the blob you want to get the position
-        y0 = keypoints[0].pt[1]
-        x1 = keypoints[1].pt[0]
-        y1 = keypoints[1].pt[1]
+    s = str(points)
+    
+    #points.sort()
 
-        cx0 = x0
-        cy0 = y0
-        ksiE0 = cx0*ksim/Nx
-        ethaE0 = cy0*etham/Ny
-        Nx1 = ksim
-        Ny1 = etham
+    #b = points[0]
+    #print points[0]
 
-        ksiA0 = ksiE0 - Nx1/2
-        ethaA0 = -(ethaE0 - Ny1/2)
-
-        YA10 = YA + ethaA0*cos(gamma)
-        ZA10 = (YA10 - YM)*tan(gamma)
-        XA10 = ksiA0
-
-        t0 = h/(h-ZA10)
-        X0 = XA10*t0
-        Y0 = YA10*t0
-
-        R0 = sqrt(X0**2+Y0**2)
-
-        X0 = int(X0*100)
-        Y0 = int(Y0*100)
-        R0 = int(R0*100)
-
-        cx1 = x1
-        cy1 = y1
-        ksiE1 = cx1*ksim/Nx
-        ethaE1 = cy1*etham/Ny
-        Nx1 = ksim
-        Ny1 = etham
-
-        ksiA1 = ksiE1 - Nx1/2
-        ethaA1 = -(ethaE1 - Ny1/2)
-
-        YA11 = YA + ethaA1*cos(gamma)
-        ZA11 = (YA11 - YM)*tan(gamma)
-        XA11 = ksiA1
-
-        t1 = h/(h-ZA11)
-        X1 = XA11*t1
-        Y1 = YA11*t1
-
-        R1 = sqrt(X1**2+Y1**2)
-
-        X1 = int(X1*100)
-        Y1 = int(Y1*100)
-        R1 = int(R1*100)
-
-    if (a==3):
-        x0 = keypoints[0].pt[0] #i is the index of the blob you want to get the position
-        y0 = keypoints[0].pt[1]
-        x1 = keypoints[1].pt[0]
-        y1 = keypoints[1].pt[1]
-        x2 = keypoints[2].pt[0]
-        y2 = keypoints[2].pt[1]
-
-        cx0 = x0
-        cy0 = y0
-        ksiE0 = cx0*ksim/Nx
-        ethaE0 = cy0*etham/Ny
-        Nx1 = ksim
-        Ny1 = etham
-
-        ksiA0 = ksiE0 - Nx1/2
-        ethaA0 = -(ethaE0 - Ny1/2)
-
-        YA10 = YA + ethaA0*cos(gamma)
-        ZA10 = (YA10 - YM)*tan(gamma)
-        XA10 = ksiA0
-
-        t0 = h/(h-ZA10)
-        X0 = XA10*t0
-        Y0 = YA10*t0
-
-        R0 = sqrt(X0**2+Y0**2)
-
-        X0 = int(X0*100)
-        Y0 = int(Y0*100)
-        R0 = int(R0*100)
-
-        cx1 = x1
-        cy1 = y1
-        ksiE1 = cx1*ksim/Nx
-        ethaE1 = cy1*etham/Ny
-        Nx1 = ksim
-        Ny1 = etham
-
-        ksiA1 = ksiE1 - Nx1/2
-        ethaA1 = -(ethaE1 - Ny1/2)
-
-        YA11 = YA + ethaA1*cos(gamma)
-        ZA11 = (YA11 - YM)*tan(gamma)
-        XA11 = ksiA1
-
-        t1 = h/(h-ZA11)
-        X1 = XA11*t1
-        Y1 = YA11*t1
-
-        R1 = sqrt(X1**2+Y1**2)
-
-        X1 = int(X1*100)
-        Y1 = int(Y1*100)
-        R1 = int(R1*100)
-
-        cx2 = x2
-        cy2 = y2
-        ksiE2 = cx2*ksim/Nx
-        ethaE2 = cy2*etham/Ny
-        Nx1 = ksim
-        Ny1 = etham
-
-        ksiA2 = ksiE2 - Nx1/2
-        ethaA2 = -(ethaE2 - Ny1/2)
-
-        YA12 = YA + ethaA2*cos(gamma)
-        ZA12 = (YA12 - YM)*tan(gamma)
-        XA12 = ksiA2
-
-        t2 = h/(h-ZA12)
-        X2 = XA11*t2
-        Y2 = YA11*t2
-
-        R2 = sqrt(X2**2+Y2**2)
-
-        X2 = int(X2*100)
-        Y2 = int(Y2*100)
-        R2 = int(R2*100)
 
     cv2.putText(img = im_with_keypoints, 
-                        text = "R1 = %s cm, R2 = %s cm, R3 = %s cm" % (str(R0),str(R1),str(R2)),
+                        text = s,
                         org = (0, int(Ny)), 
                         fontFace = cv2.FONT_HERSHEY_DUPLEX, 
-                        fontScale = 1, 
+                        fontScale = 0.5,
                         color = (0,0,255))
    
     #cv2.imshow('frame',frame)
