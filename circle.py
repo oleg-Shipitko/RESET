@@ -20,15 +20,6 @@ class Geometry(object):
         # http://stackoverflow.com/a/3349134/798588
         dx,dy = x2-x1,y2-y1
         d = sqrt(dx*dx+dy*dy)
-        if d > r1+r2:
-            print "#1"
-            return None # no solutions, the circles are separate
-        if d < abs(r1-r2):
-            print "#2"
-            return None # no solutions because one circle is contained within the other
-        if d == 0 and r1 == r2:
-            print "#3"
-            return None # circles are coincident and there are an infinite number of solutions
 
         a = (r1*r1-r2*r2+d*d)/(2*d)
         h = sqrt(r1*r1-a*a)
@@ -39,21 +30,6 @@ class Geometry(object):
         ys1 = ym - h*dx/d
         ys2 = ym + h*dx/d
 
-        return (xs1,ys1),(xs2,ys2)
-
-    def circle_intersection_sympy(self, circle1, circle2):
-        from sympy.geometry import Circle, Point
-        x1,y1,r1 = circle1
-        x2,y2,r2 = circle2
-        c1=Circle(Point(x1,y1),r1)
-        c2=Circle(Point(x2,y2),r2)
-        intersection = c1.intersection(c2)
-        if len(intersection) == 1:
-            intersection.append(intersection[0])
-        p1 = intersection[0]
-        p2 = intersection[1]
-        xs1,ys1 = p1.x,p1.y
-        xs2,ys2 = p2.x,p2.y
         return (xs1,ys1),(xs2,ys2)
 
 def test_circle_intersection():
@@ -71,3 +47,4 @@ def test_circle_intersection():
         geom.circle_intersection((0,0,1),(cos(d2r*45)*2,0,1)),
         ((cos(d2r*45),-sin(d2r*45)),
          (cos(d2r*45),+sin(d2r*45))))
+
