@@ -81,9 +81,9 @@ char setVoltage(char ch, float duty) // установить напряжени�
 
 char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,0
 {
-    if (duty>1 )duty=1;
-    if (duty<0 )duty=0;
-    *PWM_CCR[ch] = (int32_t)((duty*MAX_PWM));
+    if (duty > 1 ) duty = 1;
+    if (duty < 0 ) duty = 0;
+    *PWM_CCR[ch] = (int32_t)((duty * MAX_PWM));
     return 0;
 }
 
@@ -206,10 +206,10 @@ switch(cmd->command)
   case 0x03: //установить скважность шим
   {
       char  ch = *cmd->param;
-      float  temp =*((float*)(cmd->param+1));
-      setPWM( ch-1, temp);
+      float  temp =*((float*)(cmd->param + 1));
+      setPWM( ch - 1, temp);
       char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
+      sendAnswer(cmd->command, str, 3);
 
   }
   break;

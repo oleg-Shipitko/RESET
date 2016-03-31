@@ -1,0 +1,13 @@
+#ifndef _MANIPULATORS_INCLUDED_
+#define _MANIPULATORS_INCLUDED_
+
+
+///////////////////////////SEASHELLS///////////////////////////
+#define DOORS_ID 1
+#define LIFT_ID 2
+
+void closeDoors();
+void liftSeashell();
+///////////////////////////////////////////////////////////////
+
+#endif

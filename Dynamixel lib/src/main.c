@@ -22,6 +22,7 @@
 #define CW  0x0400
 #define CCW 0x0000
 
+
 void RCC_Config(void)
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
@@ -57,7 +58,7 @@ void USART_Config(void)
 {
     clearServoReceiveBuffer();
     USART_InitTypeDef USART;
-    USART.USART_BaudRate = 1000000;
+    USART.USART_BaudRate = 115200;
     USART.USART_WordLength = USART_WordLength_8b;
     USART.USART_StopBits = USART_StopBits_1;
     USART.USART_Parity = USART_Parity_No;
@@ -87,57 +88,58 @@ void soft_delay(long int ticks)
 {
     for(; ticks > 0; ticks-- );
 }
-    uint16_t stVal = 0;
-    uint16_t finalVal = 300;
-    uint16_t curLoad;
+
+
+    uint16_t curSpeed, curAngle;
 
 
 int main(void)
 {
+
     SystemInit();
     RCC_Config();
     GPIO_Config();
     USART_Config();
 
-    uint8_t ID = 5;
-    bool flag = 0;
+    /*uint8_t ID = 1;
 
-    setServoTorque(ID, 500);
-    setServoCWAngleLimit(ID, 0);
-    setServoCCWAngleLimit(ID, 0);
+    bool isFinished = false;
+
+    uint16_t startingPos = 0;
+    uint16_t endingPos = 300;
+
     while(1)
     {
-        setServoMovingSpeed(ID, 0, CW);
-        setServoMovingSpeed(ID, 1023, CCW);
-        //setServoMovingSpeed(ID, 0, CCW);
-        flag = getCurrentLoad(ID, &curLoad);
-        if (curLoad > 900)
-        {
-            soft_delay(2000000);
-            soft_delay(2000000);
-            soft_delay(2000000);
-            setServoMovingSpeed(ID, 0, CCW);
-            setServoMovingSpeed(ID, 1023, CW);
-            soft_delay(2000000);
-            soft_delay(2000000);
-            soft_delay(2000000);
-        }
-        //setServoMovingSpeed(ID, 0);
-        //setServoMovingSpeed(ID, 1023, CCW);
-        //setServoMovingSpeed(ID, 0);
+        setServoTorque(ID, 500);
+        setServoCWAngleLimit(ID, 0);
+        setServoCCWAngleLimit(ID, 1023);
+        setServoAngle(ID, startingPos);
+        soft_delay(20000000);
+        soft_delay(20000000);
+        setServoAngle(ID, endingPos);
+        soft_delay(20000000);
+        soft_delay(20000000);
+        setServoAngle(ID, startingPos);
     }
-}
+
+}*/
 
  //  Towers manipulator controlled from the button on discovery
-  /*while(1)
+ //  !!! Servo 11 uses 115200 baudrate !!!
+
+  uint8_t ID = 11;
+  uint16_t stVal = 0;
+  uint16_t finalVal = 300;
+  bool flag = 0;
+
+  while(1)
   {
       while (1)
       {
           if (pin_val(BUTTON))
           {
-             soft_delay(1000000);
+             soft_delay(1000);
               if (pin_val(BUTTON))
-
               break;
          }
       }
@@ -148,10 +150,9 @@ int main(void)
           {
              soft_delay(1000);
               if (!pin_val(BUTTON))
-
               break;
           }
       }
       flag = setServoAngle(ID, finalVal);
   }
-} */
+}

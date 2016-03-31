@@ -1,4 +1,4 @@
-cscope 15 $HOME\Desktop\Shipitko Oleg\Repo\Robot V2"               0001556604
+cscope 15 $HOME\Desktop\Shipitko Oleg\Repo\Robot V2"               0001562204
 	@C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Board\ADC.c
 
 5 
@@ -379,7 +379,7 @@ robŸCo‹d
 
 68 
 åa˚Fœg
- =0;
+ = 0;
 
 69 i‡(!
 movFœg
@@ -413,15 +413,15 @@ poöts
 
 73 i‡(
 åa˚Fœg
-&&
+ && 
 movFœg
-&&
+ && 
 ídFœg
 )
 
 75 i‡(
 œ°Poöt
- >0)
+ > 0)
 
 77 
 tŸÆPoötCom∂ôe
@@ -431,11 +431,11 @@ tŸÆPoötCom∂ôe
 	`Cª©eP©h
 (&
 poöts
-[1],&poöts[0],&
+[1], &poöts[0], &
 curP©h
 );
 
-81 
+80 
 	`ªmovePoöt
 (&
 poöts
@@ -443,25 +443,25 @@ poöts
 œ°Poöt
 );
 
-83 
+81 
 ídFœg
 =0;
 
-84 
+82 
 movFœg
 =0;
 
-85 
+83 
 åa˚Fœg
 =0;
 
-93 i‡(
+89 i‡(
 curSèã
 .
 åackEn
 )
 
-95 
+91 
 	`TøckReguœt‹
 (&
 robŸCo‹d
@@ -473,7 +473,7 @@ curP©h
 vT¨gëGlob
 [0]);
 
-97 i‡(
+94 i‡(
 curSèã
 .
 köemEn
@@ -487,31 +487,31 @@ robŸCo‹dT¨gë
 ªguœt‹Out
 [0]);
 
-100 
+97 
 	`NVIC_E«bÀIRQ
 (
 TIM6_DAC_IRQn
 );
 
-102 
+99 
 	}
 }
 
-112 
+109 
 	$EXTI0_IRQH™dÀr
 ()
 
-114 
+111 
 EXTI
 ->
 PR
 =0x1;
 
-115 
+112 
 ãmp
  = 2;
 
-116 i‡–
+113 i‡–
 	`pö_vÆ
 (
 EXTI2_PIN
@@ -519,31 +519,31 @@ EXTI2_PIN
 ãmp
  |=0x80;
 
-117 
+114 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-118 
+115 
 	}
 }
 
-121 
+118 
 	$EXTI1_IRQH™dÀr
 ()
 
-123 
+120 
 EXTI
 ->
 PR
 =0x2;
 
-124 
+121 
 ãmp
  = 5;
 
-125 i‡–
+122 i‡–
 	`pö_vÆ
 (
 EXTI5_PIN
@@ -551,31 +551,31 @@ EXTI5_PIN
 ãmp
  |=0x80;
 
-126 
+123 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-127 
+124 
 	}
 }
 
-130 
+127 
 	$EXTI2_IRQH™dÀr
 ()
 
-132 
+129 
 EXTI
 ->
 PR
 =0x4;
 
-133 
+130 
 ãmp
  = 4;
 
-134 i‡–
+131 i‡–
 	`pö_vÆ
 (
 EXTI4_PIN
@@ -583,31 +583,31 @@ EXTI4_PIN
 ãmp
  |=0x80;
 
-135 
+132 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-136 
+133 
 	}
 }
 
-139 
+136 
 	$EXTI3_IRQH™dÀr
 ()
 
-141 
+138 
 EXTI
 ->
 PR
 =0x8;
 
-142 
+139 
 ãmp
  = 6;
 
-143 i‡–
+140 i‡–
 	`pö_vÆ
 (
 EXTI6_PIN
@@ -615,31 +615,31 @@ EXTI6_PIN
 ãmp
  |=0x80;
 
-144 
+141 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-146 
+143 
 	}
 }
 
-149 
+146 
 	$EXTI4_IRQH™dÀr
 ()
 
-151 
+148 
 EXTI
 ->
 PR
 =0x10;
 
-152 
+149 
 ãmp
  = 9;
 
-153 i‡–
+150 i‡–
 	`pö_vÆ
 (
 EXTI9_PIN
@@ -647,37 +647,37 @@ EXTI9_PIN
 ãmp
  |=0x80;
 
-154 
+151 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-156 
+153 
 	}
 }
 
-160 
+157 
 	$EXTI9_5_IRQH™dÀr
 ()
 
-162 i‡(
+159 i‡(
 EXTI
 ->
 PR
 &(1<<6))
 
-164 
+161 
 EXTI
 ->
 PR
 =(1<<6);
 
-165 
+162 
 ãmp
  = 7;
 
-166 i‡–
+163 i‡–
 	`pö_vÆ
 (
 EXTI7_PIN
@@ -685,29 +685,29 @@ EXTI7_PIN
 ãmp
  |=0x80;
 
-167 
+164 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-169 i‡(
+166 i‡(
 EXTI
 ->
 PR
 &(1<<7))
 
-171 
+168 
 EXTI
 ->
 PR
 =(1<<7);
 
-172 
+169 
 ãmp
  = 8;
 
-173 i‡–
+170 i‡–
 	`pö_vÆ
 (
 EXTI8_PIN
@@ -715,37 +715,37 @@ EXTI8_PIN
 ãmp
  |=0x80;
 
-174 
+171 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-177 
+174 
 	}
 }
 
-183 
+180 
 	$EXTI15_10_IRQH™dÀr
 ()
 
-185 i‡(
+182 i‡(
 EXTI
 ->
 PR
 &(1<<12))
 
-187 
+184 
 EXTI
 ->
 PR
 =(1<<12);
 
-188 
+185 
 ãmp
  = 3;
 
-189 i‡–
+186 i‡–
 	`pö_vÆ
 (
 EXTI3_PIN
@@ -753,29 +753,29 @@ EXTI3_PIN
 ãmp
  |=0x80;
 
-190 
+187 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-192 i‡(
+189 i‡(
 EXTI
 ->
 PR
 &(1<<13))
 
-194 
+191 
 EXTI
 ->
 PR
 =(1<<13);
 
-195 
+192 
 ãmp
  = 10;
 
-196 i‡–
+193 i‡–
 	`pö_vÆ
 (
 EXTI10_PIN
@@ -783,33 +783,33 @@ EXTI10_PIN
 ãmp
  |=0x80;
 
-197 
+194 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-199 i‡(
+196 i‡(
 EXTI
 ->
 PR
 &(1<<15))
 
-201 
+198 
 öt_˙t
 ++;
 
-202 
+199 
 EXTI
 ->
 PR
 =(1<<15);
 
-203 
+200 
 ãmp
  = 1;
 
-204 i‡–
+201 i‡–
 	`pö_vÆ
 (
 EXTI1_PIN
@@ -817,17 +817,17 @@ EXTI1_PIN
 ãmp
  |=0x80;
 
-205 
+202 
 	`£ndAnswî
 (0x1E,&
 ãmp
 , 1);
 
-208 
+205 
 	}
 }
 
-213 
+210 
 	$dñay
 (
 __IO
@@ -837,19 +837,19 @@ uöt32_t
 nCou¡
 )
 
-215 ; 
+212 ; 
 nCou¡
  != 0;ÇCount--);
 
-216 
+213 
 	}
 }
 
-222 
+219 
 	$DMA2_Såóm0_IRQH™dÀr
 ()
 
-224 
+221 
 DMA2
 ->
 LIFCR
@@ -857,7 +857,7 @@ LIFCR
 DMA_LIFCR_CTCIF0
 ;
 
-226 
+223 
 	}
 }
 
@@ -130759,6 +130759,284 @@ _EXTERN_VARIABLES_
 	~"Reguœt‹.h
 "
 
+	@C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\MANIPU~1.C
+
+1 
+	~"M™ùuœt‹s.h
+"
+
+2 
+	~"Dy«mixñ_c⁄åﬁ.h
+"
+
+5 
+	$so·_dñay
+(
+ticks
+)
+
+7 ; 
+ticks
+ > 0;Åicks-- );
+
+8 
+	}
+}
+
+9 
+uöt16_t
+ 
+	g°VÆ
+ = 0;
+
+10 
+uöt16_t
+ 
+	gföÆVÆ
+ = 300;
+
+11 
+uöt16_t
+ 
+	gcurLﬂd
+ = 0;
+
+14 
+	$˛o£Do‹s
+()
+
+16 
+boﬁ
+ 
+Êag
+ = 
+Ál£
+;
+
+17 
+	`£tSîvoT‹que
+(
+DOORS_ID
+, 500);
+
+18 
+	`£tSîvoCWAngÀLimô
+(
+DOORS_ID
+, 0);
+
+19 
+	`£tSîvoCCWAngÀLimô
+(
+DOORS_ID
+, 0);
+
+20 
+	`£tSîvoMovögS≥ed
+(
+DOORS_ID
+, 1023, 
+CCW
+);
+
+21 !
+Êag
+)
+
+23 
+	`gëCuºítLﬂd
+(
+DOORS_ID
+, &
+curLﬂd
+);
+
+24 i‡(
+curLﬂd
+ > 600)
+
+26 
+	`£tSîvoMovögS≥ed
+(
+DOORS_ID
+, 0, 
+CCW
+);
+
+27 
+Êag
+ = 
+åue
+;
+
+30 
+	}
+}
+
+32 
+	$li·Sóshñl
+()
+
+34 
+boﬁ
+ 
+Êag
+ = 
+Ál£
+;
+
+35 
+	`£tSîvoT‹que
+(
+LIFT_ID
+, 500);
+
+36 
+	`£tSîvoCWAngÀLimô
+(
+LIFT_ID
+, 0);
+
+37 
+	`£tSîvoCCWAngÀLimô
+(
+LIFT_ID
+, 0);
+
+38 
+	`£tSîvoMovögS≥ed
+(
+LIFT_ID
+, 1023, 
+CCW
+);
+
+39 
+	`£tSîvoMovögS≥ed
+(
+LIFT_ID
+, 0, 
+CW
+);
+
+40 !
+Êag
+)
+
+42 
+	`gëCuºítLﬂd
+(
+LIFT_ID
+, &
+curLﬂd
+);
+
+43 i‡(
+curLﬂd
+ > 600)
+
+45 
+curLﬂd
+ = 0;
+
+46 
+	`£tSîvoMovögS≥ed
+(
+LIFT_ID
+, 1023, 
+CW
+);
+
+47 
+	`so·_dñay
+(2000000);
+
+48 
+	`so·_dñay
+(2000000);
+
+49 
+	`so·_dñay
+(2000000);
+
+50 
+	`so·_dñay
+(2000000);
+
+51 !
+Êag
+)
+
+53 
+	`gëCuºítLﬂd
+(
+LIFT_ID
+, &
+curLﬂd
+);
+
+54 i‡(
+curLﬂd
+ > 600)
+
+56 
+	`£tSîvoMovögS≥ed
+(
+LIFT_ID
+, 0, 
+CCW
+);
+
+57 
+	`£tSîvoMovögS≥ed
+(
+LIFT_ID
+, 0, 
+CW
+);
+
+58 
+Êag
+ = 
+åue
+;
+
+64 
+	}
+}
+
+	@C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\MANIPU~1.H
+
+1 #i‚de‡
+_MANIPULATORS_INCLUDED_
+
+
+2 
+	#_MANIPULATORS_INCLUDED_
+
+
+	)
+
+6 
+	#DOORS_ID
+ 1
+
+	)
+
+7 
+	#LIFT_ID
+ 2
+
+	)
+
+9 
+˛o£Do‹s
+();
+
+10 
+li·Sóshñl
+();
+
 	@C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\Path.c
 
 1 
@@ -130975,129 +131253,125 @@ RO
 
 33 
 	#POINT_STACK_SIZE
- 20
+ 30
 
 	)
 
-38 
+39 
 	mp_k
 ;
 
-39 
+40 
 	mi_k
 ;
 
-40 
+41 
 	md_k
 ;
 
-41 
+42 
 	mèrgë
 ;
 
-42 
+43 
 	mcuºít
 ;
 
-43 
+44 
 	m¥ev_îr‹
 ;
 
-44 
+45 
 	msum_îr‹
 ;
 
-45 
+46 
 	mmax_sum_îr‹
 ;
 
-46 
+47 
 	mmax_ouçut
 ;
 
-47 
+48 
 	mmö_ouçut
 ;
 
-48 
+49 
 	mcut_ouçut
 ;
 
-49 
+50 
 	mouçut
 ;
 
-50 
+51 
 	mpid_⁄
 ;
 
-51 
+52 
 	mpid_föish
 ;
 
-52 
+53 
 	mîr‹_dú
 ;
 
-53 
+54 
 	mpid_îr‹_íd
 ;
 
-54 
+55 
 	mpid_ouçut_íd
 ;
 
-55 } 
+56 } 
 	tPidSåu˘
 ;
 
-60 
+61 
 	m˚¡î
  [3];
 
-61 (*
+62 (*
 	mmovTask
 )();
 
-62 (*
+63 (*
 	mídTask
 )();
 
-63 
+64 
 	mídTaskP1
 ;
 
-64 (*
+65 (*
 	m•ìdVñTùe
 );
 
-65 (*
+66 (*
 	m•ìdRŸTùe
 );
 
-66 
+67 
 	m°ï
 ;
 
-67 
+68 
 	mÀngthTø˚
 ;
 
-68 }
+69 }
 	t∑thPoötSå
 ;
 
-70 
+71 
 P©h
  
 curP©h
 ;
 
-71 
-Co‹d_loˇl_åack
-[3];
-
-72 
+73 
 ∑thPoötSå
  
 poöts
@@ -131105,59 +131379,59 @@ poöts
 POINT_STACK_SIZE
 ];
 
-73 
+74 
 œ°Poöt
 ;
 
-74 
+75 
 n‹mÆVñ
 [5];
 
-75 
+76 
 °›Vñ
 [5];
 
-76 
+77 
 °™dVñ
 [5];
 
-78 
+79 
 n‹mÆRŸ
 [5];
 
-79 
+80 
 °›RŸ
 [5];
 
-80 
+81 
 °™dRŸ
 [5];
 
-81 * 
+82 * 
 •ìdTy≥
 [3];
 
-82 * 
+83 * 
 rŸTy≥
 [3];
 
-83 
+84 
 PidSåu˘
  
 whìlsPidSåu˘
 [4];
 
-84 
+85 
 ªguœt‹Out
 [4];
 
-85 
+86 
 uöt16_t
  
 tŸÆPoötCom∂ôe
 ;
 
-88 
+89 
 pidCÆc
 (
 PidSåu˘
@@ -131165,7 +131439,7 @@ PidSåu˘
 pid_c⁄åﬁ
 );
 
-89 
+90 
 Fun˘i⁄ÆReguœt‹
 (*
 V_èrgë
@@ -131177,19 +131451,19 @@ Co‹d_cur
 V_out
 );
 
-90 
+91 
 pidWhìlsFöishWaô
 ();
 
-91 
+92 
 pidLowLevñ
 ();
 
-92 
+93 
 GëD©aF‹Reguœt‹s
 ();
 
-93 
+94 
 ö‚‹mve˘
 (*
 a
@@ -131199,7 +131473,7 @@ rows
 b
 );
 
-94 
+95 
 Co°
 (*
 öpM©r
@@ -131211,7 +131485,7 @@ co°
 outKoff
 );
 
-95 
+96 
 Reguœã
 (*
 Co‹d_îr
@@ -131227,7 +131501,7 @@ V_ëÆ⁄
 V_loˇl
 );
 
-96 
+97 
 TøckReguœt‹
 (*
 Co‹d_cur
@@ -131241,7 +131515,7 @@ cur
 V
 );
 
-98 
+99 
 lö¨s
 (*
 x
@@ -131251,7 +131525,7 @@ x0
 x1
 );
 
-99 
+100 
 Movög
 (
 Co‹d_x_cur
@@ -131263,11 +131537,25 @@ Co‹d_x_èrg
 v_out
 );
 
-100 
+101 
+RŸMovög
+(
+Sèπ_a
+, 
+Co‹d_a_cur
+, 
+Co‹d_a_èrg
+, * 
+∑ømëîs
+, * 
+v_out
+) ;
+
+103 
 öôReguœt‹s
 ();
 
-101 
+104 
 ve˘‹AngÀ
 (
 x
@@ -131277,7 +131565,7 @@ y
 ™gÀ
 );
 
-102 
+105 
 movög2
 (
 Co‹d_x_cur
@@ -131289,7 +131577,7 @@ Co‹d_x_èrg
 v_out
 );
 
-103 sig√d 
+106 sig√d 
 digôÆize
 (
 d©a
@@ -131299,7 +131587,7 @@ lowîLevñ
 uµîLevñ
 );
 
-104 
+107 
 Cª©eP©h
 (
 ∑thPoötSå
@@ -131313,7 +131601,7 @@ P©h
 out
 );
 
-105 
+108 
 ªmovePoöt
 (
 ∑thPoötSå
@@ -131355,11 +131643,11 @@ poöts
 
 12 
 	gªguœt‹Out
-[4] = {0,0,0,0};
+[4] = {0, 0, 0, 0};
 
 13 
 	gvT¨gëGlob
-[3] = {0,0,0};
+[3] = {0, 0, 0};
 
 14 
 PidSåu˘
@@ -131383,9 +131671,51 @@ PidSåu˘
 uöt16_t
  
 	gtŸÆPoötCom∂ôe
- =0;
+ = 0;
 
-20 
+20 
+	gMAX_ACCEL
+ = 0.5;
+
+21 
+	gMAX_ACCEL_INC
+ = 0.1;
+
+22 
+	gACCEL_INC
+ = 0.2;
+
+23 
+TVe˘‹
+ 
+	gCurS≥ed
+ = {0, 0};
+
+24 
+TVe˘‹
+ 
+	gCurAc˚l
+ = {0, 0};
+
+25 
+TVe˘‹
+ 
+	gAc˚lInc1
+ = {0, 0};
+
+26 
+TVe˘‹
+ 
+	gAc˚lInc2
+ = {0, 0};
+
+27 
+TVe˘‹
+ 
+	gT¨gS≥ed
+ = {0, 0};
+
+29 
 ∑thPoötSå
  
 	gpoöts
@@ -131399,7 +131729,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-21 {0.0, 1.0, 0.0, 
+30 {0.0, 2.9, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131407,7 +131737,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-22 {0.0, 0.0, 0.0, 
+31 {1.0, 1.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131415,7 +131745,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-23 {0.0, 0.0, 0.0, 
+32 {1.0, 0.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131423,7 +131753,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-24 {0.0, 0.0, 0.0, 
+33 {0.0, 0.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131431,7 +131761,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-25 {0.0, 0.0, 0.0, 
+34 {0.0, 0.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131439,7 +131769,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-26 {-0.5,-0.5,3.14, 
+35 {0.0, 0.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131447,7 +131777,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-27 {-0.5,0.0,4.71, 
+36 {0.0, 0.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131455,7 +131785,7 @@ NULL
 °›RŸ
 ,0,1 },
 
-28 {0.0,0.0,6.28, 
+37 {0.0, 0.0, 0.0, 
 NULL
 ,NULL,0,
 °›Vñ
@@ -131463,135 +131793,253 @@ NULL
 °›RŸ
 ,0,1 },};
 
-32 
+41 
 	gœ°Poöt
  = 1;
 
-33 
+42 
 P©h
  
 	gcurP©h
 ;
 
-41 
+50 
 	gn‹mÆVñ
-[5]= {0.6,0.2,0.2,4.0,2.0};
+[5] = {0.6, 0.2, 0.2, 4.0, 2.0};
 
-42 
+51 
 	g°›Vñ
-[5]={0.6,0.2,-0.2,4.0,4.0};
+[5] = {0.6, 0.2, -0.2, 3.0, 2.0};
 
-43 
+52 
 	g°™dVñ
-[5]={0.6,0.6,-0.6,1.0,2.5};
+[5] = {0.6, 0.6, -0.6, 1.0, 2.5};
 
-45 
+54 
 	gn‹mÆRŸ
-[5]= {3.0,1.0,0.2,4.0,4.0};
+[5] = {3.0, 1.0, 0.2, 4.0, 4.0};
 
-46 
+55 
 	g°›RŸ
-[5]= {3.0,1.0,-1.0,4.0,4.0};
+[5] = {3.0, 1.0, -1.0, 4.0, 3.0};
 
-47 
+56 
 	g°™dRŸ
-[5]={4.0,4.0,-1.0,1.0,2.5};
+[5] = {4.0, 4.0, -1.0, 1.0, 2.5};
 
-49 * 
+58 * 
 	g•ìdTy≥
 [3] = {
 n‹mÆVñ
-,
+, 
 °›Vñ
-,
+, 
 °™dVñ
 };
 
-50 * 
+59 * 
 	grŸTy≥
 [3] = {
 n‹mÆRŸ
-,
+, 
 °›RŸ
-,
+, 
 °™dRŸ
 };
 
-53 
+62 
 	$ªmovePoöt
 (
 ∑thPoötSå
  * 
 poöts
-,*
+, *
 œ°Poöt
 )
 
-55 
+64 
 i
 ,
 j
 ;
 
-56 
+65 
 i
-=0;i<*
+ = 0; i < *
 œ°Poöt
-;i++)
+; i++)
 
-58 
+67 
 j
-=0;j<(
+ = 0; j < (
 ∑thPoötSå
-);j++)
+); j++)
 
-59 *(((*)(&
+68 *(((*)(&
 poöts
 [
 i
-]))+
+])Ë+ 
 j
-) = *(((*)(&points[i+1]))+j);
+) = *(((*)(&points[i+1])) + j);
 
-62 i‡(*
+71 i‡(*
 œ°Poöt
 >0)
 
-64 
+73 
 j
-=0;j<(
+=0; j < (
 ∑thPoötSå
-);j++)
+); j++)
 
-65 *(((*)(&
+74 *(((*)(&
 poöts
 [*
 œ°Poöt
-]))+
+])Ë+ 
 j
 ) = 0;
 
-66 (*
+75 (*
 œ°Poöt
 )--;
 
-68 
+77 
 	}
 }
 
-70 
+79 
+	$addPoötInFr⁄tOfQueue
+(
+∑thPoötSå
+ *
+poötsAºay
+, *
+√wPoöt
+, *
+ch
+, *
+œ°Poöt
+)
+
+81 
+j
+;
+
+82 
+öt8_t
+ 
+i
+;
+
+83 
+i
+ = *
+œ°Poöt
+; i >= 0; i--)
+
+85 i‡(!((
+i
+ + 1Ë> 
+POINT_STACK_SIZE
+))
+
+87 
+j
+ = 0; j < (
+∑thPoötSå
+); j++)
+
+88 *(((*)(&
+poöts
+[
+i
+ + 1])Ë+ 
+j
+) = *(((*)(&points[i])) + j);
+
+91 
+poöts
+[0].
+˚¡î
+[0] = *
+√wPoöt
+;
+
+92 
+poöts
+[0].
+˚¡î
+[1] = *(
+√wPoöt
+ + 1);
+
+93 
+poöts
+[0].
+˚¡î
+[2] = *(
+√wPoöt
+ + 2);
+
+94 
+poöts
+[0].
+•ìdVñTùe
+ = 
+•ìdTy≥
+[*
+ch
+];
+
+95 
+poöts
+[0].
+•ìdRŸTùe
+ = 
+rŸTy≥
+[*
+ch
+];
+
+96 
+poöts
+[0].
+ídTask
+ = 
+NULL
+;
+
+97 
+poöts
+[0].
+movTask
+ = 
+NULL
+;
+
+98 (*
+œ°Poöt
+)++;
+
+99 
+	}
+}
+
+101 
 	$öôReguœt‹s
 ()
 
-73 
+104 
 i
  = 0;
 
-74 
+105 
 i
  = 0; i<=3; i++)
 
-76 
+107 
 whìlsPidSåu˘
 [
 i
@@ -131599,7 +132047,7 @@ i
 p_k
  = 5.00;
 
-77 
+108 
 whìlsPidSåu˘
 [
 i
@@ -131607,7 +132055,7 @@ i
 i_k
  = 1.0;
 
-78 
+109 
 whìlsPidSåu˘
 [
 i
@@ -131615,7 +132063,7 @@ i
 d_k
  = 0.5;
 
-79 
+110 
 whìlsPidSåu˘
 [
 i
@@ -131623,7 +132071,7 @@ i
 pid_⁄
  = 1;
 
-80 
+111 
 whìlsPidSåu˘
 [
 i
@@ -131631,7 +132079,7 @@ i
 pid_îr‹_íd
  = 3;
 
-81 
+112 
 whìlsPidSåu˘
 [
 i
@@ -131639,7 +132087,7 @@ i
 pid_ouçut_íd
  = 1000;
 
-82 
+113 
 whìlsPidSåu˘
 [
 i
@@ -131647,7 +132095,7 @@ i
 max_sum_îr‹
  =16.0;
 
-83 
+114 
 whìlsPidSåu˘
 [
 i
@@ -131655,7 +132103,7 @@ i
 max_ouçut
  = 1;
 
-84 
+115 
 whìlsPidSåu˘
 [
 i
@@ -131663,83 +132111,83 @@ i
 mö_ouçut
  = 0.01;
 
-90 
+121 
 ødS≥ed
 .
 p_k
  = 1.0;
 
-91 
+122 
 ødS≥ed
 .
 i_k
  = 0.0;
 
-92 
+123 
 ødS≥ed
 .
 d_k
  = 0.0;
 
-93 
+124 
 ødS≥ed
 .
 max_ouçut
  = 3.0;
 
-94 
+125 
 ødS≥ed
 .
 max_sum_îr‹
  = 10.0;
 
-95 
+126 
 ødS≥ed
 .
 pid_⁄
  = 1;
 
-99 
+130 
 ‹toPos
 .
 p_k
  = 1.8;
 
-100 
+131 
 ‹toPos
 .
 i_k
  = 0.05;
 
-101 
+132 
 ‹toPos
 .
 d_k
  = 0.0;
 
-102 
+133 
 ‹toPos
 .
 max_ouçut
  = 4.0;
 
-103 
+134 
 ‹toPos
 .
 max_sum_îr‹
  = 0.05;
 
-104 
+135 
 ‹toPos
 .
 pid_⁄
  = 1;
 
-107 
+138 
 	}
 }
 
-109 
+140 
 	$Co°
 (*
 öpM©r
@@ -131751,11 +132199,11 @@ co°
 outKoff
 )
 
-111 
+142 
 ö‚‹m
 ;
 
-112 
+143 
 	`MaxVÆue
 (
 öpM©r
@@ -131765,25 +132213,25 @@ rows
 ö‚‹m
 );
 
-113 i‡(
+144 i‡(
 ö‚‹m
  == 0)
 
-114 *
+145 *
 outKoff
  = 0;
 
-116 i‡((
+147 i‡((
 ö‚‹m
  > 0Ë&& (ö‚‹m < 
 co°
 ))
 
-117 *
+148 *
 outKoff
-=1;
+ = 1;
 
-119 *
+150 *
 outKoff
 =
 co°
@@ -131791,11 +132239,11 @@ co°
 ö‚‹m
 );
 
-120 
+151 
 	}
 }
 
-122 
+153 
 	$MaxVÆue
 (*
 a
@@ -131805,25 +132253,25 @@ rows
 b
 )
 
-124 
+155 
 i
 ;
 
-125 *
+156 *
 b
-=
+ = 
 	`Ábs
 (*
 a
 );
 
-126 
+157 
 i
- = 0; (i<=
+ = 0; (ò<
 rows
--1); i++)
+ - 1); i++)
 
-127 i‡–(*
+158 i‡((*
 b
 Ë< 
 	`Ábs
@@ -131833,21 +132281,21 @@ a
 i
 )))
 
-128 *
+159 *
 b
-=
+ = 
 	`Ábs
 (*(
 a
-+
+ + 
 i
 ));
 
-129 
+160 
 	}
 }
 
-132 
+163 
 	$Fun˘i⁄ÆReguœt‹
 (*
 V_èrgë
@@ -131859,17 +132307,17 @@ Co‹d_cur
 V_out
 )
 
-137 
+168 
 loˇlVñocôy
 [3];
 
-139 
+170 
 ªÆRad
  = 
 robŸCo‹d
 [2];
 
-143 
+174 
 MrŸ
 [3][3] = {
 	`cos
@@ -131879,7 +132327,7 @@ MrŸ
 	`sö
 (realRad), 0,
 
-144 -
+175 -
 	`sö
 (
 ªÆRad
@@ -131887,15 +132335,15 @@ MrŸ
 	`cos
 (realRad), 0,
 
-146 
+177 
 MLöeS≥ed
 [4][3] = { 1.0, 0.0, 0.0,
 
-150 
+181 
 MRŸS≥ed
 [4][3] = { 0.0, 0.0, -0.14 ,
 
-154 
+185 
 VLöe
 [4], 
 VRŸ
@@ -131903,23 +132351,23 @@ VRŸ
 VSum
 [4];
 
-155 
+186 
 MaxMŸS≥ed
 ;
 
-156 
+187 
 MaxLöe
 ,
 MaxRŸ
 ;
 
-161 
+192 
 Vve˘
 [4], 
 Vød
 [4];
 
-162 
+193 
 buf1
 [3], 
 buf2
@@ -131927,19 +132375,19 @@ buf2
 buf3
 [4];
 
-166 
+197 
 c1
 ;
 
-167 
+198 
 c2
 ;
 
-168 
+199 
 Cmax
 ;
 
-169 
+200 
 Kve˘
 , 
 Kphi
@@ -131947,13 +132395,13 @@ Kphi
 Kn‹mVe˘
 ;
 
-172 
+203 
 Cmax
 
 MAX_CAPACITANCE
 ;
 
-175 
+206 
 	`m©rixMu…ùlyM2M
 (&
 MrŸ
@@ -131963,7 +132411,7 @@ V_èrgë
 loˇlVñocôy
 [0]);
 
-177 
+208 
 	`m©rixMu…ùlyM2M
 (&
 MLöeS≥ed
@@ -131973,7 +132421,7 @@ loˇlVñocôy
 VLöe
 [0]);
 
-178 
+209 
 	`m©rixMu…ùlyM2M
 (&
 MRŸS≥ed
@@ -131983,7 +132431,7 @@ loˇlVñocôy
 VRŸ
 [0]);
 
-180 
+211 
 	`m©rixPlusMöus
 (&
 VLöe
@@ -131993,7 +132441,7 @@ VRŸ
 VSum
 [0]);
 
-181 
+212 
 	`MaxVÆue
 (&
 VSum
@@ -132001,7 +132449,7 @@ VSum
 MaxMŸS≥ed
 );
 
-183 i‡(
+214 i‡(
 	`Ábs
 (
 MaxMŸS≥ed
@@ -132009,7 +132457,7 @@ MaxMŸS≥ed
 MAX_CAPACITANCE
 )
 
-186 
+217 
 c1
 
 	`Ábs
@@ -132019,11 +132467,11 @@ MAX_CAPACITANCE
 MaxMŸS≥ed
  );
 
-187 } 
+218 } 
 c1
 =1;
 
-189 
+220 
 	`m©rixMu…ùlyS2M
 (&
 VSum
@@ -132033,11 +132481,11 @@ c1
 V_out
 [0]);
 
-223 
+254 
 	}
 }
 
-225 
+256 
 	$Reguœã
 (*
 Co‹d_cur
@@ -132053,13 +132501,13 @@ V_ëÆ⁄
 V_loˇl
 )
 
-228 
+259 
 t_Æph_cur
 [2][2], 
 t_Æph_dñè
 [2][2];
 
-229 
+260 
 uS
 , 
 uE
@@ -132067,7 +132515,7 @@ uE
 u
 [2];
 
-230 
+261 
 buf
 [2][2],
 buf1
@@ -132075,15 +132523,15 @@ buf1
 buf3
 [2][1];
 
-231 
+262 
 cosAÕhCur
 ;
 
-232 
+263 
 söAÕhCur
 ;
 
-234 
+265 
 ªsu…Ve˘‹
  = 
 	`sqπf
@@ -132091,11 +132539,11 @@ söAÕhCur
 Co‹d_cur
 ) * (*Coord_cur) + (*(Coord_cur+1)) * (*(Coord_cur+1)));
 
-236 i‡(
+267 i‡(
 ªsu…Ve˘‹
 ==0.0)
 
-238 
+269 
 cosAÕhCur
 =
 	`cosf
@@ -132103,7 +132551,7 @@ cosAÕhCur
 ÆphZad
 );
 
-239 
+270 
 söAÕhCur
 =
 	`söf
@@ -132111,7 +132559,7 @@ söAÕhCur
 ÆphZad
 );
 
-243 
+274 
 cosAÕhCur
  = (*
 Co‹d_cur
@@ -132119,7 +132567,7 @@ Co‹d_cur
 ªsu…Ve˘‹
 ;
 
-244 
+275 
 söAÕhCur
  = (*(
 Co‹d_cur
@@ -132127,31 +132575,31 @@ Co‹d_cur
 ªsu…Ve˘‹
 ;
 
-247 
+278 
 t_Æph_cur
 [0][0] = 
 cosAÕhCur
 ;
 
-248 
+279 
 t_Æph_cur
 [0][1] = 
 söAÕhCur
 ;
 
-249 
+280 
 t_Æph_cur
 [1][0] = -
 söAÕhCur
 ;
 
-250 
+281 
 t_Æph_cur
 [1][1] = 
 cosAÕhCur
 ;
 
-252 
+283 
 	`m©rixTøn•o£
 (&
 t_Æph_cur
@@ -132159,7 +132607,7 @@ t_Æph_cur
 buf
 [0][0]);
 
-253 
+284 
 	`m©rixMu…ùlyM2M
 (
 tAÕhZad
@@ -132169,7 +132617,7 @@ buf
 t_Æph_dñè
 [0][0]);
 
-254 
+285 
 	`m©rixTøn•o£
 (&
 t_Æph_dñè
@@ -132177,13 +132625,13 @@ t_Æph_dñè
 buf1
 [0][0]);
 
-260 *(
+291 *(
 V_loˇl
 +2Ë=*(
 V_ëÆ⁄
 +1);
 
-267 
+298 
 ‹toPos
 .
 cuºít
@@ -132191,19 +132639,19 @@ cuºít
 Co‹d_cur
 +1));
 
-268 
+299 
 ‹toPos
 .
 èrgë
  = 0.0;
 
-269 
+300 
 	`pidCÆc
 (&
 ‹toPos
 );
 
-270 
+301 
 uE
  = 
 ‹toPos
@@ -132211,25 +132659,25 @@ uE
 ouçut
 ;
 
-273 
+304 
 uS
  =(*
 V_ëÆ⁄
 );
 
-275 
+306 
 u
 [0] = 
 uS
 ;
 
-276 
+307 
 u
 [1] = 
 uE
 ;
 
-278 
+309 
 	`m©rixMu…ùlyM2M
 (&
 buf1
@@ -132239,7 +132687,7 @@ u
 buf3
 [0][0]);
 
-279 
+310 
 	`m©rixMu…ùlyM2M
 (&
 buf
@@ -132249,15 +132697,15 @@ buf3
 V_loˇl
 );
 
-280 
+311 
 	}
 }
 
-282 
+313 
 	$TøckReguœt‹
-(* 
+(*
 Co‹d_cur
-, * 
+, *
 S≥edCur
 , 
 P©h
@@ -132267,11 +132715,11 @@ cur
 V
 )
 
-284 
+315 
 vñocôy
 [3] = {0.0, 0.0, 0.0};
 
-285 
+316 
 cosAÕhZad
  = 
 	`cosf
@@ -132285,19 +132733,19 @@ söAÕhZad
 	`söf
 (cur->alphZad);
 
-286 
+317 
 t_Æph_zad
 [2][2];
 
-287 
+318 
 buf1
 [3];
 
-288 
+319 
 vñFromEt
 [2];
 
-292 
+323 
 	`m©rixPlusMöus
 (
 Co‹d_cur
@@ -132309,31 +132757,31 @@ co‹dCíãr
 buf1
 [0]);
 
-294 
+325 
 t_Æph_zad
 [0][0] = 
 cosAÕhZad
 ;
 
-295 
+326 
 t_Æph_zad
 [0][1] = 
 söAÕhZad
 ;
 
-296 
+327 
 t_Æph_zad
 [1][0] = -
 söAÕhZad
 ;
 
-297 
+328 
 t_Æph_zad
 [1][1] = 
 cosAÕhZad
 ;
 
-299 
+330 
 	`m©rixMu…ùlyM2M
 (&
 t_Æph_zad
@@ -132345,7 +132793,7 @@ cur
 S≥ed_loˇl_åack
 [0]));
 
-300 
+331 
 	`m©rixMu…ùlyM2M
 (&
 t_Æph_zad
@@ -132357,7 +132805,7 @@ cur
 Co‹d_loˇl_åack
 [0]));
 
-301 
+332 
 cur
 ->
 Co‹d_loˇl_åack
@@ -132369,7 +132817,7 @@ co‹dCíãr
 phiDú
 ;
 
-302 i‡(
+333 i‡(
 cur
 ->
 Co‹d_loˇl_åack
@@ -132377,21 +132825,21 @@ Co‹d_loˇl_åack
 PI
 ;
 
-309 
+340 
 	`Movög
 (
 cur
 ->
 Co‹d_loˇl_åack
-[0],(cur->
+[0], (cur->
 ÀngthTø˚
-),(cur->
+), (cur->
 åa˚Vñ
-),&
+), &
 vñFromEt
 [0]);
 
-310 
+341 
 	`RŸMovög
 ((
 cur
@@ -132399,33 +132847,33 @@ cur
 co‹dCíãr
 [2]), 
 robŸCo‹d
-[2],(cur->
+[2], (cur->
 phiZad
-),(cur->
+), (cur->
 omegaVñ
-),&
+), &
 vñFromEt
 [1]);
 
-316 
+347 
 	`Reguœã
 (&(
 cur
 ->
 Co‹d_loˇl_åack
-[0]),&(cur->
+[0]), &(cur->
 S≥ed_loˇl_åack
-[0]),&
+[0]), &
 t_Æph_zad
-[0][0],&
+[0][0], &
 vñFromEt
-[0],&(cur->
+[0], &(cur->
 ÆphZad
 ), &
 vñocôy
 [0]);
 
-317 
+348 
 	`m©rixC›y
 (&
 vñocôy
@@ -132433,11 +132881,11 @@ vñocôy
 V
 [0]);
 
-318 
+350 
 	}
 }
 
-319 
+352 
 	$lö¨s
 (*
 x
@@ -132447,7 +132895,7 @@ x0
 x1
 )
 
-321 
+354 
 out
  = (((*
 x
@@ -132457,21 +132905,21 @@ x0
 x1
  - *(x0))) * (*(x1+1) - (*(x0+1)))) + (*(x0+1));
 
-322  
+355  
 out
 ;
 
-323 
+356 
 	}
 }
 
-324 
+358 
 	$øngeAngÀ
 (* 
 ™gÀ
 )
 
-326 *
+360 *
 ™gÀ
  = 
 	`fmod
@@ -132479,23 +132927,23 @@ out
 PI
 );
 
-327 i‡(*
+361 i‡(*
 ™gÀ
 <-
 PI
 ) *angle+=2.0*PI;
 
-328 i‡(*
+362 i‡(*
 ™gÀ
 >
 PI
 ) *angle-=2.0*PI;
 
-329 
+363 
 	}
 }
 
-332 
+365 
 	$RŸMovög
 (
 Sèπ_a
@@ -132509,7 +132957,7 @@ Co‹d_a_èrg
 v_out
 )
 
-334 
+367 
 vSèπ
 , 
 vSt
@@ -132521,47 +132969,47 @@ acc
 decc
 ;
 
-335 
+368 
 vAcc
 , 
 vDecc
 ;
 
-336 
+369 
 out
 ;
 
-339 
+372 
 vSt
  = (*
 ∑ømëîs
 );
 
-340 
+373 
 vSèπ
  = (*(
 ∑ømëîs
 +1));
 
-341 
+374 
 vEnd
  = (*(
 ∑ømëîs
 +2));
 
-342 
+375 
 acc
  = (*(
 ∑ømëîs
 +3));
 
-343 
+376 
 decc
  = (*(
 ∑ømëîs
 +4));
 
-345 
+378 
 di°‰om°¨t
  = 
 Co‹d_a_cur
@@ -132569,13 +133017,13 @@ Co‹d_a_cur
 Sèπ_a
 ;
 
-346 
+379 
 	`øngeAngÀ
 (&
 di°‰om°¨t
 ) ;
 
-347 
+380 
 ™gÀEº
  = 
 Co‹d_a_èrg
@@ -132583,17 +133031,17 @@ Co‹d_a_èrg
 Co‹d_a_cur
 ;
 
-348 
+381 
 	`øngeAngÀ
 (&
 ™gÀEº
 ) ;
 
-349 
+382 
 sign
  ;
 
-352 
+385 
 vAcc
  = 
 acc
@@ -132605,7 +133053,7 @@ di°‰om°¨t
 vSèπ
 ;
 
-354 
+387 
 vDecc
  = 
 decc
@@ -132615,65 +133063,65 @@ decc
 ™gÀEº
 ));
 
-356 
+389 
 out
  = 
 vSt
 ;
 
-357 i‡(
+390 i‡(
 vAcc
  < 
 out
 )
 
-358 
+391 
 out
  = 
 vAcc
 ;
 
-359 i‡(
+392 i‡(
 vDecc
  < 
 out
 )
 
-361 i‡(
+394 i‡(
 vDecc
  < 
 vEnd
 )
 
-362 
+395 
 out
  = 
 vEnd
 ;
 
-364 
+397 
 out
  = 
 vDecc
 ;
 
-366 i‡(
+399 i‡(
 ™gÀEº
 <0Ë
 out
 =-out;
 
-367 *
+400 *
 v_out
  = 
 out
 ;
 
-368 
+401 
 	}
 }
 
-371 
+405 
 	$Movög
 (
 Co‹d_x_cur
@@ -132685,7 +133133,7 @@ Co‹d_x_èrg
 v_out
 )
 
-373 
+407 
 vSèπ
 , 
 vSt
@@ -132697,47 +133145,47 @@ acc
 decc
 ;
 
-374 
+408 
 vAcc
 , 
 vDecc
 ;
 
-375 
+409 
 out
 ;
 
-378 
+412 
 vSt
  = (*
 ∑ømëîs
 );
 
-379 
+413 
 vSèπ
  = (*(
 ∑ømëîs
 +1));
 
-380 
+414 
 vEnd
  = (*(
 ∑ømëîs
 +2));
 
-381 
+415 
 acc
  = (*(
 ∑ømëîs
 +3));
 
-382 
+416 
 decc
  = (*(
 ∑ømëîs
 +4));
 
-386 
+420 
 vAcc
  = 
 acc
@@ -132747,13 +133195,13 @@ Co‹d_x_cur
 vSèπ
 ;
 
-387 i‡(
+421 i‡(
 vAcc
 < 
 vSèπ
 ) vAcc = vStart;
 
-389 
+423 
 vDecc
  = -
 decc
@@ -132763,59 +133211,59 @@ Co‹d_x_cur
 Co‹d_x_èrg
 );
 
-391 
+425 
 out
  = 
 vSt
 ;
 
-392 i‡(
+426 i‡(
 vAcc
  < 
 out
 )
 
-393 
+427 
 out
  = 
 vAcc
 ;
 
-394 i‡(
+428 i‡(
 vDecc
  < 
 out
 )
 
-396 i‡(
+430 i‡(
 vDecc
  < 
 vEnd
 )
 
-397 
+431 
 out
  = 
 vEnd
 ;
 
-399 
+433 
 out
  = 
 vDecc
 ;
 
-401 *
+435 *
 v_out
  = 
 out
 ;
 
-402 
+436 
 	}
 }
 
-405 
+439 
 	$pidCÆc
 (
 PidSåu˘
@@ -132823,13 +133271,13 @@ PidSåu˘
 pid_c⁄åﬁ
 )
 
-408 
+442 
 îr‹
 , 
 dif_îr‹
 ;
 
-409 
+443 
 îr‹
  = 
 pid_c⁄åﬁ
@@ -132839,7 +133287,7 @@ pid_c⁄åﬁ
 cuºít
 ;
 
-410 
+444 
 dif_îr‹
  = 
 îr‹
@@ -132849,7 +133297,7 @@ pid_c⁄åﬁ
 ¥ev_îr‹
 ;
 
-411 
+445 
 pid_c⁄åﬁ
 ->
 ¥ev_îr‹
@@ -132857,7 +133305,7 @@ pid_c⁄åﬁ
 îr‹
 ;
 
-412 
+446 
 pid_c⁄åﬁ
 ->
 sum_îr‹
@@ -132865,7 +133313,7 @@ sum_îr‹
 îr‹
 ;
 
-414 i‡(
+448 i‡(
 pid_c⁄åﬁ
 ->
 sum_îr‹
@@ -132873,7 +133321,7 @@ sum_îr‹
 max_sum_îr‹
 )
 
-415 
+449 
 pid_c⁄åﬁ
 ->
 sum_îr‹
@@ -132881,7 +133329,7 @@ sum_îr‹
 max_sum_îr‹
 ;
 
-416 i‡(
+450 i‡(
 pid_c⁄åﬁ
 ->
 sum_îr‹
@@ -132889,7 +133337,7 @@ sum_îr‹
 max_sum_îr‹
 )
 
-417 
+451 
 pid_c⁄åﬁ
 ->
 sum_îr‹
@@ -132897,13 +133345,13 @@ sum_îr‹
 max_sum_îr‹
 ;
 
-419 i‡(
+453 i‡(
 pid_c⁄åﬁ
 ->
 pid_⁄
 )
 
-421 
+455 
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132917,7 +133365,7 @@ i_k
 sum_îr‹
 )+
 
-422 (
+456 (
 pid_c⁄åﬁ
 ->
 d_k
@@ -132925,7 +133373,7 @@ d_k
 dif_îr‹
 ));
 
-425 i‡(
+459 i‡(
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132933,7 +133381,7 @@ ouçut
 max_ouçut
 )
 
-426 
+460 
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132941,7 +133389,7 @@ ouçut
 max_ouçut
 ;
 
-427 i‡(
+461 i‡(
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132949,7 +133397,7 @@ ouçut
 max_ouçut
 )
 
-428 
+462 
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132957,7 +133405,7 @@ ouçut
 max_ouçut
 ;
 
-430 i‡(
+464 i‡(
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132965,13 +133413,13 @@ ouçut
 mö_ouçut
  &&Öid_control->output > -pid_control->min_output)
 
-431 
+465 
 pid_c⁄åﬁ
 ->
 ouçut
  = 0;
 
-433 i‡((
+467 i‡((
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132979,7 +133427,7 @@ ouçut
 pid_ouçut_íd
 ) &&(
 
-434 
+468 
 pid_c⁄åﬁ
 ->
 ouçut
@@ -132987,7 +133435,7 @@ ouçut
 pid_ouçut_íd
 ) &&(
 
-435 
+469 
 îr‹
  <
 pid_c⁄åﬁ
@@ -132995,55 +133443,55 @@ pid_c⁄åﬁ
 pid_îr‹_íd
 ) && (error >= -pid_control->pid_error_end))
 
-436 
+470 
 pid_c⁄åﬁ
 ->
 pid_föish
  = 1;
 
-438 
+472 
 pid_c⁄åﬁ
 ->
 pid_föish
  = 0;
 
-442 
+476 
 pid_c⁄åﬁ
 ->
 ouçut
  = 0;
 
-443 
+477 
 pid_c⁄åﬁ
 ->
 pid_föish
  = 0;
 
-445 
+479 
 	}
 }
 
-450 
+483 
 	$GëD©aF‹Reguœt‹s
 ()
 
-452 
+485 
 öt16_t
  
 mŸ‹S≥edBuf
 [4];
 
-453 
+486 
 öt8_t
  
 i
 ;
 
-454 
+487 
 i
  = 3;i>=0;i--)
 
-456 
+489 
 mŸ‹S≥edBuf
 [
 i
@@ -133051,21 +133499,21 @@ i
 ícC¡
 [i];
 
-457 *
+490 *
 ícC¡
 [
 i
 ] =0;
 
-459 #ifde‡
+492 #ifde‡
 ENCODER_IMITATION
 
 
-460 
+493 
 i
  =3;i>=0;i--)
 
-462 
+495 
 mŸ‹S≥ed
 [
 i
@@ -133073,7 +133521,7 @@ i
 ªguœt‹Out
 [i];
 
-463 
+496 
 mŸ‹Co‹d
 [
 i
@@ -133083,11 +133531,11 @@ mŸ‹S≥ed
 PID_PERIOD
 ;
 
-468 
+501 
 i
  =3;i>=0;i--)
 
-470 
+503 
 mŸ‹S≥ed
 [
 i
@@ -133099,7 +133547,7 @@ DISKR_TO_REAL
 PID_PERIOD
 ;
 
-471 
+504 
 mŸ‹Co‹d
 [
 i
@@ -133109,29 +133557,29 @@ mŸ‹S≥ed
 PID_PERIOD
 ;
 
-474 
+507 
 ªÆRad
  = -
 robŸCo‹d
 [2];
 
-475 
+508 
 J_öv
 [4][4];
 
-481 
+514 
 Mlglob
 [4][4] =
 
-486 
+519 
 ãmp
 [4];
 
-487 
+520 
 ãmp2
 [4];
 
-489 
+522 
 MrŸ
 [2][2]={ 
 	`cos
@@ -133141,7 +133589,7 @@ MrŸ
 	`sö
 (realRad),
 
-490 -
+523 -
 	`sö
 (
 ªÆRad
@@ -133149,7 +133597,7 @@ MrŸ
 	`cos
 (realRad)};
 
-493 
+526 
 	`m©rixMu…ùlyM2M
 ((*)&
 Mlglob
@@ -133159,7 +133607,7 @@ mŸ‹S≥ed
 ãmp
 );
 
-495 
+528 
 	`m©rixMu…ùlyM2M
 ((*)&
 MrŸ
@@ -133169,25 +133617,25 @@ MrŸ
 ãmp2
 );
 
-499 
+532 
 robŸS≥ed
  [0]
 ãmp2
 [0];
 
-500 
+533 
 robŸS≥ed
  [1]
 ãmp2
 [1];
 
-501 
+534 
 robŸS≥ed
  [2]
 ãmp
 [2];
 
-504 
+537 
 robŸCo‹d
 [0] +
 robŸS≥ed
@@ -133195,7 +133643,7 @@ robŸS≥ed
 PID_PERIOD
 ;
 
-505 
+538 
 robŸCo‹d
 [1] +
 robŸS≥ed
@@ -133203,7 +133651,7 @@ robŸS≥ed
 PID_PERIOD
 ;
 
-506 
+539 
 robŸCo‹d
 [2] +
 robŸS≥ed
@@ -133211,29 +133659,29 @@ robŸS≥ed
 PID_PERIOD
 ;
 
-507 
+540 
 	`øngeAngÀ
 (&
 robŸCo‹d
 [2]);
 
-509 
+542 
 	}
 }
 
-511 
+544 
 	$pidLowLevñ
 ()
 
-514 
+547 
 i
 ;
 
-515 
+548 
 i
  =0;i<4;i++)
 
-518 
+551 
 whìlsPidSåu˘
 [
 i
@@ -133243,7 +133691,7 @@ i
 ªguœt‹Out
 [i];
 
-519 
+552 
 whìlsPidSåu˘
 [
 i
@@ -133253,7 +133701,7 @@ cuºít
 mŸ‹S≥ed
 [i];
 
-520 
+553 
 	`pidCÆc
 (&
 whìlsPidSåu˘
@@ -133261,7 +133709,7 @@ whìlsPidSåu˘
 i
 ]);
 
-521 i‡(
+554 i‡(
 curSèã
 .
 pidE«bÀd
@@ -133277,11 +133725,11 @@ whìlsPidSåu˘
 ouçut
 );
 
-523 
+556 
 	}
 }
 
-525 
+558 
 	$ve˘‹AngÀ
 (
 x
@@ -133291,49 +133739,49 @@ y
 ™gÀ
 )
 
-527 
+560 
 ¨˘™gísAÕha
 ;
 
-529 i‡(
+562 i‡(
 x
  == 0.0)
 
-531 i‡(
+564 i‡(
 y
  >= 0.0)
 
-532 *
+565 *
 ™gÀ
  = 
 PI
 /2.0;
 
-534 *
+567 *
 ™gÀ
  = 3.0/2.0*
 PI
 ;
 
-537 i‡(
+570 i‡(
 y
  == 0.0)
 
-539 i‡(
+572 i‡(
 x
  >= 0.0)
 
-540 *
+573 *
 ™gÀ
  = 0.0;
 
-542 *
+575 *
 ™gÀ
  = 
 PI
 ;
 
-546 
+579 
 ¨˘™gísAÕha
  = 
 	`©™f
@@ -133345,13 +133793,13 @@ y
 x
 ));
 
-548 i‡((
+581 i‡((
 x
  < 0.0Ë&& (
 y
  > 0.0))
 
-549 *
+582 *
 ™gÀ
  = 
 PI
@@ -133359,13 +133807,13 @@ PI
 ¨˘™gísAÕha
 ;
 
-551 i‡((
+584 i‡((
 x
  < 0.0Ë&& (
 y
  < 0.0))
 
-552 *
+585 *
 ™gÀ
  = 
 PI
@@ -133373,13 +133821,13 @@ PI
 ¨˘™gísAÕha
 ;
 
-554 i‡((
+587 i‡((
 x
  > 0.0Ë&& (
 y
  < 0.0))
 
-555 *
+588 *
 ™gÀ
  = 2.0*
 PI
@@ -133387,17 +133835,17 @@ PI
 ¨˘™gísAÕha
 ;
 
-557 *
+590 *
 ™gÀ
  = 
 ¨˘™gísAÕha
 ;
 
-559 
+592 
 	}
 }
 
-562 
+595 
 	$Cª©eP©h
 (
 ∑thPoötSå
@@ -133411,19 +133859,19 @@ P©h
 out
 )
 
-564 
+597 
 dñè_x
 ;
 
-565 
+598 
 dñè_y
 ;
 
-566 
+599 
 dñè_phi
 ;
 
-570 
+603 
 dñè_x
  = 
 √xt_poöt
@@ -133433,7 +133881,7 @@ dñè_x
 cur_poöt
 ->center[0];
 
-571 
+604 
 dñè_y
  = 
 √xt_poöt
@@ -133443,7 +133891,7 @@ dñè_y
 cur_poöt
 ->center[1];
 
-572 
+605 
 dñè_phi
  = 
 √xt_poöt
@@ -133453,13 +133901,13 @@ dñè_phi
 cur_poöt
 ->center[2];
 
-574 
+607 
 	`øngeAngÀ
 –&
 dñè_phi
 );
 
-575 
+608 
 	`øngeAngÀ
 –&(
 √xt_poöt
@@ -133467,7 +133915,7 @@ dñè_phi
 ˚¡î
 [2]));
 
-576 
+609 
 out
 ->
 co‹dCíãr
@@ -133477,7 +133925,7 @@ cur_poöt
 ˚¡î
 [0];
 
-577 
+610 
 out
 ->
 co‹dCíãr
@@ -133487,7 +133935,7 @@ cur_poöt
 ˚¡î
 [1];
 
-578 
+611 
 out
 ->
 co‹dCíãr
@@ -133497,11 +133945,11 @@ cur_poöt
 ˚¡î
 [2];
 
-579 i‡(
+612 i‡(
 dñè_x
 <0)
 
-580 
+613 
 out
 ->
 ÆphZad
@@ -133515,15 +133963,15 @@ dñè_x
 PI
 ;
 
-582 i‡(
+615 i‡(
 dñè_x
 ==0)
 
-584 i‡(
+617 i‡(
 dñè_y
 <0)
 
-586 
+619 
 out
 ->
 ÆphZad
@@ -133531,17 +133979,17 @@ out
 PI
 /2;
 
-589 i‡(
+622 i‡(
 dñè_y
 ==0)
 
-591 
+624 
 out
 ->
 ÆphZad
 =0;
 
-595 
+628 
 out
 ->
 ÆphZad
@@ -133549,11 +133997,11 @@ out
 PI
 /2;
 
-599 i‡(
+632 i‡(
 dñè_x
 >0)
 
-600 
+633 
 out
 ->
 ÆphZad
@@ -133565,7 +134013,7 @@ dñè_y
 dñè_x
 );
 
-604 
+637 
 out
 ->
 phiZad
@@ -133575,7 +134023,7 @@ phiZad
 ˚¡î
 [2];
 
-605 
+638 
 out
 ->
 ÀngthTø˚
@@ -133587,13 +134035,13 @@ dñè_x
 dñè_y
 *delta_y));
 
-607 i‡(
+640 i‡(
 out
 ->
 ÀngthTø˚
  == 0)
 
-608 
+641 
 out
 ->
 åa˚Vñ
@@ -133601,7 +134049,7 @@ out
 °™dVñ
 [0];
 
-610 
+643 
 out
 ->
 åa˚Vñ
@@ -133611,11 +134059,11 @@ out
 •ìdVñTùe
 ;
 
-611 i‡(
+644 i‡(
 dñè_phi
  == 0)
 
-612 
+645 
 out
 ->
 omegaVñ
@@ -133623,7 +134071,7 @@ omegaVñ
 °™dRŸ
 [0];
 
-614 
+647 
 out
 ->
 omegaVñ
@@ -133633,7 +134081,447 @@ omegaVñ
 •ìdRŸTùe
 ;
 
-616 
+649 
+	}
+}
+
+652 
+	$S≥edFûå©i⁄
+(*
+V
+)
+
+654 
+T¨gS≥ed
+.
+x
+ = 
+V
+[0];
+
+655 
+T¨gS≥ed
+.
+y
+ = 
+V
+[1];
+
+657 
+TVe˘‹
+ 
+ãmp
+;
+
+658 
+	`subåa˘i⁄
+(
+CurS≥ed
+,
+T¨gS≥ed
+, &
+ãmp
+);
+
+659 
+ACCEL_INC
+ = 
+	`pow
+(
+	`mod
+(
+ãmp
+Ë* 10.0, 2Ë/ 10.0 + 0.001 + mod(
+CurAc˚l
+) / 2.0;
+
+660 i‡(
+ACCEL_INC
+ > 
+MAX_ACCEL_INC
+) { ACCEL_INC = MAX_ACCEL_INC;}
+
+661 i‡(
+ACCEL_INC
+ < -
+MAX_ACCEL_INC
+) { ACCEL_INC = -MAX_ACCEL_INC;}
+
+662 
+TVe˘‹
+ 
+ac˚lInc
+;
+
+663 
+	`subåa˘i⁄
+(
+T¨gS≥ed
+, 
+CurS≥ed
+, &
+ãmp
+);
+
+664 
+	`subåa˘i⁄
+(
+ãmp
+, 
+CurAc˚l
+, &temp);
+
+665 
+	`n‹mÆiz©i⁄
+(
+ãmp
+, 
+ACCEL_INC
+, &temp);
+
+666 
+ac˚lInc
+ = 
+ãmp
+;
+
+667 
+	`subåa˘i⁄
+(
+T¨gS≥ed
+, 
+CurS≥ed
+, &
+ãmp
+);
+
+668 
+	`subåa˘i⁄
+(
+CurAc˚l
+, 
+ãmp
+, &temp);
+
+669 
+	`n‹mÆiz©i⁄
+(
+ãmp
+, 
+ACCEL_INC
+, &temp);
+
+670 
+TVe˘‹
+ 
+ac˚lDec
+ = 
+ãmp
+;
+
+672 
+TVe˘‹
+ 
+√wAc˚lInc
+, 
+√wAc˚lDec
+;
+
+673 
+	`addôi⁄
+(
+CurAc˚l
+, 
+ac˚lInc
+, &
+√wAc˚lInc
+);
+
+674 
+	`addôi⁄
+(
+CurAc˚l
+, 
+ac˚lDec
+, &
+√wAc˚lDec
+);
+
+676 
+TVe˘‹
+ 
+√wS≥edInc
+, 
+√wS≥edDec
+, 
+√wS≥edZî
+;
+
+677 
+	`addôi⁄
+(
+CurS≥ed
+, 
+√wAc˚lInc
+, &
+√wS≥edInc
+);
+
+678 
+	`addôi⁄
+(
+CurS≥ed
+, 
+√wAc˚lDec
+, &
+√wS≥edDec
+);
+
+679 
+	`addôi⁄
+(
+CurS≥ed
+, 
+CurAc˚l
+, &
+√wS≥edZî
+);
+
+680 
+timeToSt›
+;
+
+681 i‡(
+	`mod
+(
+ac˚lInc
+) > 0)
+
+682 
+timeToSt›
+ = 
+	`abs
+(
+	`mod
+(
+CurAc˚l
+)/mod(
+ac˚lInc
+))/2.0 + 0.50;
+
+683 
+timeToSt›
+ = 1;
+
+684 
+öcEº
+ = 
+	`mod
+(
+	`subåa˘i⁄
+(
+T¨gS≥ed
+,
+	`addôi⁄
+(
+√wS≥edInc
+,
+
+685 
+	`addôi⁄
+(
+	`sˇÀ
+(
+√wAc˚lInc
+,
+timeToSt›
+),
+
+686 
+	`sˇÀ
+(
+ac˚lInc
+,
+timeToSt›
+*timeToStop/2.0)))));
+
+687 
+decEº
+ = 
+	`mod
+(
+	`subåa˘i⁄
+(
+T¨gS≥ed
+,
+	`addôi⁄
+(
+√wS≥edDec
+,
+
+688 
+	`addôi⁄
+(
+	`sˇÀ
+(
+√wAc˚lDec
+,
+timeToSt›
+),
+
+689 
+	`sˇÀ
+(
+ac˚lDec
+,
+timeToSt›
+*timeToStop/2.0)))));
+
+690 
+zîEº
+ = 
+	`mod
+(
+	`subåa˘i⁄
+(
+T¨gS≥ed
+,
+	`addôi⁄
+(
+√wS≥edDec
+,
+
+691 
+	`sˇÀ
+(
+√wAc˚lDec
+,
+timeToSt›
+))));
+
+692 i‡(
+öcEº
+ > 
+decEº
+)
+
+694 i‡(
+decEº
+ < 
+zîEº
+)
+
+696 
+Ac˚lInc1
+ = 
+ac˚lDec
+;
+
+697 
+CurS≥ed
+ = 
+√wS≥edDec
+;
+
+698 
+CurAc˚l
+ = 
+√wAc˚lDec
+;
+
+702 
+Ac˚lInc1
+.
+x
+ = 0;
+
+703 
+Ac˚lInc1
+.
+y
+ = 0;
+
+705 
+CurS≥ed
+ = 
+√wS≥edZî
+;
+
+711 i‡(
+öcEº
+ < 
+zîEº
+) {
+
+712 
+Ac˚lInc1
+ = 
+ac˚lInc
+;
+
+713 
+CurS≥ed
+ = 
+√wS≥edInc
+;
+
+714 
+CurAc˚l
+ = 
+√wAc˚lInc
+;
+
+718 
+Ac˚lInc1
+.
+x
+ = 0;
+
+719 
+Ac˚lInc1
+.
+y
+ = 0;
+
+720 
+CurS≥ed
+ =
+√wS≥edZî
+;
+
+723 i‡(
+	`mod
+(
+CurAc˚l
+Ë> 
+MAX_ACCEL
+)
+
+724 
+	`n‹mÆiz©i⁄
+(
+CurAc˚l
+, 
+MAX_ACCEL
+, &CurAccel);
+
+725 
+V
+[0] = 
+CurS≥ed
+.
+x
+;
+
+726 
+V
+[1] = 
+CurS≥ed
+.
+y
+;
+
+727 
 	}
 }
 
@@ -134571,6 +135459,196 @@ size
 	}
 }
 
+204 
+	$subåa˘i⁄
+(
+TVe˘‹
+ 
+a
+, TVe˘‹ 
+b
+, TVe˘‹ *
+ªsu…
+)
+
+206 
+ªsu…
+->
+x
+ = 
+a
+.x - 
+b
+.x;
+
+207 
+ªsu…
+->
+y
+ = 
+a
+.y - 
+b
+.y;
+
+208 
+	}
+}
+
+210 
+	$addôi⁄
+(
+TVe˘‹
+ 
+a
+, TVe˘‹ 
+b
+, TVe˘‹ *
+ªsu…
+)
+
+212 
+ªsu…
+->
+x
+ = 
+a
+.x + 
+b
+.x;
+
+213 
+ªsu…
+->
+y
+ = 
+a
+.y + 
+b
+.y;
+
+214 
+	}
+}
+
+216 
+	$n‹mÆiz©i⁄
+(
+TVe˘‹
+ 
+a
+, 
+Àn
+, TVe˘‹ *
+ªsu…
+)
+
+218 
+mod
+ = 
+	`pow
+(
+a
+.
+x
+ *á.x +á.
+y
+ *á.y, 0.5) ;
+
+219 i‡(
+mod
+ > 0) {
+
+220 
+k
+ = 
+Àn
+/
+mod
+;
+
+222 
+ªsu…
+->
+x
+ = 
+a
+.x * 
+k
+;
+
+223 
+ªsu…
+->
+y
+ = 
+a
+.y * 
+k
+;
+
+225 
+	}
+}
+
+227 
+	$sˇÀ
+(
+TVe˘‹
+ 
+a
+, 
+k
+, TVe˘‹ *
+ªsu…
+)
+
+229 
+ªsu…
+->
+x
+ = 
+a
+.x * 
+k
+;
+
+230 
+ªsu…
+->
+y
+ = 
+a
+.y * 
+k
+;
+
+231 
+	}
+}
+
+233 
+	$mod
+(
+TVe˘‹
+ 
+a
+)
+
+235  
+	`pow
+(
+a
+.
+x
+ *á.x +á.
+y
+ *á.y, 0.5);
+
+236 
+	}
+}
+
 	@C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\matrix.h
 
 1 #i‚de‡
@@ -134583,7 +135661,19 @@ __MATR
 
 	)
 
-4 
+4 
+	sTVe˘‹
+ {
+
+5 
+	mx
+;
+
+6 
+	my
+;
+
+9 
 m©rixC›y
 (*
 m
@@ -134595,7 +135685,7 @@ cﬁumns
 √w_m
 );
 
-5 
+10 
 m©rixGëCñl
 (*
 m
@@ -134609,7 +135699,7 @@ row
 cﬁumn
 );
 
-6 
+11 
 m©rixMu…ùlyM2M
 (*
 m1
@@ -134627,7 +135717,7 @@ cﬁumns2
 √w_m
 );
 
-7 
+12 
 m©rixMu…ùlyS2M
 (*
 m
@@ -134641,7 +135731,7 @@ s
 √w_m
 );
 
-8 
+13 
 m©rixPlusMöus
 (*
 m1
@@ -134657,7 +135747,7 @@ sign
 √w_m
 );
 
-9 
+14 
 m©rixTøn•o£
 (*
 m
@@ -134669,7 +135759,7 @@ cﬁumns
 √w_m
 );
 
-10 
+15 
 m©rixDë_LU_Tønsf‹m
 (*
 A
@@ -134679,7 +135769,7 @@ n
 out
 );
 
-11 
+16 
 m©rixCoÁ˘‹
 (*
 m
@@ -134689,7 +135779,7 @@ size
 √w_m
 );
 
-12 
+17 
 m©rixInvî£
 (*
 m
@@ -134699,7 +135789,7 @@ size
 √w_m
 );
 
-13 
+18 
 m©rixFûl
 (*
 m
@@ -134793,7 +135883,7 @@ vÆ
 robSèãSåu˘
  
 	gcurSèã
- = {1,1,1};
+ = {1, 1, 1, 1};
 
 24 
 ícOutPackSåu˘
@@ -135107,11 +136197,11 @@ duty
 
 84 i‡(
 duty
->1 )duty=1;
+ > 1 ) duty = 1;
 
 85 i‡(
 duty
-<0 )duty=0;
+ < 0 ) duty = 0;
 
 86 *
 PWM_CCR
@@ -135121,7 +136211,7 @@ ch
 öt32_t
 )((
 duty
-*
+ * 
 MAX_PWM
 ));
 
@@ -135599,13 +136689,13 @@ cmd
 cmd
 ->
 ∑øm
-+1));
+ + 1));
 
 210 
 	`£tPWM
 –
 ch
--1, 
+ - 1, 
 ãmp
 );
 
@@ -135619,7 +136709,7 @@ ch
 cmd
 ->
 comm™d
-,
+, 
 °r
 , 3);
 
@@ -135997,7 +137087,7 @@ ch
 cmd
 ->
 ∑øm
-+12;
+ + 12;
 
 336 
 œ°Poöt
@@ -136063,7 +137153,7 @@ poöts
 œ°Poöt
 ].
 ídTask
-=
+ = 
 NULL
 ;
 
@@ -136073,7 +137163,7 @@ poöts
 œ°Poöt
 ].
 movTask
- =
+ = 
 NULL
 ;
 
@@ -137121,51 +138211,35 @@ comm™d
 °r
 , 3);
 
-632 
-i
-;
+632 *(
+ãmp
+Ë(*)(
+cmd
+->
+∑øm
+);
 
-633 
-curSèã
-.
-åackEn
- = 0;
+633 * 
+ch
+ = 
+cmd
+->
+∑øm
+ + 12;
 
-635 
-i
- = 0; i<=2; i++)
-
-637 
-vT¨gëGlob
-[
-i
-] = 0;
-
-640 
+634 
+	`addPoötInFr⁄tOfQueue
+(&
 poöts
-[0].
-˚¡î
-[0] = 
-robŸCo‹d
-[0];
+[0], &
+ãmp
+[0], &
+ch
+, &
+œ°Poöt
+);
 
-641 
-poöts
-[0].
-˚¡î
-[1] = 
-robŸCo‹d
-[1];
-
-642 
-poöts
-[0].
-˚¡î
-[2] = 
-robŸCo‹d
-[2];
-
-643 
+635 
 	`Cª©eP©h
 (&
 poöts
@@ -137175,27 +138249,21 @@ robŸCo‹d
 curP©h
 );
 
-645 
-curSèã
-.
-åackEn
- = 1;
-
-647 * 
+637 * 
 °r
  ="Ok";
 
-648 
+638 
 	`£ndAnswî
 (
 cmd
 ->
 comm™d
-,
+, 
 °r
 , 3);
 
-657 
+647 
 	}
 }
 
@@ -137361,7 +138429,7 @@ ENCODER4A_PIN
 
 32 
 	#HEADER_SIZE
- 3
+ 4
 
 	)
 
@@ -137557,97 +138625,101 @@ p›
 	mköemEn
 ;
 
-88 } 
+88 
+	mfûãrög
+;
+
+89 } 
 	trobSèãSåu˘
 ;
 
-90 
+91 
 robŸCo‹dT¨gë
 [3];
 
-91 
+92 
 robŸS≥edT¨gë
 [3] ;
 
-92 
+93 
 mŸ‹S≥ed
 [4];
 
-93 
+94 
 mŸ‹Co‹d
 [4] ;
 
-94 
+95 
 robŸCo‹d
 [3] ;
 
-95 
+96 
 robŸS≥ed
 [3] ;
 
-96 
+97 
 robSèãSåu˘
  
 curSèã
 ;
 
-97 
+98 
 ícOutPackSåu˘
  
 outEnc
 ;
 
-98 
+99 
 vT¨gëGlob
 [3];
 
-100 
+101 
 uöt32_t
  
 PWM_DIR
 [10];
 
-101 
+102 
 uöt32_t
  * 
 PWM_CCR
 [10];
 
-102 
+103 
 uöt32_t
  * 
 ícC¡
 [4];
 
-103 
+104 
 WHEELS
 [4];
 
-104 
+105 
 uöt16_t
  
 adcD©a
 [10];
 
-106 
+107 
 ∑ckLí
 [0x29];
 
-107 
+108 
 InPackSåu˘
  
 öComm™d
 ;
 
-108 
+109 
 öD©a
 [64];
 
-109 
+110 
 d©aIndex
 ;
 
-112 
+113 
 £tVﬁège
 (
 ch
@@ -137655,7 +138727,7 @@ ch
 duty
 );
 
-113 
+114 
 execComm™d
 (
 InPackSåu˘
@@ -137663,13 +138735,13 @@ InPackSåu˘
 cmd
 );
 
-114 
+115 
 pushByã
 (
 öByã
 );
 
-115 
+116 
 £ndAnswî
 (
 cmd
@@ -251879,8 +252951,8 @@ VERSION_H
 1
 .
 0
-139
-9346
+141
+9476
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Board\ADC.c
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Board\INTERR~1.C
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Board\INTERR~1.H
@@ -251932,6 +253004,8 @@ C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Library\core_cm4.h
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\DYNAMI~1.C
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\DYNAMI~1.H
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\EXTERN~1.H
+C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\MANIPU~1.C
+C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\MANIPU~1.H
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\Path.c
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\Path.h
 C:\Users\Student\Desktop\SHIPIT~1\Repo\ROBOTV~1\Robot\REGULA~1.H

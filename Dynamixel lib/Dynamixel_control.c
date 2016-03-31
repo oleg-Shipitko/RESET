@@ -339,7 +339,7 @@ bool getServoCurrentSpeed (const uint8_t servoId,
 bool getCurrentLoad (const uint8_t servoId,
                      uint16_t *loadValue)
 {
-    const uint8_t params[2] = {CURRENT_LOAD, 2};  // read two bytes, starting at address TORQUE
+    const uint8_t params[2] = {CURRENT_LOAD, 2};  // read two bytes, starting at address CURRENT_LOAD
 
     sendServoCommand (servoId, READ, 2, params);
 
@@ -349,7 +349,7 @@ bool getCurrentLoad (const uint8_t servoId,
     *loadValue = response.params[1];
     *loadValue <<= 8;
     *loadValue |= response.params[0];
-    *loadValue &= 0x03ff;
+    *loadValue &= 0x3ff;
 
     return true;
 }

@@ -27,7 +27,7 @@ struct TVector AccelInc2 = {0, 0};
 struct TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
-                                        {0.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0, 2.9, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {1.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {1.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -38,7 +38,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stop
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 0;// последняя активная точка в очереди
+char lastPoint = 1;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 //vSt    = (*parameters);     normal speed

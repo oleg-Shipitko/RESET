@@ -4938,7 +4938,7 @@
 	"stm32f4xx_rcc.h"
 	"stm32f4xx_conf.h"
 
-1458235395 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.c
+1458634172 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.c
 	"Interrupts.h"
 	"gpio.h"
 	"Regulator.h"
@@ -4951,7 +4951,7 @@
 1457656554 c:\users\student\desktop\shipitko oleg\repo\robot v2\board\interrupts.h
 	"stm32f4xx.h"
 
-1457957174 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.h
+1458655563 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.h
 	"stm32f4xx.h"
 	"Path.h"
 
@@ -5309,7 +5309,7 @@
 1457656554 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\src\system_stm32f4xx.c
 	"stm32f4xx.h"
 
-1458296865 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.c
+1458655249 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\regulator.c
 	"Regulator.h"
 	"robot.h"
 	"matrix.h"
@@ -5328,4 +5328,10 @@
 	<inttypes.h>
 	<stdbool.h>
 	<stdlib.h>
+
+1458871011 source:c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\manipulators.c
+	"Manipulators.h"
+	"Dynamixel_control.h"
+
+1458871008 c:\users\student\desktop\shipitko oleg\repo\robot v2\robot\manipulators.h
 
