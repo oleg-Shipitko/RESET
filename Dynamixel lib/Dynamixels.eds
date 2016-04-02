@@ -2,15 +2,22 @@
 <EmBlocks_debug_session>
 	<debuggerLastSession>
 		<watches>
+			<watch key="*test" format="3" array="0" start="0" count="0" />
+			<watch key="adcData" format="0" array="0" start="0" count="0" />
+			<watch key="checkSum" format="3" array="0" start="0" count="0" />
+			<watch key="curPath" format="0" array="0" start="0" count="0" />
+			<watch key="dataIndex" format="0" array="0" start="0" count="0" />
+			<watch key="inData" format="3" array="1" start="0" count="0" />
+			<watch key="lastPoint" format="1" array="0" start="0" count="0" />
+			<watch key="outData" format="3" array="1" start="0" count="0" />
+			<watch key="points" format="0" array="1" start="0" count="0" />
+			<watch key="robotCoord" format="1" array="0" start="0" count="0" />
+			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
 			<watch key="curAngle" format="0" array="0" start="0" count="0" />
 			<watch key="curLoad" format="0" array="0" start="0" count="0" />
-			<watch key="curPath" format="0" array="0" start="0" count="0" />
 			<watch key="curSpeed" format="0" array="0" start="0" count="0" />
-			<watch key="lastPoint" format="1" array="0" start="0" count="0" />
 			<watch key="params" format="3" array="0" start="0" count="0" />
-			<watch key="points" format="0" array="1" start="0" count="0" />
 			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
-			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
 		</watches>
 	</debuggerLastSession>
 </EmBlocks_debug_session>

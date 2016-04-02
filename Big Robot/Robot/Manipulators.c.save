@@ -1,0 +1,51 @@
+#include "Manipulators.h"
+#include "Dynamixel_control.h"
+
+
+void soft_delay(long int ticks)
+{
+    for(; ticks > 0; ticks--);
+}
+    uint16_t stVal = 0;
+    uint16_t finalVal = 300;
+    uint16_t curLoad = 0;
+
+///////////////////////////TOWER BUILDER///////////////////////
+#define ID_FRONT 11;      // Передний манипулятор
+#define ID_BACK 11;       // Задний манипулятор
+#define CLOSED_ANG 0;
+#define OPEN_ANG 300;
+
+
+bool open_tower()               // Открыть манипулятор
+{
+    setServoAngle(ID, OPEN_ANG);
+    return true;
+}
+
+bool close_tower()              // Закрыть манипулятор
+{
+    setServoAngle(ID, CLOSED_ANG);
+    return true;
+}
+///////////////////////////////////////////////////////////////
+
+///////////////////////////CUBES CATCHER///////////////////////
+#define ID_RIGHT 18;  // If to look on robot from the front
+#define ID_LEFT 1;
+#define OPEN_ANG_RIGHT 300;
+#define OPEN_ANG_LEFT 300;
+#define CLOSED_ANG_RIGHT 0;
+#define CLOSED_ANG_LEFT 300;
+
+
+bool open_cubes()
+{
+    setServoAngle(ID_RIGHT, OPEN_ANG_RIGHT);
+    setServoAngle(ID_LEFT, OPEN_ANG_LEFT);
+    soft_delay
+    getServoAngle (const uint8_t servoId, float *angle)
+    getServoAngle (const uint8_t servoId, float *angle)
+}
+
+///////////////////////////////////////////////////////////////
