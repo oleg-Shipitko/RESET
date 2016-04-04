@@ -41,7 +41,7 @@ def plus(data):
 	for i in data:
 		item += i
 
-@profile
+#@profile
 def update_di(answer):		
 	#answer = answer.split('\n')		
 	#time = answer.pop(1)[:-1]
@@ -64,7 +64,8 @@ def update_di(answer):
 	#print 'point ', polar_graph
 	#print 'angle ', angle
 	combined = zip(angle, polar_graph)
-	#print 'zip ', combined	
+	print 'zip ', combined	
+	print len(combined)
 	#print type(combined)
 #d = deque()
 #n = np.empty([1, 1])
