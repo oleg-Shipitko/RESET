@@ -29,7 +29,7 @@ TCP_IP = '192.168.0.10'
 TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 # Number of particles
-N = 30
+N = 50
 # Dimensions of the playing field  
 WORLD_X = 3000
 WORLD_Y = 2000
@@ -185,7 +185,7 @@ class Robot(object):
 			#print 'calculated distance: ', dist
 			prob *= (self.gaussian(dist, self.sense_noise, measurement[i][1])) #* 
 				#self.gaussian(self.orientation, self.sense_noise, measurement[i][0]))
-		print 'Probability:................................. ', prob
+		#print 'Probability:................................. ', prob
 		return prob
 
 	def gaussian(self, mu, sigma, x):
@@ -204,15 +204,13 @@ class Robot(object):
 		except OverflowError: 
 			return 0.0		
 
-
-
 	def __str__(self):
 		return 'Particle pose: x = %i mm, y = %i mm, theta = %.2f deg' \
 			%(self.x, self.y, np.degrees(self.orientation))
 
 def init_xy_plot():
 	""" setup an XY plot canvas """
-	plt.ion()
+	#plt.ion()
 	figure = plt.figure(figsize=(6, 4),
 						dpi=200,
 						facecolor="w",
@@ -249,44 +247,40 @@ if __name__ == '__main__':
 	#for i in p:
 	#	print 'First particles: ', i
 	#update_xy_plot([p[i].x for i in xrange(N)], [p[i].y for i in xrange(N)])
-	#myrobot.set(1510, 590, math.pi/2)
 	
 	#time.sleep(5)
 	#while True:
-	for iteration in xrange(10):
+	for iteration in xrange(30):
 		print 'ITERATION:.......', iteration
 		# Move robot; noise is in prob function
 		myrobot = myrobot.move(rel_motion)
 		#print 'Robot after movement: ', myrobot
+
 		# Lidar sense - returns distance to 3 beacons
 		lidar = ttest.update_di(data_3)
 		#print lidar 
+
 		# Move particles
 		p2 = [p[i].move(rel_motion) for i in xrange(N)]
 		p = p2
-		# for i in xrange(N):
-		# 	p2.append(p[i].set(pmm.prob(p[i].pose(), rel_motion)))
-		# p = p2
-		#p.pop()
-		#p.append(myrobot)
 		#for i in p:
 		#	print 'Particels after movement: ', i
+
 		# Calculate the weights 
 		w =[p[i].weight(lidar) for i in xrange(N)]
 		w = np.asarray(w)
 		w /= w.sum()
-		# for i in xrange(N):
-		# 	w.append(p[i].weight(*arguments))
-		#w = np.asarray(w)
-		print 'sum of weights: ', w
-		print 'sum of weights: ', np.sum(w)
+		#print 'sum of weights: ', w
+		#print 'sum of weights: ', np.sum(w)
+
 		# Probability random pick - use np.random alg
 		p3 = np.random.choice(p, N, p = w)
 		p = list(p3)
 		#print 'list particles after random: ', p
+
 		# Set myrobot to particle with max w
 		index2 = np.nonzero(w == w.max())[0][0]
 		myrobot = copy.deepcopy(p[index2])
-		for i in p:
-			print 'Final particles: ', i
+		# for i in p:
+		# 	print 'Final particles: ', i
 		print myrobot
