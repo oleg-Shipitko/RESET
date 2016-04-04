@@ -75,6 +75,40 @@ def update_di(answer):
 	except:
 		print 'not same length'
 
+def read():
+	answer = answer.split('\n')		
+	dist = answer[2:-2]
+	dist2 = [item[:-1] for item in dist]
+	dist4 = ''.join(dist2)			
+	step, idxh = -3*np.pi/4, 3 			
+	polar_graph = deque()
+	angle = deque()	
+	lend = len(dist4)
+	while idxh <= lend:
+		point = dist_val(dist4[idxh-3:idxh])
+		if dist_val(dist4[idxh:idxh+3]) > 1600:	
+			polar_graph.append(point)
+			angle.append(step)
+		idxh += 6		
+		step += 0.004363323129985824
+	combined = zip(angle, polar_graph)
+	y = 1
+	prev = 0
+	beacons = []
+	for i in xrange(1,len(combined)):
+		if (combined[i][0] - combined[i-1][0]) > 0.2:
+			beacons.append(beacon_num(i,y, prev))
+			y += 1
+			prev = i
+	return beacons[0], beacons[1], beacons[2]
+
+def beacon_num(index, number, prev):
+	if number == 1:
+		return np.mean(combined[:index], axis = 0)
+	if number == 2:
+		return np.mean(combined[prev:index], axis = 0)
+	if number == 3:
+		return np.mean(combined[prev:], axis = 0)
 	
 def init_xy_plot():
 	""" setup an XY plot canvas """

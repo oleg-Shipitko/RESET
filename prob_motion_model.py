@@ -8,7 +8,6 @@ Ref:	Probabilistic Robotics, ch 5.4, pp 136
 import math
 import random
 import matplotlib.pyplot as plt
-import numpy as np
 
 x, y, tetha = 0, 0, 0 # t-1 position in global coord sys
 x_bar, y_bar, tetha_bar = 2, 3, 0 # t-1 odometry position in local coord sys
@@ -49,22 +48,25 @@ def prob2(x, y, tetha, x_bar, y_bar, tetha_bar, x_bar_prime, y_bar_prime, tetha_
 	tetha_prime = tetha + edelta_rot 
 	return x_prime, y_prime, tetha_prime
 
-def prob(*pose, *delta):
+def prob(pose, delta):
 	# From robot I get relative position. And I can do new relative minus 
 	# old relative to get displacement dx, dy, dtheta
 	if delta[2] == 0:
-		x_prime = pose[0] + delta[0] + theta_noise()
-		y_prime = pose[1] + delta[1] + theta_noise()
+		x_prime = pose[0] + delta[0] + trans_noise()
+		y_prime = pose[1] + delta[1] + trans_noise()
 		theta_prime = pose[2] + theta_noise()
-	else:
-		x_prime = pose[0] + delta[0] + noise
-		y_prime = pose[1] + delta[1] + noise
-		theta_prime = pose[2] + delta[2] + noise + drift # pp 3 
+	# else:
+	# 	x_prime = pose[0] + delta[0] + noise
+	# 	y_prime = pose[1] + delta[1] + noise
+	# 	theta_prime = pose[2] + delta[2] + noise + drift # pp 3 
 
 	return x_prime, y_prime, theta_prime
 
+def trans_noise(): 
+	return random.gauss(0, 10)
+
 def theta_noise():
-	return (1.1*np.random.randn()+0.5)
+	return random.gauss(0, 0.1)
 
 def sample(b):
 	"""Draws a sample from the normal distribution"""
