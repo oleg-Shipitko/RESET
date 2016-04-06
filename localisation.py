@@ -152,6 +152,7 @@ class Robot(object):
 		self.orientation = random.random() * 2.0 * math.pi
 		# Dummpy sensor noise
 		self.sense_noise = 50
+		self.sense_angle_noise = math.radians(10)
 
 	def set(self, new_x, new_y, new_orientation):
 		if new_x < 0 or new_x > WORLD_X:
@@ -178,17 +179,24 @@ class Robot(object):
 		return self.x, self.y, self.orientation
 
 	def weight(self, measurement):
+		#beacons_sorted = sort_beacons(self.orientation, BEACONS, self.x, self.y)
+		beacons_sorted = BEACONS
 		prob = 1.0
 		#print 'measurement in weights: ', measurement
-		for i in xrange(len(BEACONS)):
-			dist = math.sqrt((self.x - BEACONS[i][0]) ** 2 + (self.y - BEACONS[i][1]) ** 2)
+		for i in xrange(len(beacons_sorted)):
+			dist = math.sqrt((self.x - beacons_sorted[i][0]) ** 2 + (self.y - beacons_sorted[i][1]) ** 2)
+			# Angle between current orientation and global beacons, measure counterclockwise
+			fi = angle(angle_conv(beacons_sorted[i][1] - self.y, beacons_sorted[i][0] - self.x) - self.orientation)
 			#print 'calculated distance: ', dist
-			prob *= (self.gaussian(dist, self.sense_noise, measurement[i][1])) #* 
-				#self.gaussian(self.orientation, self.sense_noise, measurement[i][0]))
+			try:
+				prob *= ((self.gaussian_trans(dist, self.sense_noise, measurement[i][1])) * \
+			 		self.gaussian_rot(fi, self.sense_angle_noise, angle2(measurement[i][0])))
+			except IndexError:
+				prob *= 1
 		#print 'Probability:................................. ', prob
 		return prob
 
-	def gaussian(self, mu, sigma, x):
+	def gaussian_trans(self, mu, sigma, x):
 		# calculates the probability of x for 1-dim Gaussian with mean mu and var. sigma
 		#print 'Gaussian mu: ', mu
 		#print 'Gaussian sigma: ', sigma
@@ -200,13 +208,60 @@ class Robot(object):
 		# 	print 'Gaussian calculation rouding: ', 0
 		try:
 			return math.exp(- ((mu - (x+29)) ** 2) / (sigma ** 2) / 2.0) / \
-				math.sqrt(2.0 * math.pi * (sigma ** 2))
+				(sigma * math.sqrt(2.0 * math.pi))
 		except OverflowError: 
 			return 0.0		
+
+	def gaussian_rot(self, mu, sigma, x):
+		try:
+			return math.exp(- ((mu - x) ** 2) / (sigma ** 2) / 2.0) / \
+				(sigma * math.sqrt(2.0 * math.pi))
+		except OverflowError: 
+			return 0.0	
 
 	def __str__(self):
 		return 'Particle pose: x = %i mm, y = %i mm, theta = %.2f deg' \
 			%(self.x, self.y, np.degrees(self.orientation))
+
+def angle_conv(y, x):
+	angle = math.atan2(y, x)
+	if angle<0:
+		angle += (2*math.pi)
+	return angle
+
+def angle(measurement):
+	if measurement < 0:
+		measurement += (2*math.pi)	
+	return measurement
+
+def angle2(measurement):
+	if measurement < 3*math.pi/4:
+		measurement += (5*math.pi/4)
+		return measurement
+	else:
+		measurement -= (3*math.pi/4)
+		return measurement
+
+# Finds angle of lidar start arm from global x axis (takes self.orientation)
+def angle3(orientation):
+	start = orientation - 3*math.pi/4
+	if start < 0:
+		start += (2*math.pi)
+	return start
+
+# Finds angle between angle3 and beacon (takes angle3 of orientation, and angle_conv of beacon point)
+def angle4(arm, beacon):
+	angle = beacon - arm
+	if angle < 0:
+		angle += (2*math.pi)
+	return angle
+
+def sort_beacons(orientation,BEACONS,x,y):
+	arm = angle3(orientation)
+	beacons = [angle_conv(BEACONS[i][1] - y, BEACONS[i][0] - x) for i in xrange(3)]
+	order =[angle4(arm,beacon) for beacon in beacons]
+	beacons_sort = [BEACONS for (order,BEACONS) in sorted(zip(order,BEACONS)) if order <= 3*math.pi/2]
+	return beacons_sort
 
 def init_xy_plot():
 	""" setup an XY plot canvas """
@@ -250,7 +305,7 @@ if __name__ == '__main__':
 	
 	#time.sleep(5)
 	#while True:
-	for iteration in xrange(30):
+	for iteration in xrange(60):
 		print 'ITERATION:.......', iteration
 		# Move robot; noise is in prob function
 		myrobot = myrobot.move(rel_motion)
@@ -270,7 +325,7 @@ if __name__ == '__main__':
 		w =[p[i].weight(lidar) for i in xrange(N)]
 		w = np.asarray(w)
 		w /= w.sum()
-		#print 'sum of weights: ', w
+		#print 'just weights: ', w
 		#print 'sum of weights: ', np.sum(w)
 
 		# Probability random pick - use np.random alg

@@ -1,5 +1,6 @@
 from collections import deque
 import numpy as np
+import math
 
 def time_val(value):	
 	return ((ord(value[0])-48)<<18)|((ord(value[1])-48)<<12)|((ord(value[2])-48)<<6)|(ord(value[3])-48)
@@ -41,6 +42,11 @@ def plus(data):
 	for i in data:
 		item += i
 
+def pi():
+	step = 0
+	for i in xrange(10000):
+		step += math.radians(0.25)
+
 #@profile
 def update_di(answer):		
 	#answer = answer.split('\n')		
@@ -77,7 +83,7 @@ def update_di(answer):
 			y += 1
 			prev = i
 	#print 'beacons :', beacons
-	return beacons[0], beacons[1], beacons[2]
+	return beacons
 #	print 'beacon 1: ', beacons[0]
 #	print 'beacon 2: ', beacons[1]
 #	print 'beacon 3: ', beacons[2]
@@ -94,7 +100,6 @@ def beacon_num(index, number, prev):
 #d = deque()
 #n = np.empty([1, 1])
 #l = []
-
 
 #[(0.1308996938995748, 1541), (0.13526301702956062, 1542), (0.13962634015954645, 1533), (0.14398966328953228, 1540), (0.1483529864195181, 1538), (0.15271630954950394, 1539), (0.15707963267948977, 1540), (1.2915436464757954, 2022), (1.2959069696057812, 2016), (1.300270292735767, 2021), (1.3046336158657528, 2015), (1.3089969389957385, 2021), (1.3133602621257243, 2032), (3.4121186876489538, 1592), (3.4164820107789398, 1583), (3.4208453339089258, 1582), (3.4252086570389118, 1581), (3.4295719801688977, 1583), (3.4339353032988837, 1583), (3.4382986264288697, 1590), (3.6695547523181276, 4518), (3.6739180754481136, 4493), (3.6782813985780995, 4514)]
 
@@ -410,5 +415,85 @@ data_3 = ['GE0000108000\r00P', '0L;:a',
  '7B0>c07=0>g07i0>`07`0>g07n0?;08e0?;08e0>R0990>N0<30>C0<m0>C0=L0>O', 
  'E0<A0>L0<10>G0;X0>Y0<1U', '', '']
 
-#update_di(data_3)
+if __name__ == '__main__':
+	lidar = update_di(data_3)
+	print lidar
+	print len(lidar)
 
+
+# i need to build beacons on the assumption what robot sees
+
+# fov_start = self.orientation - 135
+# fov_end = self.orientation + 135
+
+# def angle(pt1, pt2):
+#     x1, y1 = pt1
+#     x2, y2 = pt2
+#     inner_product = x1*x2 + y1*y2
+#     len1 = math.hypot(x1, y1)
+#     len2 = math.hypot(x2, y2)
+#     return math.acos(inner_product/(len1*len2))
+
+# def pol2cart(rho, phi):
+#     x = rho * np.cos(phi)
+#     y = rho * np.sin(phi)
+#     return(x, y)
+
+# def rtpi(x, y):
+#     hypotenuse = math.hypot(x, y)
+#     angle = round(math.degrees(math.atan2(y, x)))
+#     if angle<0:
+#         angle += 360
+#     return angle
+
+# def angle_conv(y, x):
+# 	angle = math.atan2(y, x)
+# 	if angle<0:
+# 		angle += (2*math.pi)
+# 	return angle
+
+# def angle(measurement):
+# 	if measurement < 0:
+# 		measurement += (2*math.pi)	
+# 	return measurement
+
+# def angle2(measurement):
+# 	if measurement < 3*math.pi/4:
+# 		measurement += (5*math.pi/4)
+# 		return measurement
+# 	else:
+# 		measurement -= (3*math.pi/4)
+# 		return measurement
+
+# # SORTING BEACONS
+
+# # Finds angle of lidar start arm from global x axis (takes self.orientation)
+# def angle3(orientation):
+# 	start = orientation - 3*math.pi/4
+# 	if start < 0:
+# 		start += (2*math.pi)
+# 	return start
+
+# # Finds angle between angle3 and beacon (takes angle3 of orientation, and angle_conv of beacon point)
+# def angle4(arm, beacon):
+# 	angle = beacon - arm
+# 	if angle < 0:
+# 		angle += (2*math.pi)
+# 	return angle
+
+# def sort_beacons(orientation,BEACONS,x,y):
+# 	arm = angle3(orientation)
+# 	print 'arm: ', arm
+# 	beacons = [angle_conv(BEACONS[i][1] - y, BEACONS[i][0] - x) for i in xrange(3)]
+# 	print 'beacon relative angle to robot position: ', beacons
+# 	order =[angle4(arm,beacon) for beacon in beacons]
+# 	print 'angle between arm and beacons: ', order
+# 	print 'sorted: ', sorted(zip(order,BEACONS))
+# 	beacons_sort = [BEACONS for (order,BEACONS) in sorted(zip(order,BEACONS)) if order <= 3*math.pi/2]
+# 	return beacons_sort
+
+# orientation = 3*math.pi/2
+# BEACONS = [(3000,0),(3000,2000),(0,1000)]
+# x = 1500
+# y = 0.000
+# print sort_beacons(orientation,BEACONS,x,y)
