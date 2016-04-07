@@ -1,18 +1,5 @@
 # Monte Carlo Localisation
 
-# Initialize robot position - random
-# Sense (lidar)
-# Initialize particles - random uniform 
-# Move robot (in our case will be 0,0,0)
-# Sense (lidar)
-# Move every particle
-# Calculate weight for every particle (probability)
-# Resample (probability random pick)
-# Set the one with biggest probability as real position
-
-# Change kinematic model to give only one particle with noise
-# But have many particles
-
 import prob_motion_model as pmm
 import hokuyo
 import random
@@ -29,17 +16,17 @@ TCP_IP = '192.168.0.10'
 TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 # Number of particles
-N = 50
+N = 100
 # Dimensions of the playing field  
 WORLD_X = 3000
 WORLD_Y = 2000
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 # BEACONS = [(-62,1000),(3062,-62),(3062,2062)]
-BEACONS = [(3000,0),(3000,2000),(0,1000)]
+BEACONS = [(2994,0),(2994,1996),(0,960)]
 # Dummy list before I implement odometry reading and conversion to global coord
 rel_motion = [0, 0, 0]
 # Dummy sensor noise
-sense_noise = 1.5
+#sense_noise = 1.5
 
 data_3 = ['GE0000108000\r00P', '0L;:a',
  '0:D0BY0:k0C90;00CK0:o0CE0;40CA0;70CA0;<0C@0;90C@0;:0C00;40Bn0;70G', 
@@ -143,16 +130,16 @@ data_3 = ['GE0000108000\r00P', '0L;:a',
  'd0;>0>[0:k0>g0;60>g0;60>[0;D0>n0;J0?;0;J0?b0;:0@00;;0@L0:_0@W0:bC', 
  '0?O0;G0>T0;50>P0;80>[0;A0>Z0;70>:0910>:0910>808N0>e07;0>n0770?@00', 
  '7B0>c07=0>g07i0>`07`0>g07n0?;08e0?;08e0>R0990>N0<30>C0<m0>C0=L0>O', 
- 'E0<A0>L0<10>G0;X0>Y0<1U', '', '']
+ 'E0<A0>L0<10>G0;X0>Y0<1U', '', '']	
 
 class Robot(object):
 	def __init__(self):
 		self.x = random.random() * WORLD_X
 		self.y = random.random() * WORLD_Y
 		self.orientation = random.random() * 2.0 * math.pi
-		# Dummpy sensor noise
+		# Dummy sensor noise
 		self.sense_noise = 50
-		self.sense_angle_noise = math.radians(10)
+		self.sense_angle_noise = math.radians(5)
 
 	def set(self, new_x, new_y, new_orientation):
 		if new_x < 0 or new_x > WORLD_X:
@@ -179,19 +166,30 @@ class Robot(object):
 		return self.x, self.y, self.orientation
 
 	def weight(self, measurement):
-		#beacons_sorted = sort_beacons(self.orientation, BEACONS, self.x, self.y)
-		beacons_sorted = BEACONS
+		beacons_sorted = sort_beacons(self.orientation, BEACONS, self.x, self.y)
+		#beacons_sorted = BEACONS
+		print 'SORTED BEACONS: ', beacons_sorted		
 		prob = 1.0
 		#print 'measurement in weights: ', measurement
+		if len(beacons_sorted) != len(measurement):
+			print 'beacons not the same length' 
+			return 0.0		
 		for i in xrange(len(beacons_sorted)):
 			dist = math.sqrt((self.x - beacons_sorted[i][0]) ** 2 + (self.y - beacons_sorted[i][1]) ** 2)
 			# Angle between current orientation and global beacons, measure counterclockwise
 			fi = angle(angle_conv(beacons_sorted[i][1] - self.y, beacons_sorted[i][0] - self.x) - self.orientation)
-			#print 'calculated distance: ', dist
+			print 'calculated distance: ', dist, measurement[i][1]
+			print 'calculated angle: ', fi, angle2(measurement[i][0])
 			try:
-				prob *= ((self.gaussian_trans(dist, self.sense_noise, measurement[i][1])) * \
-			 		self.gaussian_rot(fi, self.sense_angle_noise, angle2(measurement[i][0])))
+				prob_trans = self.gaussian_trans(dist, self.sense_noise, measurement[i][1])
+				print 'prob_trans: ', prob_trans
+				prob_rot = self.gaussian_rot(fi, self.sense_angle_noise, angle2(measurement[i][0]))
+				print 'prob_rot: ', prob_rot/10
+				#prob *= ((self.gaussian_trans(dist, self.sense_noise, measurement[i][1])) * \
+			 	#	self.gaussian_rot(fi, self.sense_angle_noise, angle2(measurement[i][0])))
+				prob *= (prob_trans*(prob_rot/10))
 			except IndexError:
+				print 'INDEX ERROR'				
 				prob *= 1
 		#print 'Probability:................................. ', prob
 		return prob
@@ -265,7 +263,7 @@ def sort_beacons(orientation,BEACONS,x,y):
 
 def init_xy_plot():
 	""" setup an XY plot canvas """
-	#plt.ion()
+	plt.ion()
 	figure = plt.figure(figsize=(6, 4),
 						dpi=200,
 						facecolor="w",
@@ -273,7 +271,7 @@ def init_xy_plot():
 	ax = figure.add_subplot(111)
 	lines, = ax.plot([],[],linestyle="none",
 						marker=".",
-						markersize=3,
+						markersize=1,
 						markerfacecolor="blue")
 	ax.set_xlim(0, 3000)
 	ax.set_ylim(0, 2000)
@@ -286,13 +284,50 @@ def update_xy_plot(x, y):
 	lines.set_ydata(y)
 	figure.canvas.draw()
 
+def init_polar_plot():
+	""" setup a polar plot canvas """
+
+	plt.ion()
+	figure = plt.figure(figsize=(6, 6), 
+						dpi=160, 
+						facecolor="w", 
+						edgecolor="k")
+	ax = figure.add_subplot(111, polar=True)
+	lines, = ax.plot([],[], 
+					linestyle="none", 
+					marker=".", 
+					markersize=3, 
+					markerfacecolor="blue")
+	ax.set_rmax(4000)
+	ax.set_theta_direction(1) #set to clockwise
+	ax.set_theta_offset(-np.pi/4) #offset by 90 degree so that 0 degree is at 12 o'clock
+	#ax.grid()
+	return figure, lines
+
+def update_polar_plot(angle, dist):
+	""" re-draw the polar plot with new current_frame """
+
+	lines2.set_xdata(angle)
+	lines2.set_ydata(dist)
+	figure2.canvas.draw()
+
 if __name__ == '__main__':
 	# Initialize socket connection
-	#s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	#s.connect((TCP_IP, TCP_PORT))
-
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	print 'test'	
+	s.connect((TCP_IP, TCP_PORT))
+	time.sleep(0.1)
+	s.send('BM\r')
+	data = s.recv(BUFFER_SIZE)
+	time.sleep(0.1)	
+	for i in xrange(3):
+		s.send('GE0000108000\r')
+		data = s.recv(BUFFER_SIZE)
+		time.sleep(0.1)
+	print 'Ready'
 	# Initialize the plot
-	#figure, lines = init_xy_plot()
+	figure2, lines2 = init_polar_plot()
+	figure, lines = init_xy_plot()
 	
 	# Set Robot randomly 
 	myrobot = Robot()
@@ -301,41 +336,56 @@ if __name__ == '__main__':
 	p = [Robot() for i in xrange(N)]
 	#for i in p:
 	#	print 'First particles: ', i
-	#update_xy_plot([p[i].x for i in xrange(N)], [p[i].y for i in xrange(N)])
-	
+	update_xy_plot([p[i].x for i in xrange(N)], [p[i].y for i in xrange(N)])
 	#time.sleep(5)
-	#while True:
-	for iteration in xrange(60):
-		print 'ITERATION:.......', iteration
+	while True:
+		try:	
+	#for iteration in xrange(30):
+			#print 'ITERATION:.......', iteration
 		# Move robot; noise is in prob function
-		myrobot = myrobot.move(rel_motion)
+			myrobot = myrobot.move(rel_motion)
 		#print 'Robot after movement: ', myrobot
-
+			s.send('GE0000108000\r')
+			data_lidar = s.recv(BUFFER_SIZE)
 		# Lidar sense - returns distance to 3 beacons
-		lidar = ttest.update_di(data_3)
-		#print lidar 
-
+			lidar, langle, lgraph = ttest.update_di(data_lidar) 
+			#print 'After lidar'			
+			try:
+				update_polar_plot(langle, lgraph)
+			except:
+				print 'not same length'
 		# Move particles
-		p2 = [p[i].move(rel_motion) for i in xrange(N)]
-		p = p2
+			p2 = [p[i].move(rel_motion) for i in xrange(N)]
+			p = p2
 		#for i in p:
 		#	print 'Particels after movement: ', i
 
 		# Calculate the weights 
-		w =[p[i].weight(lidar) for i in xrange(N)]
-		w = np.asarray(w)
-		w /= w.sum()
-		#print 'just weights: ', w
-		#print 'sum of weights: ', np.sum(w)
-
+			print 'lidar data: ', lidar			
+			w =[p[i].weight(lidar) for i in xrange(N)]
+			w = np.asarray(w)
+			w /= w.sum()
+			print 'just weights: ', w
+			#print 'sum of weights: ', np.sum(w)
+			try:
 		# Probability random pick - use np.random alg
-		p3 = np.random.choice(p, N, p = w)
-		p = list(p3)
+				p3 = np.random.choice(p, N, p = w)
+				p = list(p3)
 		#print 'list particles after random: ', p
 
 		# Set myrobot to particle with max w
-		index2 = np.nonzero(w == w.max())[0][0]
-		myrobot = copy.deepcopy(p[index2])
+				index2 = np.nonzero(w == w.max())[0][0]
+				myrobot = copy.deepcopy(p[index2])
+			except:
+				print 'error with choice'
+				pass
 		# for i in p:
 		# 	print 'Final particles: ', i
-		print myrobot
+			update_xy_plot([p[i].x for i in xrange(N)], [p[i].y for i in xrange(N)])			
+			print myrobot
+		except:			
+			s.send('QT\r')
+			s.shutdown(2)			
+			s.close()
+
+	 

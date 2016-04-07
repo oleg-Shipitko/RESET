@@ -49,7 +49,7 @@ def pi():
 
 #@profile
 def update_di(answer):		
-	#answer = answer.split('\n')		
+	answer = answer.split('\n')		
 	#time = answer.pop(1)[:-1]
 	dist = answer[2:-2]
 	dist2 = [item[:-1] for item in dist]
@@ -61,15 +61,14 @@ def update_di(answer):
 	while idxh <= lend:
 		point = dist_val(dist4[idxh-3:idxh])
 		#strength = dist_val(dist4[idxh:idxh+3])
-		if dist_val(dist4[idxh:idxh+3]) > 1600:	
+		if dist_val(dist4[idxh:idxh+3]) > 1500 and point < 3000:	
 			polar_graph.append(point)
 			angle.append(step)
 		#idxl = idxh + 3
 		idxh += 6		
 		step += 0.004363323129985824
 	#print 'point ', polar_graph
-	#print 'angle ', angle
-	global combined 
+	#print 'angle ', angle 
 	combined = zip(angle, polar_graph)
 	#print 'zip ', combined	
 	#print len(combined)
@@ -77,26 +76,26 @@ def update_di(answer):
 	prev = 0
 	beacons = []
 	for i in xrange(1,len(combined)):
-		if (combined[i][0] - combined[i-1][0]) > 0.2 or i == (len(combined)-1):
-			beacons.append(beacon_num(i,y, prev))
+		if ((combined[i][0] - combined[i-1][0]) > 0.2 or i == (len(combined)-1)) and y<4:
+			beacons.append(beacon_num(i,y, prev, combined))
 			#print i
 			y += 1
 			prev = i
-	#print 'beacons :', beacons
-	return beacons
-#	print 'beacon 1: ', beacons[0]
-#	print 'beacon 2: ', beacons[1]
-#	print 'beacon 3: ', beacons[2]
+	#print 'beacons: ', beacons	
+	return beacons, angle, polar_graph
 
-def beacon_num(index, number, prev):
+def beacon_num(index, number, prev, combined):
 	if number == 1:
+		#print 'got into 1'		
 		return np.mean(combined[:index], axis = 0)
 	if number == 2:
+		#print 'got into 2'		
 		return np.mean(combined[prev:index], axis = 0)
 	if number == 3:
-		print 'got into 3'
+		#print 'got into 3'
 		return np.mean(combined[prev:], axis = 0)
 	#print type(combined)
+
 #d = deque()
 #n = np.empty([1, 1])
 #l = []
