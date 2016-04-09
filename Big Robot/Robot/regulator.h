@@ -84,6 +84,9 @@ extern float * rotType[3];
 extern PidStruct wheelsPidStruct[4];
 extern float regulatorOut[4];
 extern uint16_t totalPointComplite;
+extern float MLineSpeed[4][3];          //
+extern float MRotSpeed[4][3];           // Матрицы должны быть определены из вне
+extern float InverseKinematics[4][4];   //
 
 
 void pidCalc(PidStruct *pid_control); //Расчитать ПИД, в качестве параметра - указатель на структуру

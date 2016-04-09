@@ -23,6 +23,7 @@ void TIM2_IRQHandler(void)
   //USB_OTG_BSP_TimerIRQ();
 }
 ////////////////////////////////////////////////////////////////////////////////
+
 void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регуляторов колес
 {
 //static char i=0; // Divider by 2 to get 10Hz frequency

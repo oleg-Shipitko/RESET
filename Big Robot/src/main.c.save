@@ -14,7 +14,7 @@
 #include "stm32f4xx_conf.h"
 
 #include "stm32f4xx.h"
-#include "Board.h"  //файл инициализации
+#include "щфкв.h"  //файл инициализации
 
 #include "gpio.h" // работа с портами ввода-вывода
 #include "Pins.h" // определение ножек на плате

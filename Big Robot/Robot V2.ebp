@@ -97,6 +97,10 @@
 		<Unit filename="Board\ADC.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="Board\Board.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Board\Board.h" />
 		<Unit filename="Board\Interrupts.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -110,10 +114,6 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="Board\i2c.h" />
-		<Unit filename="Board\init.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="Board\init.h" />
 		<Unit filename="Board\tim.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -170,15 +170,25 @@
 		<Unit filename="Library\stm32f4xx.h" />
 		<Unit filename="Library\stm32f4xx_conf.h" />
 		<Unit filename="Library\system_stm32f4xx.h" />
+		<Unit filename="Robot\Communication.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Robot\Communication.h" />
 		<Unit filename="Robot\Dynamixel_control.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Robot\Dynamixel_control.h" />
 		<Unit filename="Robot\Extern_variables.h" />
+		<Unit filename="Robot\Kinematics.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Robot\Manipulators.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Robot\Manipulators.h" />
+		<Unit filename="Robot\Matrix.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Robot\Path.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -186,14 +196,11 @@
 		<Unit filename="Robot\Regulator.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Robot\matrix.c">
+		<Unit filename="Robot\Robot.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Robot\matrix.h" />
 		<Unit filename="Robot\regulator.h" />
-		<Unit filename="Robot\robot.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="Robot\robot.h" />
 		<Unit filename="USB App\stm32fxxx_it.c">
 			<Option compilerVar="CC" />

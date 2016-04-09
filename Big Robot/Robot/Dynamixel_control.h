@@ -4,6 +4,7 @@ Code to control multiple Dynamixel AX-12 servo motors over USART
 on an STM32F4 chip.
 
 */
+
 #ifndef Dynamixels_h
 #define Dynamixels_h
 

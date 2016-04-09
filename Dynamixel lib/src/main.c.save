@@ -46,7 +46,7 @@ void GPIO_Config(void)
     GPIO1.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO1.GPIO_OType = GPIO_OType_PP;
     GPIO1.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO1.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11; // PC10-Tx PC11-Rx
+    //GPIO1.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11; // PC10-Tx PC11-Rx
     //GPIO1.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11; // PB10-Tx PB11-Rx
 
     GPIO_Init(GPIOC, &GPIO1);

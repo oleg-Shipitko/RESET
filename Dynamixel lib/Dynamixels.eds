@@ -2,6 +2,9 @@
 <EmBlocks_debug_session>
 	<debuggerLastSession>
 		<watches>
+			<watch key="left_servo_angle" format="0" array="0" start="0" count="0" />
+			<watch key="num" format="1" array="0" start="0" count="0" />
+			<watch key="right_servo_angle" format="1" array="0" start="0" count="0" />
 			<watch key="*test" format="3" array="0" start="0" count="0" />
 			<watch key="adcData" format="0" array="0" start="0" count="0" />
 			<watch key="checkSum" format="3" array="0" start="0" count="0" />

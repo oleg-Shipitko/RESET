@@ -170,15 +170,21 @@
 		<Unit filename="Library\stm32f4xx.h" />
 		<Unit filename="Library\stm32f4xx_conf.h" />
 		<Unit filename="Library\system_stm32f4xx.h" />
+		<Unit filename="Robot\Communication.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Robot\Dynamixel_control.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="Robot\Dynamixel_control.h" />
 		<Unit filename="Robot\Extern_variables.h" />
-		<Unit filename="Robot\Mainipulators.h" />
+		<Unit filename="Robot\Kinematics.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="Robot\Manipulators.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="Robot\Manipulators.h" />
 		<Unit filename="Robot\Path.c">
 			<Option compilerVar="CC" />
 		</Unit>

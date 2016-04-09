@@ -277,7 +277,7 @@ bool setServoMovingSpeed (const uint8_t servoId,
     return true;
 }
 
-// get maximum allowed speed
+// get maximum allowed speedgetServoAngle
 bool getServoMovingSpeed (const uint8_t servoId,
                        uint16_t *speedValue)
 {

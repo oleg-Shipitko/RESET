@@ -1,4 +1,4 @@
-#include "init.h"
+#include "Board.h"
 #include "stm32f4xx.h"
 #include "Pins.h"
 #include "i2c.h"
@@ -7,6 +7,63 @@
 #include "tim.h"
 #include "adc.h"
 #include "Regulator.h"
+
+uint16_t adcData[10];
+uint8_t pinType[10];
+uint8_t extiType[10];
+uint16_t extiFlag;
+
+uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
+                          BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
+uint32_t  PWM_DIR[10] ={BTN1_DIR_PIN,BTN2_DIR_PIN,
+                          BTN3_DIR_PIN,BTN4_DIR_PIN,
+                          BTN5_DIR_PIN,BTN6_DIR_PIN,
+                          BTN7_DIR_PIN,BTN8_DIR_PIN,
+                          BTN9_DIR_PIN,BTN10_DIR_PIN};
+uint32_t  GENERAL_PIN[10] ={GENERAL_PIN_0,GENERAL_PIN_1,
+                            GENERAL_PIN_2,GENERAL_PIN_3,
+                            GENERAL_PIN_4,GENERAL_PIN_5,
+                            GENERAL_PIN_6,GENERAL_PIN_7,
+                            GENERAL_PIN_8,GENERAL_PIN_9};
+uint32_t  EXTI_PIN[10] ={EXTI1_PIN,EXTI2_PIN,
+                         EXTI3_PIN,EXTI4_PIN,
+                         EXTI5_PIN,EXTI6_PIN,
+                         EXTI7_PIN,EXTI8_PIN,
+                         EXTI9_PIN,EXTI10_PIN};
+uint32_t  V12_PIN[6] ={PIN5_12V,PIN6_12V,
+                            PIN3_12V,PIN4_12V,
+                            PIN5_12V,PIN6_12V};
+
+
+////////////////////////////////////////////////////////////////////////////////
+//___________________________PWM CONTROS______________________________________//
+////////////////////////////////////////////////////////////////////////////////
+char setVoltage(char ch, float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
+{
+    if (ch == 255)
+        return 0;
+    if (duty>1 )duty = 1;
+    if (duty<-1 )duty = -1;
+    if (duty < 0)
+    {
+          *PWM_CCR[ch] = (int32_t)(MAX_PWM +  (duty * MAX_PWM));
+          set_pin(PWM_DIR[ch]);
+    }
+  else
+    {
+          *PWM_CCR[ch] = (int32_t) (duty * MAX_PWM);
+          reset_pin(PWM_DIR[ch]);
+    }
+    return 0;
+}
+
+char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,0
+{
+    if (duty > 1 ) duty = 1;
+    if (duty < 0 ) duty = 0;
+    *PWM_CCR[ch] = (int32_t)((duty * MAX_PWM));
+    return 0;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //__________________________________EXTI______________________________________//
@@ -46,6 +103,7 @@ void clear_ext_interrupt(unsigned char pin)
  EXTI->IMR &= ~(1<<((pin)&0xF));
 
 }
+
 
 /////////////////////////////////////////////////////////////////////////////
 void initAll(void)
@@ -140,7 +198,7 @@ initRegulators();
 
 
   timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1); // 1000Hz
-  timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
+  timPWMConfigure(TIM11, 2*1667, MAX_PWM, 1, 0, 0, 0); // 50 HZ // timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM10, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM9, 14, MAX_PWM, 1, 1, 0, 0);
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);

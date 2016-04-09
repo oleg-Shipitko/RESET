@@ -6,6 +6,7 @@
 #include <math.h>
 #include "adc.h"
 
+#define ENCODER_IMITATION
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -25,6 +26,15 @@ struct TVector CurAccel = {0, 0};
 struct TVector AccelInc1 = {0, 0};
 struct TVector AccelInc2 = {0, 0};
 struct TVector TargSpeed = {0, 0};
+//
+//  float MLineSpeed[4][3] = { 1.0,  0.0, 0.0,  // матрица расчета линейных скоростей
+//                             0.0,  1.0, 0.0,
+//                             0.0, -1.0, 0.0,
+//                             -1.0,  0.0, 0.0};
+//  float MRotSpeed[4][3] = { 0.0, 0.0, -0.14 , // матрица расчета линейных скоростей
+//                            0.0, 0.0, -0.14,
+//                            0.0, 0.0, -0.14,
+//                            0.0, 0.0, -0.14};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
                                         {0.0, 2.9, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -38,7 +48,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stop
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 0;// последняя активная точка в очереди
+char lastPoint = 4;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 //vSt    = (*parameters);     normal speed
@@ -49,11 +59,11 @@ Path curPath; //параметры активной прямой для траекторного регулятора
 
 float normalVel[5] = {0.6, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopVel[5] = {0.6, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVel[5] = {0.6, 0.6, -0.6, 1.0, 2.5};                                       //удержание заданного положения
+float standVel[5] = {0.6, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
 
 float normalRot[5] = {3.0, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopRot[5] = {3.0, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
-float standRot[5] = {4.0, 4.0, -1.0, 1.0, 2.5};                                       //удержание заданного положения
+float standRot[5] = {4.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
 
 float * speedType[3] = {normalVel, stopVel, standVel};                            // типы  линейный скоростей
 float * rotType[3] = {normalRot, stopRot, standRot};                              // типы угловых скоростей
@@ -174,18 +184,11 @@ void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur,
   float Mrot[3][3]   = {cos(realRad) , sin(realRad), 0,
                         -sin(realRad), cos(realRad), 0,
                                     0,            0, 1};  //матрица пересчета глобальных скоростей в локальные
-  float MLineSpeed[4][3] = { 1.0,  0.0, 0.0,  // матрица расчета линейных скоростей
-                             0.0,  1.0, 0.0,
-                             0.0, -1.0, 0.0,
-                             -1.0,  0.0, 0.0};
-  float MRotSpeed[4][3] = { 0.0, 0.0, -0.14 , // матрица расчета линейных скоростей
-                            0.0, 0.0, -0.14,
-                            0.0, 0.0, -0.14,
-                            0.0, 0.0, -0.14};
+
   float VLine[4], VRot[4], VSum[4];
   float MaxMotSpeed;
   float MaxLine,MaxRot;
-  // float Kr[2][2]     = {1.0, 0.0, 0.0, 1.0};
+  // float Kr[2][float InverseKinematics[4][4]2]     = {1.0, 0.0, 0.0, 1.0};
   //float Kfi          = 1.0;
   //float deltaVect[2] = {(*(Coord_target)) - (*(Coord_cur)), (*(Coord_target+1)) - (*(Coord_cur+1))};
   //float deltaPhi     = (*(Coord_target+2)) - (*(Coord_cur+2));
@@ -511,19 +514,14 @@ int16_t motorSpeedBuf[4];
   //                             0.0, -1.0, 0.0,
   //                             -1.0,  0.0, 0.0};
 
-  float Mlglob[4][4] =
-  {0.50, 0.0, 0.0,-0.5,
-   0.0, 0.5, -0.5,0.0,
-   -25.0/14.0, -25.0/14.0, -25.0/14.0,-25.0/14.0,
-   1, -1, -1,1};
   float temp[4];
   float temp2[4];
 
 float Mrot[2][2]={ cos(realRad),   sin(realRad),
                     -sin(realRad),  cos(realRad)};
 //______________________________________________________________________________
-  //matrixInverse((float*)Mlglob, 4, (float*)J_inv);
-  matrixMultiplyM2M((float*)&Mlglob, 4, 4, motorSpeed, 4, 1, &temp);
+  //matrixInverse((float*)InverseKinematics, 4, (float*)J_inv);
+  matrixMultiplyM2M((float*)&InverseKinematics, 4, 4, motorSpeed, 4, 1, &temp);
 
   matrixMultiplyM2M((float*)&Mrot, 2, 2, &temp, 2, 1, &temp2);
 
@@ -545,7 +543,7 @@ void pidLowLevel(void) //вычисление ПИД регулятора колес
 {
 //Low level pid target values are setting here__________________________________
   char i;
-  for(i =0;i<4;i++)
+  for(i =0; i < 4; i++)
   {
 
     wheelsPidStruct[i].target = regulatorOut[i];//передача требуемых значений от траекторного регулятора

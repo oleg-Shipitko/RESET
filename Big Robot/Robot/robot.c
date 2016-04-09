@@ -11,7 +11,8 @@
 #include "string.h"
 #include "regulator.h"
 #include "interrupts.h"
-#include "init.h"
+#include "Board.h"
+#include "Communication.h"
 
 
 float robotCoordTarget[3] = {0,0,0}; // Целевые координаты робота в глоб сис-ме координат
@@ -23,148 +24,10 @@ float robotSpeed[3] = {0,0,0};       // скорость робота по по�
 robStateStruct curState = {1, 1, 1, 1};    // состояние регуляторов активен-1/неактвен -0
 encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
 
-char param[30] ;                      //буфер параметров входящих команд
-char inData[64];                      //Входной буфер данных
-char outData[30];                     //Выходной буфер данных
-char dataIndex;                       //счетчик количества байт во входящем пакете
-InPackStruct inCommand ={0xFA, 0xAF, 0x00, 0x00, &param[0]}; //структура входящего пакета
-
-uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
-                          BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
-uint32_t  PWM_DIR[10] ={BTN1_DIR_PIN,BTN2_DIR_PIN,
-                          BTN3_DIR_PIN,BTN4_DIR_PIN,
-                          BTN5_DIR_PIN,BTN6_DIR_PIN,
-                          BTN7_DIR_PIN,BTN8_DIR_PIN,
-                          BTN9_DIR_PIN,BTN10_DIR_PIN};
-uint32_t  GENERAL_PIN[10] ={GENERAL_PIN_0,GENERAL_PIN_1,
-                            GENERAL_PIN_2,GENERAL_PIN_3,
-                            GENERAL_PIN_4,GENERAL_PIN_5,
-                            GENERAL_PIN_6,GENERAL_PIN_7,
-                            GENERAL_PIN_8,GENERAL_PIN_9};
-uint32_t  EXTI_PIN[10] ={EXTI1_PIN,EXTI2_PIN,
-                         EXTI3_PIN,EXTI4_PIN,
-                         EXTI5_PIN,EXTI6_PIN,
-                         EXTI7_PIN,EXTI8_PIN,
-                         EXTI9_PIN,EXTI10_PIN};
-uint32_t  V12_PIN[6] ={PIN5_12V,PIN6_12V,
-                            PIN3_12V,PIN4_12V,
-                            PIN5_12V,PIN6_12V};
-
 uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
-
 char  WHEELS[4]= {WHEEL1_CH,WHEEL2_CH,WHEEL3_CH,WHEEL4_CH}; //каналы подкючения колес
 
-uint16_t adcData[10];
-uint8_t pinType[10];
-uint8_t extiType[10];
-uint16_t extiFlag;
-
-extern CDC_IF_Prop_TypeDef  APP_FOPS;
-
-char setVoltage(char ch, float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
-{
-    if (duty>1 )duty=1;
-    if (duty<-1 )duty=-1;
-
-    if (duty < 0)
-    {
-          *PWM_CCR[ch] = (int32_t)(MAX_PWM +  (duty*MAX_PWM));
-          set_pin(PWM_DIR[ch]);
-    }
-  else
-    {
-          *PWM_CCR[ch] = (int32_t) (duty*MAX_PWM);
-          reset_pin(PWM_DIR[ch]);
-    }
-    return 0;
-}
-
-char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,0
-{
-    if (duty > 1 ) duty = 1;
-    if (duty < 0 ) duty = 0;
-    *PWM_CCR[ch] = (int32_t)((duty * MAX_PWM));
-    return 0;
-}
-
-void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в потоке данных
-{
-  char j;
-  uint16_t checkSum;
-  uint16_t * test;
-  inData[dataIndex++] = inByte;
-
-  if((inData[0] == SYNC_BYTE) && (inData[1] == ADR_BYTE))  //поиск заголовка
-  {
-    if( (dataIndex >= inData[2]) && (dataIndex > 3) ) //проверка длинны пакета
-    {
-      checkSum = packetCheck(&inData[0], inData[2] - CHECK_SIZE);
-      test = ( uint16_t *) &inData[inData[2] - CHECK_SIZE];
-      if (*test == checkSum) // проверка CRC
-      {
-        inCommand.packLen = inData[2];
-        for (j=0; j < inCommand.packLen - CHECK_SIZE - HEADER_SIZE; j++)  //Копирование параметров
-                      *(inCommand.param + j) = inData[4 + j];
-        inCommand.command = inData[3];
-        execCommand(&inCommand);     //выполнение команды
-      }
-      dataIndex = 0;
-      inData[0] = 0;
-      inData[1] = 0;
-    }
-  }
-  else
-  {
-    if (dataIndex > 1)
-    {
-      inData[0] = inData[1];
-      inData[1] = 0;
-      dataIndex = 1;
-    }
-  }
-}
-
-extern uint8_t  APP_Rx_Buffer []; /* Write CDC received data in this buffer.
-                                     These data will be sent over USB IN endpoint
-                                     in the CDC core functions. */
-extern uint32_t APP_Rx_ptr_in;    /* Increment this pointer or roll it back to
-                                     start address when writing received data
-                                     in the buffer APP_Rx_Buffer. */
-
-char sendAnswer(char cmd, char * param, int paramSize) // отправить ответ по USB
-{
-         //    __disable_irq();
-         outData[0] = 0xFA;
-         outData[1] = 0xFA;
-         outData[2] = paramSize + HEADER_SIZE + CHECK_SIZE;
-         outData[3] = cmd;
-         memcpy(&outData[4], param, paramSize);
-
-         *((int16_t*)&outData[paramSize + HEADER_SIZE]) = (int16_t) packetCheck(&outData[0], paramSize + HEADER_SIZE);
-         int _size = paramSize + HEADER_SIZE + CHECK_SIZE  ;
-         int i;
-         for (i=0; i < _size; i++) putchar(outData[i]);
-
-         if (APP_Rx_ptr_in + _size < APP_RX_DATA_SIZE)
-         {
-            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, _size);
-            APP_Rx_ptr_in += _size;
-         }
-         else
-         {
-            int freeSpace = APP_RX_DATA_SIZE - APP_Rx_ptr_in;
-
-            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], outData, freeSpace);
-            APP_Rx_ptr_in = 0;
-            memcpy(&APP_Rx_Buffer[APP_Rx_ptr_in], &outData[freeSpace], _size - freeSpace);
-            APP_Rx_ptr_in += _size - freeSpace;
-         }
-         //     APP_FOPS.pIf_DataTx((uint8_t*)outData,
-         //             paramSize+HEADER_SIZE+CHECK_SIZE);
-
-         // __enable_irq();
-         return paramSize + HEADER_SIZE + CHECK_SIZE;
-}
+//extern CDC_IF_Prop_TypeDef  APP_FOPS;
 
 char execCommand(InPackStruct* cmd) //обработать входящую команду
 {

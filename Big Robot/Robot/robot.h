@@ -41,6 +41,7 @@
 #define EXTI_FALL       2
 #define EXTI_DIG_INPUT  3
 #define EXTI_DIG_OUTPUT 4
+#define NO_MOTOR 255
 
 //структура данных имерительной тележки
 #pragma pack(push,1)
