@@ -12,4 +12,5 @@ obj\debug\board\adc.o: Board\ADC.c Board\adc.h Library/stm32f4xx.h \
  SPL\inc/stm32f4xx_sdio.h SPL\inc/stm32f4xx_spi.h \
  SPL\inc/stm32f4xx_syscfg.h SPL\inc/stm32f4xx_tim.h \
  SPL\inc/stm32f4xx_usart.h SPL\inc/stm32f4xx_wwdg.h SPL\inc/misc.h \
- Robot/robot.h Board/gpio.h Library/stm32f4xx_conf.h
+ Robot/robot.h Board/gpio.h Library/stm32f4xx_conf.h \
+ Robot/Communication.h USB\ App/usbd_conf.h USB\ App/usb_conf.h

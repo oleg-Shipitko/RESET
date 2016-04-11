@@ -90,7 +90,6 @@ extern uint16_t adcData[10];
 extern char packLen[0x29];
 extern char inData[64];
 extern char dataIndex;
-extern struct InPackStruct;
 
 char execCommand(InPackStruct* cmd);
 

@@ -5,8 +5,10 @@ Upper level functions for communication with Odroid board.
 */
 
 #include "Communication.h"
-#include "stdint.h"
 #include "robot.h"
+#include "stdint.h"
+
+InPackStruct inCommand = {0xFA, 0xAF, 0x00, 0x00, &param[0]}; //структура входящего пакета
 
 void pushByte(char inByte) // поиск, формирование и проверка входящего пакета в потоке данных
 {

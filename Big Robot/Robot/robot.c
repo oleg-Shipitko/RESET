@@ -1,6 +1,5 @@
 #include "robot.h"
 #include "pins.h"
-
 #include "usart.h"
 #include "usbd_cdc_core.h"
 #include "usbd_usr.h"
@@ -24,8 +23,8 @@ float robotSpeed[3] = {0,0,0};       // скорость робота по по�
 robStateStruct curState = {1, 1, 1, 1};    // состояние регуляторов активен-1/неактвен -0
 encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
 
-uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
-char  WHEELS[4]= {WHEEL1_CH,WHEEL2_CH,WHEEL3_CH,WHEEL4_CH}; //каналы подкючения колес
+uint32_t * encCnt[4] ={ENCODER4_CNT, ENCODER3_CNT, ENCODER1_CNT, ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
+char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
 
 //extern CDC_IF_Prop_TypeDef  APP_FOPS;
 
