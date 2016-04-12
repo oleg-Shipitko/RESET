@@ -22,11 +22,15 @@ WORLD_X = 3000
 WORLD_Y = 2000
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 # BEACONS = [(-62,1000),(3062,-62),(3062,2062)]
-BEACONS = [(2994,0),(2994,1996),(0,960)]
+BEACONS = [(2994,0),(2994,1996),(0,962)]
 # Dummy list before I implement odometry reading and conversion to global coord
 rel_motion = [0, 0, 0]
 # Dummy sensor noise
 #sense_noise = 1.5
+
+MARKER_POSITIONS = [(514,217),(1587,349),(2597,248),
+					(514,951),(1593,903),(2602,918),
+					(514,1677),(1613,1677),(2618,1699)]
 
 data_3 = ['GE0000108000\r00P', '0L;:a',
  '0:D0BY0:k0C90;00CK0:o0CE0;40CA0;70CA0;<0C@0;90C@0;:0C00;40Bn0;70G', 
@@ -168,23 +172,23 @@ class Robot(object):
 	def weight(self, measurement):
 		beacons_sorted = sort_beacons(self.orientation, BEACONS, self.x, self.y)
 		#beacons_sorted = BEACONS
-		print 'SORTED BEACONS: ', beacons_sorted		
+		#print 'SORTED BEACONS: ', beacons_sorted		
 		prob = 1.0
 		#print 'measurement in weights: ', measurement
 		if len(beacons_sorted) != len(measurement):
-			print 'beacons not the same length' 
+			#print 'beacons not the same length' 
 			return 0.0		
 		for i in xrange(len(beacons_sorted)):
 			dist = math.sqrt((self.x - beacons_sorted[i][0]) ** 2 + (self.y - beacons_sorted[i][1]) ** 2)
 			# Angle between current orientation and global beacons, measure counterclockwise
 			fi = angle(angle_conv(beacons_sorted[i][1] - self.y, beacons_sorted[i][0] - self.x) - self.orientation)
-			print 'calculated distance: ', dist, measurement[i][1]
-			print 'calculated angle: ', fi, angle2(measurement[i][0])
+			#print 'calculated distance: ', dist, measurement[i][1]
+			#print 'calculated angle: ', fi, angle2(measurement[i][0])
 			try:
 				prob_trans = self.gaussian_trans(dist, self.sense_noise, measurement[i][1])
-				print 'prob_trans: ', prob_trans
+				#print 'prob_trans: ', prob_trans
 				prob_rot = self.gaussian_rot(fi, self.sense_angle_noise, angle2(measurement[i][0]))
-				print 'prob_rot: ', prob_rot/10
+				#print 'prob_rot: ', prob_rot/10
 				#prob *= ((self.gaussian_trans(dist, self.sense_noise, measurement[i][1])) * \
 			 	#	self.gaussian_rot(fi, self.sense_angle_noise, angle2(measurement[i][0])))
 				prob *= (prob_trans*(prob_rot/10))
@@ -326,7 +330,7 @@ if __name__ == '__main__':
 		time.sleep(0.1)
 	print 'Ready'
 	# Initialize the plot
-	figure2, lines2 = init_polar_plot()
+	#figure2, lines2 = init_polar_plot()
 	figure, lines = init_xy_plot()
 	
 	# Set Robot randomly 
@@ -350,10 +354,10 @@ if __name__ == '__main__':
 		# Lidar sense - returns distance to 3 beacons
 			lidar, langle, lgraph = ttest.update_di(data_lidar) 
 			#print 'After lidar'			
-			try:
-				update_polar_plot(langle, lgraph)
-			except:
-				print 'not same length'
+			#try:
+			#	update_polar_plot(langle, lgraph)
+			#except:
+			#	print 'not same length'
 		# Move particles
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
@@ -361,21 +365,24 @@ if __name__ == '__main__':
 		#	print 'Particels after movement: ', i
 
 		# Calculate the weights 
-			print 'lidar data: ', lidar			
+			#print 'lidar data: ', lidar			
 			w =[p[i].weight(lidar) for i in xrange(N)]
 			w = np.asarray(w)
 			w /= w.sum()
-			print 'just weights: ', w
+			#print 'just weights: ', w
 			#print 'sum of weights: ', np.sum(w)
 			try:
 		# Probability random pick - use np.random alg
 				p3 = np.random.choice(p, N, p = w)
 				p = list(p3)
+				mean_val = [(p[i].x, p[i].y, p[i].orientation) for i in xrange(len(p))]
 		#print 'list particles after random: ', p
 
 		# Set myrobot to particle with max w
-				index2 = np.nonzero(w == w.max())[0][0]
-				myrobot = copy.deepcopy(p[index2])
+				#index2 = np.nonzero(w == w.max())[0][0]
+				#myrobot = copy.deepcopy(p[index2])
+				center = np.mean(mean_val, axis = 0)
+				myrobot.x, myrobot.y, myrobot.orientation = center[0], center[1], center[2]
 			except:
 				print 'error with choice'
 				pass
@@ -383,6 +390,7 @@ if __name__ == '__main__':
 		# 	print 'Final particles: ', i
 			update_xy_plot([p[i].x for i in xrange(N)], [p[i].y for i in xrange(N)])			
 			print myrobot
+			time.sleep(0.01)
 		except:			
 			s.send('QT\r')
 			s.shutdown(2)			

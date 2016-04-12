@@ -64,45 +64,51 @@ def update_di(answer):
 	while idxh <= len(dist4):
 		point = dist_val(dist4[idxl:idxh])
 		#strength = dist_val(dist4[idxh:idxh+3])
-		if dist_val(dist4[idxh:idxh+3]) > 1600 and point < 1000:	
+		if dist_val(dist4[idxh:idxh+3]) > 1600:	
 			polar_graph.append(point)
 			angle.append(step)
 		idxl = idxh + 3
 		idxh += 6		
 		step += 0.004363323129985824
+	print polar_graph	
 	try:
 		update_polar_plot(angle, polar_graph)
 	except:
 		print 'not same length'
 
-def read():
+def read(answer):
 	answer = answer.split('\n')		
 	dist = answer[2:-2]
 	dist2 = [item[:-1] for item in dist]
 	dist4 = ''.join(dist2)			
-	step, idxh = -3*np.pi/4, 3 			
+	step, idxh = 0, 3 			
 	polar_graph = deque()
 	angle = deque()	
 	lend = len(dist4)
 	while idxh <= lend:
 		point = dist_val(dist4[idxh-3:idxh])
-		if dist_val(dist4[idxh:idxh+3]) > 1600:	
+		if dist_val(dist4[idxh:idxh+3]) > 1600 and point < 3200:	
 			polar_graph.append(point)
 			angle.append(step)
 		idxh += 6		
-		step += 0.004363323129985824
+		step += 0.004363323129985824	
 	combined = zip(angle, polar_graph)
 	y = 1
 	prev = 0
 	beacons = []
 	for i in xrange(1,len(combined)):
-		if (combined[i][0] - combined[i-1][0]) > 0.2:
-			beacons.append(beacon_num(i,y, prev))
+		if ((combined[i][0] - combined[i-1][0]) > 0.2 or i == (len(combined)-1)) and y<4:
+			beacons.append(beacon_num(i,y, prev, combined))
 			y += 1
 			prev = i
-	return beacons[0], beacons[1], beacons[2]
+			print 'beacon in the loop: ', beacons
+	try:
+		update_polar_plot(angle, polar_graph)
+	except:
+		print 'not same length'
+	return beacons
 
-def beacon_num(index, number, prev):
+def beacon_num(index, number, prev, combined):
 	if number == 1:
 		return np.mean(combined[:index], axis = 0)
 	if number == 2:
@@ -241,6 +247,17 @@ if __name__ == '__main__':
 					answer = s.recv(BUFFER_SIZE)
 					update_di(answer)
 
+			elif msg == 'r':
+				while True:
+					try:
+						s.send(cont)
+						answer = s.recv(BUFFER_SIZE)
+						beacons = read(answer)
+						print 'beacons2 :', beacons
+					except:
+						s.shutdown(2)
+						s.close()	
+
 			elif msg == 'k':
 				s.send(cont)
 				answer = s.recv(BUFFER_SIZE)		
@@ -271,6 +288,8 @@ if __name__ == '__main__':
 					idxl = idxh + 3
 					idxh += 6		
 					step += np.radians(0.25)	
+				print 'strenght ', maxs
+				print 'polar graph: ', polar_graph
 				if len(angle) != len(polar_graph):
 					print 'not same length, angle len %i, polar_graph len %i' %(len(angle), len(polar_graph))
 				try:
@@ -278,7 +297,8 @@ if __name__ == '__main__':
 					print 'max strength ', maxs
 					print zip(angle, polar_graph)
 				except:
-					print 'not same length'	
+					pri
+nt 'not same length'	
 		except KeyboardInterrupt:
 			s.shutdown(2)
 			s.close()	
