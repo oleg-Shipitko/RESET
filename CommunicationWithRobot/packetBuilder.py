@@ -135,3 +135,5 @@ class CommandsList(object):
 	unloadAllPucks = 0x29	#expected parameters: int[1]
 	changeFishingRodState = 0x30	#expected parameters: int[1]
 	changeFishingLatchState = 0x2A	#expected parameters: int[1]
+	openCubeCollector = 0x2A
+	closeCubeCollector = 0x2B
