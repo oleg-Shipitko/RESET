@@ -1,7 +1,6 @@
-obj\debug\robot\manipulators.o: Robot\Manipulators.c Robot\Manipulators.h \
- Robot\Dynamixel_control.h Robot\Regulator.h Library/stm32f4xx.h \
- Library/core_cm4.h cmsis/core_cmInstr.h cmsis/core_cmFunc.h \
- cmsis/core_cm4_simd.h Library/system_stm32f4xx.h \
+obj\release\board\board.o: Board\Board.c Board\Board.h \
+ Library/stm32f4xx.h Library/core_cm4.h cmsis/core_cmInstr.h \
+ cmsis/core_cmFunc.h cmsis/core_cm4_simd.h Library/system_stm32f4xx.h \
  Library/stm32f4xx_conf.h SPL\inc/stm32f4xx_adc.h SPL\inc/stm32f4xx_can.h \
  SPL\inc/stm32f4xx_crc.h SPL\inc/stm32f4xx_cryp.h SPL\inc/stm32f4xx_dac.h \
  SPL\inc/stm32f4xx_dbgmcu.h SPL\inc/stm32f4xx_dcmi.h \
@@ -13,4 +12,6 @@ obj\debug\robot\manipulators.o: Robot\Manipulators.c Robot\Manipulators.h \
  SPL\inc/stm32f4xx_sdio.h SPL\inc/stm32f4xx_spi.h \
  SPL\inc/stm32f4xx_syscfg.h SPL\inc/stm32f4xx_tim.h \
  SPL\inc/stm32f4xx_usart.h SPL\inc/stm32f4xx_wwdg.h SPL\inc/misc.h \
- Robot\Path.h
+ Board\Pins.h Board\gpio.h Library/stm32f4xx_conf.h Board\i2c.h \
+ Board\Interrupts.h Board\usart.h Board\tim.h Board\adc.h \
+ Robot/Regulator.h Robot/Path.h

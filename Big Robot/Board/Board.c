@@ -42,8 +42,8 @@ char setVoltage(char ch, float duty) // установить напряжение на выходе управлен
 {
     if (ch == 255)
         return 0;
-    if (duty>1 )duty = 1;
-    if (duty<-1 )duty = -1;
+    if (duty > 1 )duty = 1;
+    if (duty < -1 )duty = -1;
     if (duty < 0)
     {
           *PWM_CCR[ch] = (int32_t)(MAX_PWM +  (duty * MAX_PWM));
@@ -114,7 +114,7 @@ PWR->CR|=PWR_CR_DBP;
 __disable_irq();
 
 initRegulators();
-
+initCubeCatcherPID();
 
 
 //___CLOCKS_________________________________________________________________
@@ -296,13 +296,13 @@ initRegulators();
   add_ext_interrupt(EXTI8_PIN, EXTI_BOTH_EDGES);
   add_ext_interrupt(EXTI9_PIN, EXTI_BOTH_EDGES);
   add_ext_interrupt(EXTI10_PIN, EXTI_BOTH_EDGES);
-  NVIC_EnableIRQ(EXTI0_IRQn);
-  NVIC_EnableIRQ(EXTI1_IRQn);
-  NVIC_EnableIRQ(EXTI2_IRQn);
-  NVIC_EnableIRQ(EXTI3_IRQn);
-  NVIC_EnableIRQ(EXTI4_IRQn);
-  NVIC_EnableIRQ(EXTI9_5_IRQn);
-  NVIC_EnableIRQ(EXTI15_10_IRQn);
+//  NVIC_EnableIRQ(EXTI0_IRQn);
+//  NVIC_EnableIRQ(EXTI1_IRQn);
+//  NVIC_EnableIRQ(EXTI2_IRQn);
+//  NVIC_EnableIRQ(EXTI3_IRQn);         // Временно отключил
+//  NVIC_EnableIRQ(EXTI4_IRQn);
+//  NVIC_EnableIRQ(EXTI9_5_IRQn);
+//  NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 //___I2C_____________________________________________________________________
 //conf_af(I2C_SDA_PIN, AF4);
