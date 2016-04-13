@@ -1,4 +1,4 @@
-obj\release\robot\robot.o: Robot\robot.c Robot\robot.h Board/gpio.h \
+obj\release\robot\robot.o: Robot\Robot.c Robot\robot.h Board/gpio.h \
  Library/stm32f4xx.h Library/core_cm4.h cmsis/core_cmInstr.h \
  cmsis/core_cmFunc.h cmsis/core_cm4_simd.h Library/system_stm32f4xx.h \
  Library/stm32f4xx_conf.h SPL\inc/stm32f4xx_adc.h SPL\inc/stm32f4xx_can.h \
@@ -12,13 +12,14 @@ obj\release\robot\robot.o: Robot\robot.c Robot\robot.h Board/gpio.h \
  SPL\inc/stm32f4xx_sdio.h SPL\inc/stm32f4xx_spi.h \
  SPL\inc/stm32f4xx_syscfg.h SPL\inc/stm32f4xx_tim.h \
  SPL\inc/stm32f4xx_usart.h SPL\inc/stm32f4xx_wwdg.h SPL\inc/misc.h \
- Library/stm32f4xx_conf.h Board/pins.h Board/gpio.h Board/usart.h \
+ Library/stm32f4xx_conf.h Robot\Communication.h USB\ App/usbd_conf.h \
+ USB\ App/usb_conf.h Board/pins.h Board/gpio.h Board/usart.h \
  Library\cdc\inc/usbd_cdc_core.h Library\core\inc/usbd_ioreq.h \
- Library\core\inc/usbd_def.h USB\ App/usbd_conf.h USB\ App/usb_conf.h \
- Library\core\inc/usbd_core.h Library\core\inc/usb_dcd.h \
- Library\core\inc/usb_core.h USB\ App/usb_conf.h \
- Library\core\inc/usb_regs.h Library\core\inc/usb_defines.h \
- Library\core\inc/usbd_usr.h Library\core\inc/usbd_ioreq.h \
- USB\ App/usbd_desc.h Library\core\inc/usbd_req.h USB\ App/stm32fxxx_it.h \
+ Library\core\inc/usbd_def.h Library\core\inc/usbd_core.h \
+ Library\core\inc/usb_dcd.h Library\core\inc/usb_core.h \
+ USB\ App/usb_conf.h Library\core\inc/usb_regs.h \
+ Library\core\inc/usb_defines.h Library\core\inc/usbd_usr.h \
+ Library\core\inc/usbd_ioreq.h USB\ App/usbd_desc.h \
+ Library\core\inc/usbd_req.h USB\ App/stm32fxxx_it.h \
  USB\ App/usbd_cdc_vcp.h USB\ App/usbd_conf.h Robot\regulator.h \
- Robot\Path.h Board/interrupts.h Board/init.h
+ Robot\Path.h Board/interrupts.h Board/Board.h

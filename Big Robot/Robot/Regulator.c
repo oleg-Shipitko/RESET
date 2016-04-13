@@ -6,7 +6,7 @@
 #include <math.h>
 #include "adc.h"
 
-#define ENCODER_IMITATION
+//#define ENCODER_IMITATION // Encoders emulation
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -26,15 +26,6 @@ struct TVector CurAccel = {0, 0};
 struct TVector AccelInc1 = {0, 0};
 struct TVector AccelInc2 = {0, 0};
 struct TVector TargSpeed = {0, 0};
-//
-//  float MLineSpeed[4][3] = { 1.0,  0.0, 0.0,  // матрица расчета линейных скоростей
-//                             0.0,  1.0, 0.0,
-//                             0.0, -1.0, 0.0,
-//                             -1.0,  0.0, 0.0};
-//  float MRotSpeed[4][3] = { 0.0, 0.0, -0.14 , // матрица расчета линейных скоростей
-//                            0.0, 0.0, -0.14,
-//                            0.0, 0.0, -0.14,
-//                            0.0, 0.0, -0.14};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //—тек точек траектории
                                         {0.0, 2.9, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -203,7 +194,7 @@ void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur,
   float Kvect, Kphi, KnormVect;
 
 
-  Cmax= MAX_CAPACITANCE;
+  Cmax = MAX_CAPACITANCE;
 
 
   matrixMultiplyM2M(&Mrot[0][0], 3, 3, V_target, 3, 1, &localVelocity[0]);//Ml*Velocity speed in local coordinate system
@@ -217,8 +208,8 @@ void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur,
   if (fabs(MaxMotSpeed)>MAX_CAPACITANCE)
   {
 
-     c1= fabs(MAX_CAPACITANCE/MaxMotSpeed );
-  } else c1=1;
+     c1 = fabs(MAX_CAPACITANCE/MaxMotSpeed );
+  } else c1 = 1;
 
     matrixMultiplyS2M(&VSum[0], 4, 1, c1, &V_out[0]);
 
@@ -257,7 +248,6 @@ void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur,
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Regulate(float *Coord_cur, float *Speed_cur, float *tAlphZad,float *V_etalon,float *alphZad, float *V_local)
-
 {
 float t_alph_cur[2][2], t_alph_delta[2][2];
 float uS, uE, u[2];
@@ -487,33 +477,26 @@ void GetDataForRegulators(void)
 {
 int16_t motorSpeedBuf[4];
   int8_t i;
-  for(i = 3;i>=0;i--)
+  for(i = 3; i>=0; i--)
   {
     motorSpeedBuf[i] = *encCnt[i];
     *encCnt[i] =0;
   }
   #ifdef ENCODER_IMITATION
-  for(i =3;i>=0;i--)
+  for(i =3; i>=0; i--)
   {
     motorSpeed[i] =  regulatorOut[i];
     motorCoord[i] += motorSpeed[i]*PID_PERIOD;
   }
-
-
   #else
-  for(i =3;i>=0;i--)
+  for(i =3; i>=0; i--)
   {
-    motorSpeed[i] =  motorSpeedBuf[i]*DISKR_TO_REAL/PID_PERIOD;
-    motorCoord[i] += motorSpeed[i]*PID_PERIOD;
+    motorSpeed[i] =  motorSpeedBuf[i] * DISKR_TO_REAL/PID_PERIOD;
+    motorCoord[i] += motorSpeed[i] * PID_PERIOD;
   }
    #endif
   float realRad =  -robotCoord[2];
   float J_inv[4][4];
-  //  float MLineSpeed[4][3] = { 1.0,  0.0, 0.0,  // матрица расчета линейных скоростей
-  //                             0.0,  1.0, 0.0,
-  //                             0.0, -1.0, 0.0,
-  //                             -1.0,  0.0, 0.0};
-
   float temp[4];
   float temp2[4];
 
@@ -541,7 +524,7 @@ float Mrot[2][2]={ cos(realRad),   sin(realRad),
 ///////////////////////////////////////////////////////////////////////////////
 void pidLowLevel(void) //вычисление ѕ»ƒ регул€тора колес
 {
-//Low level pid target values are setting here__________________________________
+//Low level pid target values are set here__________________________________
   char i;
   for(i =0; i < 4; i++)
   {

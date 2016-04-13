@@ -178,7 +178,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x10:  //очистить очередь точек
+  case 0x10:  //Очистить очередь точек
   {
       while(lastPoint>0) removePoint(&points[0],&lastPoint);
       points[0].center[0]= robotCoord[0];
@@ -252,7 +252,7 @@ switch(cmd->command)
   }
   break;
 
-   case 0x16:  //установить режим ножки
+   case 0x16:  //Установить режим ножки
    {
 
     char ch = (*((char *)(cmd->param))) -1;
@@ -274,8 +274,8 @@ switch(cmd->command)
 
   case 0x17:  //отправить состояние выбранного входа АЦП
   {
-      char ch = (*((char *)(cmd->param))) -1;
-    if (ch<10)
+      char ch = (*((char *)(cmd->param))) - 1;
+    if (ch < 10)
       sendAnswer(cmd->command,(char *)&(adcData[ch]), sizeof(uint16_t));
   }
   break;
