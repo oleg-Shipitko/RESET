@@ -32,6 +32,10 @@ class ParsePacket(object):
  			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[8:16]))
  			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[0:8]))
 			return coordinatesList
+			
+		if self.listOfComands.closeCubeCollector == self.command:
+			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])			
+			return recievedPametersString
 
 		return self.byteArray[4:len(self.byteArray) - 2][:-1]
 
