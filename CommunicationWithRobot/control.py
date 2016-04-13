@@ -6,9 +6,9 @@ import sys
 import time
 
 # STM32 USB microcontroller ID
-VID = '0483'
-PID = '5740'
-SNR = '338434693534'
+VID = 1155
+PID = 22336
+SNR = '336234893534'
 
 def initPTC():
 	"""Initialize PID, Trajectory, Kinematics"""
@@ -50,8 +50,8 @@ def initPTC():
 def portNumber():
 	"""Find all ports, and returns one with defined STM values"""	
 	for port in list_ports.comports():
-		if port[2] == 'USB VID:PID=%s:%s SNR=%s' %(VID,PID,SNR):	
-			return port[0]
+		if (port.serial_number == SNR) and (port.pid == PID) and (port.vid == VID):	
+			return port.name
 
 def globMov():
 	print '\nInput coordinates and speed type'	
@@ -140,7 +140,7 @@ def stopMotors():
 	#packet = packetBuilder.BuildPacket(commands.switchOnKinematicCalculation)
 	#recievedPacket = computerPort.sendRequest(packet.bytearray)
 	
-port = portNumber()
+port = '/dev/'+portNumber()
 if port:
 	print 'STM32 found on port %s' %port
 else:
@@ -156,21 +156,13 @@ commands = packetBuilder.CommandsList()
 # Initialize PID, Trajectory and Kinematics
 initPTC()
 iteration = 0
+comm_list = {1: globMov, 2: relMov, 3: setCoord, 4: getCoord, 5: stopMotors}
 while True:
 	iteration += 1	
 	print '\nList of available commands: \n1 Global Movement\n2 Relative Movement'\
 		'\n3 Set Coordinates\n4 Get Coordinates\n5 Stop Movement' 	
-	command = raw_input('Command number: ')
-	if command == '1':
-		globMov()
-	elif command == '2':
-		relMov()	
-	elif command == '3':
-		setCoord()
-	elif command == '4':
-		getCoord()	
-	elif command == '5':
-		stopMotors()
+	command = int(raw_input('Command number: '))
+	comm_list[command]()
 
 	#Communication test	
 	#getCoord()
