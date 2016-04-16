@@ -126,7 +126,9 @@ class CommandsList(object):
 	switchOffPid = 0x23
 	switchOnPid = 0x24
 	stopAllMotors = 0x29
-
+	
+	# TODO: playing field side
+	# TODO: beginning of the competition sign
 	# TODO: implement commands listed below
 	setManipulatorState = 0x25
 	getManipulatorState = 0x26
