@@ -13,8 +13,8 @@ class BigRobot(object):
 
     def __init__(self):
         portNumber = self.GetPortNumber()
-        self.computerPort = serialWrapper.SerialWrapper("/dev/ttyACM2")
-        #self.computerPort = serialWrapper.SerialWrapper(portNumber)
+        #self.computerPort = serialWrapper.SerialWrapper("/dev/ttyACM2")
+        self.computerPort = serialWrapper.SerialWrapper(portNumber)
         self.commands = packetBuilder.CommandsList()
         self.InitializeRobot()		
 
@@ -53,38 +53,64 @@ class BigRobot(object):
 		if recievedPacket.reply == 'Ok':
 			print 'Kinematics ON'
 		else:
-			raise Exception('switchOnKinematicCalculation failed')
-
+			raise Exception('switchOnKinematicCalculation failed')		
+		
     def GetPortNumber(self):        
         """Find all ports, and returns one with defined STM values"""
         for port in list_ports.comports():
             if port[2] == "USB VID:PID=0483:5740 SER=336234893534 LOCATION=1-3.3":
                 return port[0]
             #if port[2] == 'USB VID:PID=%s:%s SER=%s' %(VID,PID,SNR):
+    
+    def GetPlayingFieldSide(self):
+	return 0
+    
+    def CheckForTheBegginigOfGame(self):
+	return True
 
     def LocalMovement(self, x, y, fi):
-		dsplcmnt = [x, y]
-		oldCoord = self.GetCurrentCoordinates()
-		newCoordRotated = self.rotation(dsplcmnt, oldCoord[2])
-		newCoordTranslated = self.translation(newCoordRotated, oldCoord)
-		globalCoord = [newCoordTranslated[0], newCoordTranslated[1], oldCoord[2]+ fi, 1]
-		packet = packetBuilder.BuildPacket(self.commands.addPointToStack, globalCoord)
-		recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	dsplcmnt = [x, y]
+	oldCoord = self.GetCurrentCoordinates()
+	newCoordRotated = self.rotation(dsplcmnt, oldCoord[2])
+	newCoordTranslated = self.translation(newCoordRotated, oldCoord)
+	globalCoord = [newCoordTranslated[0], newCoordTranslated[1], oldCoord[2]+ fi, 1]
+	packet = packetBuilder.BuildPacket(self.commands.addPointToStack, globalCoord)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
 
     def RelativeMovement(self, coordinates):
-		dsplcmnt = [coordinates[0], coordinates[1], coordinates[2], 1]
-		startT = time.time()	
-		oldCoord = self.GetCurrentCoordinates()
-		newCoord = [oldCoord[0] + dsplcmnt[0], oldCoord[1] + dsplcmnt[1], oldCoord[2] + dsplcmnt[2], 1]
-		endT = time.time()
-		packet = packetBuilder.BuildPacket(self.commands.addPointToStack, newCoord)
-		recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	dsplcmnt = [coordinates[0], coordinates[1], coordinates[2], 1]
+	startT = time.time()	
+	oldCoord = self.GetCurrentCoordinates()
+	newCoord = [oldCoord[0] + dsplcmnt[0], oldCoord[1] + dsplcmnt[1], oldCoord[2] + dsplcmnt[2], 1]
+	endT = time.time()
+	packet = packetBuilder.BuildPacket(self.commands.addPointToStack, newCoord)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
 
     def GetCurrentCoordinates(self):
-		packet = packetBuilder.BuildPacket(self.commands.getCurentCoordinates)
-		recievedPacket = self.computerPort.sendRequest(packet.bytearray)
-		return recievedPacket.GetReply()
-
+	packet = packetBuilder.BuildPacket(self.commands.getCurentCoordinates)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	return recievedPacket.GetReply()
+    
+    def StopRobot(self):
+	packet = packetBuilder.BuildPacket(self.commands.switchOffKinematicCalculation)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	movementSpeed = [0, 0, 0]	
+	packet = packetBuilder.BuildPacket(self.commands.setMovementSpeed, movementSpeed)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+    
+    def CheckForEnemy(self):
+	packet = packetBuilder.BuildPacket(self.commands.getADCPinState, 1)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	value = recievedPacket * 0.0822 * 2.54;
+	
+	if value < 5:
+		return true    
+	return False
+	
+    def ActivateRobotAfterStopping(self):
+	packet = packetBuilder.BuildPacket(self.commands.switchOnKinematicCalculation)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	
     def translation(self, ruler, robot_global):
 		"""Translates points from origin coord system, to left point coord
 		system coordnate system. New coord sys is paralel with X and Y axis, 

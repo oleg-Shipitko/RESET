@@ -1,0 +1,3 @@
+unsorted list[(29, 642, 642)]
+sorted list[(29, 642, 642)]
+The nearest objest is:(29, 642, 642)

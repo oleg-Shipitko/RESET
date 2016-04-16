@@ -54,7 +54,8 @@ params.minInertiaRatio = 0"""
 params.filterByColor = 1
 params.blobColor = 0;0;0"""
 
-detector = cv2.SimpleBlobDetector_create(params)
+#detector = cv2.SimpleBlobDetector_create(params)
+detector = cv2.SimpleBlobDetector(params) #- use this if line 57 returns error!!!
 				
 class GetObjectPosition(object):
 
@@ -123,7 +124,7 @@ class GetObjectPosition(object):
 		#img1 = cv2.imread('result.png')
 		#img2 = cv2.putText(img = img1,text = points,org = (0,Ny),fontFace = cv2.FONT_HERSHEY_DUPLEX,fontScale = 0.5,
 		#color = (1,1,255))
-		#cv2.imwrite('result1.png',img2)
+		cv2.imwrite('result1.png',img2)
 		return(b)
 		del(cap)
 a = GetObjectPosition()
