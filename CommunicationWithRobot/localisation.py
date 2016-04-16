@@ -1,7 +1,6 @@
 # Monte Carlo Localisation
 
 import prob_motion_model as pmm
-#import hokuyo
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,11 +22,8 @@ WORLD_X = 3000
 WORLD_Y = 2000
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 BEACONS = [(-56,1000),(3062,-56),(3055,2014)]
-#BEACONS = [(2994,0),(2994,1996),(0,962)]
 # Dummy list before I implement odometry reading and conversion to global coord
 rel_motion = [0, 0, 0]
-# Dummy sensor noise
-#sense_noise = 1.5
 
 MARKER_POSITIONS = [(514,217),(1587,349),(2597,248),
 					(514,951),(1593,903),(2602,918),
@@ -35,6 +31,7 @@ MARKER_POSITIONS = [(514,217),(1587,349),(2597,248),
 	
 class Robot(object):
 	def __init__(self):
+	"""Initialize robot/particle with random position"""
 		self.x = random.gauss(1587, 5) 
 		self.y = random.gauss(349, 5) 
 		self.orientation = 0.0
@@ -43,6 +40,7 @@ class Robot(object):
 		self.sense_angle_noise = math.radians(5)
 
 	def set(self, new_x, new_y, new_orientation):
+		"""Set particle position on the field"""
 		if new_x < 0 or new_x > WORLD_X:
 			pass
 		else:
@@ -54,7 +52,7 @@ class Robot(object):
 		self.orientation = new_orientation % (2 * math.pi)
 		
 	def move(self, rel_motion):
-		#print 'rel motion: ', rel_motion, self.pose()
+		"""Move particle by creating new one and setting position"""
 		new_x, new_y, new_orientation = pmm.prob(self.pose(), rel_motion)	
 		new_robot = Robot()
 		new_robot.set(new_x, new_y, new_orientation)
@@ -80,11 +78,8 @@ class Robot(object):
 		#bx = [beacons[0][0],beacons[1][0],beacons[2][0]]
 		#by = [beacons[0][1],beacons[1][1],beacons[2][1]]
 		#update_xy_plot(bx + x_rob, by+y_rob)	
-		#print self.pose()
-		#print 'trans beac: ', beacons
 		beacon = [0, 0, 0]
 		num_point = [0, 0, 0]
-		#median = 0.0
 		for j in xrange(len(x_rob)):
 			l1 = abs(math.sqrt((beacons[0][0] - x_rob[j])**2 + (beacons[0][1] - y_rob[j])**2) - 40)
 			l2 = abs(math.sqrt((beacons[1][0] - x_rob[j])**2 + (beacons[1][1] - y_rob[j])**2) - 40)
@@ -99,11 +94,6 @@ class Robot(object):
 				num = 2
 			beacon[num] += lmin
 			num_point[num] += 1
-		#for j in xrange(3):
-		#	if num_point[j] != 0:
-		#		median += (beacon[j]/num_point[j]) 	
-		#return 1.0/median
-
 		median =[(beacon[i]/num_point[i]) for i in xrange(3) if num_point[i] != 0]
 		return 1.0/sum(median)
 	
@@ -252,7 +242,7 @@ if __name__ == '__main__':
 			s.send('GE0000108000\r')
 			data_lidar = s.recv(BUFFER_SIZE)
 		# Lidar sense - returns distance to 3 beacons
-			combined, langle, lgraph, bec_x, bec_y = ttest.update_di2(data_lidar, myrobot.pose()) 
+			angle, distance = ttest.update_di2(data_lidar, myrobot.pose()) 
 			#print 'After lidar'			
 			#try:
 			#	update_polar_plot(langle, lgraph)
@@ -260,7 +250,7 @@ if __name__ == '__main__':
 			#	print 'not same length'
 		# Calculate the weights 
 			#print 'lidar data: ', lidar
-			x_rob, y_rob = ttest.p_trans(combined)			
+			x_rob, y_rob = ttest.p_trans(angle, distance)			
 			w =[p[i].weight2(x_rob, y_rob) for i in xrange(N)]
 			w = np.asarray(w)
 			#print 'just weights: ', w
@@ -282,7 +272,6 @@ if __name__ == '__main__':
 				#myrobot = copy.deepcopy(p[index2])
 				center = np.sum(mean_val, axis = 0)
 				myrobot.x, myrobot.y, myrobot.orientation = center[0], center[1], mean_orientation
-				pass
 			except:
 				print 'error with choice'
 				pass
@@ -297,5 +286,3 @@ if __name__ == '__main__':
 			traceback.print_exc()
 			s.shutdown(2)			
 			s.close()
-
-	
