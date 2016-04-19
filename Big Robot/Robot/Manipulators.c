@@ -31,7 +31,9 @@ float left_servo_angle = 0;
 float prev_right_servo_angle = 1;
 float prev_left_servo_angle = 1;
 
-bool openCubes()
+float CubesCatcherAngle;
+
+bool openCubesCatcher()
 {
     setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT);
     setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT);
@@ -39,8 +41,10 @@ bool openCubes()
     return 0;
 }
 
-bool closeCubes(int8_t *numberOfCubesCatched)
+bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 {
+    setServoReturnDelayMicros((uint8_t)ID_RIGHT, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)ID_LEFT, (uint16_t) 0);
     setServoTorque((uint8_t)ID_RIGHT, 500);
     setServoTorque((uint8_t)ID_LEFT, 500);
     setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT);
@@ -50,9 +54,9 @@ bool closeCubes(int8_t *numberOfCubesCatched)
     {
         prev_right_servo_angle = right_servo_angle;
         prev_left_servo_angle = left_servo_angle;
-        getServoAngle((int8_t)ID_RIGHT, &right_servo_angle);
+        getServoAngle((uint8_t)ID_RIGHT, &right_servo_angle);
         softDelay(1000);
-        getServoAngle(ID_LEFT, &left_servo_angle);
+        getServoAngle((uint8_t)ID_LEFT, &left_servo_angle);
     }
     float difference = right_servo_angle - left_servo_angle;
     if ((difference > 1) && (difference <= 15))
@@ -77,8 +81,8 @@ bool closeCubes(int8_t *numberOfCubesCatched)
 void initCubeCatcherPID(void)
 {
   	cubesCatcherPID.p_k = 5.00;
-  	cubesCatcherPID.i_k = 1.0;
-  	cubesCatcherPID.d_k = 0.5;
+  	cubesCatcherPID.i_k = 0.0;
+  	cubesCatcherPID.d_k = 0.0;
   	cubesCatcherPID.pid_on = 1;
   	cubesCatcherPID.pid_error_end  = 3;
   	cubesCatcherPID.pid_output_end = 1000;
@@ -89,8 +93,7 @@ void initCubeCatcherPID(void)
 
 void GetDataForManipulator(void)
 {
-  float manipulatorAngle;
-  manipulatorAngle = adcData[(char)CEBES_CATCHER_ADC - 1] * 360 / 3.3;
+  CubesCatcherAngle = adcData[(char)CEBES_CATCHER_ADC - 1] * 360 / 3.3;
 
 }
 

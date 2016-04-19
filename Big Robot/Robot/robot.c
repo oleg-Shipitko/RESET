@@ -20,10 +20,10 @@ float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 1};    // состояние регуляторов активен-1/неактвен -0
+robStateStruct curState = {1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
 encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
 
-uint32_t * encCnt[4] ={ENCODER4_CNT, ENCODER3_CNT, ENCODER1_CNT, ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
+uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
 
 //extern CDC_IF_Prop_TypeDef  APP_FOPS;
@@ -51,16 +51,9 @@ switch(cmd->command)
       robotCoord[0]= temp[0];
       robotCoord[1]= temp[1];
       robotCoord[2]= temp[2];
+      CreatePath(&points[0], &robotCoord[0], &curPath);
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-       outEnc.adress=0x02;
-       outEnc.sync = 0xAA;
-       outEnc.Command =  ENC_SET_CUR_POS;
-       outEnc.robotCoord[0]=0;
-       outEnc.robotCoord[1]=0;
-       outEnc.robotCoord[2]=0;
-       outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc)-2);
-       sendPacket((char *) &outEnc,sizeof(outEnc));
 
   }
   break;
@@ -500,6 +493,25 @@ switch(cmd->command)
       sendAnswer(cmd->command, str, 3);
   }
   break;
+
+  case 0x2A:  //Open Cubes Catcher
+  {
+      openCubesCatcher();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command, str, 3);
+  }
+  break;
+
+  case 0x2B:  //Close Cubes Catcher
+  {
+      uint8_t numberOfCubesCatched;
+      closeCubesCatcher(&numberOfCubesCatched);
+
+      sendAnswer(cmd->command, numberOfCubesCatched, sizeof(uint8_t));
+  }
+  break;
+
 
   default:
   break;

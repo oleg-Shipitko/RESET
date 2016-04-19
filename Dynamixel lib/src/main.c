@@ -96,9 +96,9 @@ void soft_delay(long int ticks)
     for(; ticks > 0; ticks-- );
 }
 
-    #define id_right 18
-    //int8_t id_right = 18;
-    int8_t id_left = 1;
+    //#define id_right 18
+    uint8_t id_right = 18;
+    uint8_t id_left = 1;
 
     uint16_t left_open = 0;  // left open
     uint16_t left_closed = 150; // left closed
@@ -123,21 +123,20 @@ bool openCubes()
     return 0;
 }
 
-bool closeCubes(int8_t *numberOfCubesCatched)
+bool closeCubes(uint8_t *numberOfCubesCatched)
 {
 
 
-    setServoTorque((int8_t)id_right, 500);
+    setServoTorque((uint8_t)id_right, 500);
     setServoTorque(id_left, 500);
-    setServoAngle((int8_t)id_right, right_closed);
+    setServoAngle((uint8_t)id_right, right_closed);
     setServoAngle(id_left, left_closed);
     soft_delay(100000);
-    soft_delay(20000000);
     while((prev_right_servo_angle != right_servo_angle) || (prev_left_servo_angle != left_servo_angle))
     {
         prev_right_servo_angle = right_servo_angle;
         prev_left_servo_angle = left_servo_angle;
-        getServoAngle((int8_t)id_right, &right_servo_angle);
+        getServoAngle((uint8_t)id_right, &right_servo_angle);
         soft_delay(1000);
         getServoAngle(id_left, &left_servo_angle);
     }
@@ -170,12 +169,14 @@ int main(void)
     GPIO_Config();
     USART_Config();
 
-    setServoReturnDelayMicros((int8_t)id_right, delay);
-    setServoReturnDelayMicros(id_left, delay);
+    setServoReturnDelayMicros((uint8_t)id_right, delay);
+    setServoReturnDelayMicros((uint8_t)id_left, delay);
 
     while(1)
     {
         openCubes();
+       // getServoAngle((uint8_t)id_right, &right_servo_angle);
+        // getServoAngle((uint8_t)id_left, &left_servo_angle);
         soft_delay(1000);
        // getServoAngle(id_left, &left_servo_angle);
         soft_delay(20000000);

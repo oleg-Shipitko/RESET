@@ -37,16 +37,16 @@
 /////////////////////////////////////////////////////////////////////////////
 //_____________________________BTN directions___________________________//
 /////////////////////////////////////////////////////////////////////////////
-#define BTN1_DIR_PIN          pin_id(PORTC,14)           //
+#define BTN1_DIR_PIN          pin_id(PORTC,14)          //
 #define BTN2_DIR_PIN          pin_id(PORTC,15)           //
-#define BTN3_DIR_PIN          pin_id(PORTE,10)           //
-#define BTN4_DIR_PIN          pin_id(PORTE,14)           //
+#define BTN3_DIR_PIN          pin_id(PORTE,10)          //
+#define BTN4_DIR_PIN          pin_id(PORTE,14)          //
 #define BTN5_DIR_PIN          pin_id(PORTE,7)           //
-#define BTN6_DIR_PIN          pin_id(PORTE,2)            //
-#define BTN7_DIR_PIN          pin_id(PORTE,8)            //
-#define BTN8_DIR_PIN          pin_id(PORTE,13)            //
-#define BTN9_DIR_PIN          pin_id(PORTE,0)            //
-#define BTN10_DIR_PIN         pin_id(PORTB,13)           //
+#define BTN6_DIR_PIN          pin_id(PORTE,2)           //
+#define BTN7_DIR_PIN          pin_id(PORTE,8)           //
+#define BTN8_DIR_PIN          pin_id(PORTE,13)          //
+#define BTN9_DIR_PIN          pin_id(PORTE,12)          //
+#define BTN10_DIR_PIN         pin_id(PORTB,13)          //
 /////////////////////////////////////////////////////////////////////////////
 //________________________________Encoders_________________________________//
 /////////////////////////////////////////////////////////////////////////////
@@ -66,16 +66,16 @@
 /////////////////////////////////////////////////////////////////////////////
 //_____________________________GENERAL_PIN_________________________________//
 /////////////////////////////////////////////////////////////////////////////
-#define GENERAL_PIN_0            pin_id(PORTA,0)                //ADC12_IN1//
-#define GENERAL_PIN_1            pin_id(PORTA,1)                //ADC12_IN2//
-#define GENERAL_PIN_2            pin_id(PORTA,2)                //ADC12_IN3//
-#define GENERAL_PIN_3            pin_id(PORTA,3)                //ADC12_IN4//
-#define GENERAL_PIN_4            pin_id(PORTB,0)                //ADC12_IN5//
-#define GENERAL_PIN_5            pin_id(PORTB,1)                //ADC12_IN6//
-#define GENERAL_PIN_6            pin_id(PORTC,1)                //ADC12_IN7//
-#define GENERAL_PIN_7            pin_id(PORTC,2)                //ADC12_IN8//
-#define GENERAL_PIN_8            pin_id(PORTC,4)                //ADC12_IN9//
-#define GENERAL_PIN_9            pin_id(PORTC,5)                //ADC12_IN10//
+#define GENERAL_PIN_0            pin_id(PORTA,0)                //ADC12_IN0//
+#define GENERAL_PIN_1            pin_id(PORTA,1)                //ADC12_IN1//
+#define GENERAL_PIN_2            pin_id(PORTA,2)                //ADC12_IN2//
+#define GENERAL_PIN_3            pin_id(PORTA,3)                //ADC12_IN3//
+#define GENERAL_PIN_4            pin_id(PORTB,0)                //ADC12_IN8//
+#define GENERAL_PIN_5            pin_id(PORTB,1)                //ADC12_IN9//
+#define GENERAL_PIN_6            pin_id(PORTC,1)                //ADC12_IN11//
+#define GENERAL_PIN_7            pin_id(PORTC,2)                //ADC12_IN12//
+#define GENERAL_PIN_8            pin_id(PORTC,4)                //ADC12_IN14//
+#define GENERAL_PIN_9            pin_id(PORTC,5)                //ADC12_IN15//
 
 /////////////////////////////////////////////////////////////////////////////
 //__________________________________USART__________________________________//
@@ -115,5 +115,9 @@
 #define PIN5_12V	        pin_id(PORTC, 9)
 #define PIN6_12V	        pin_id(PORTC, 8)
 /////////////////////////////////////////////////////////////////////////////
-
+/////////////////////////////////////////////////////////////////////////////
+//_________________________________Other Pins_______________________________//
+/////////////////////////////////////////////////////////////////////////////
+#define DYNAMIXEL_IO_CONTROL	        pin_id(PORTB, 12)
+/////////////////////////////////////////////////////////////////////////////
 #endif

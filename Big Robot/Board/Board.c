@@ -61,7 +61,7 @@ char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,
 {
     if (duty > 1 ) duty = 1;
     if (duty < 0 ) duty = 0;
-    *PWM_CCR[ch] = (int32_t)((duty * MAX_PWM));
+    *PWM_CCR[ch] = (int32_t)((duty * (MAX_PWM-1)));
     return 0;
 }
 
@@ -303,6 +303,9 @@ initCubeCatcherPID();
 //  NVIC_EnableIRQ(EXTI4_IRQn);
 //  NVIC_EnableIRQ(EXTI9_5_IRQn);
 //  NVIC_EnableIRQ(EXTI15_10_IRQn);
+
+//___Dynamixel IO control____________________________________________________________________
+  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
 
 //___I2C_____________________________________________________________________
 //conf_af(I2C_SDA_PIN, AF4);

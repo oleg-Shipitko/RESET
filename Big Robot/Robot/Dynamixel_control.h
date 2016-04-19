@@ -17,7 +17,7 @@ on an STM32F4 chip.
 
 #define REC_WAIT_START_US    75
 #define REC_WAIT_PARAMS_US   (SERVO_MAX_PARAMS * 5)
-#define REC_WAIT_MAX_RETRIES 2000
+#define REC_WAIT_MAX_RETRIES 20000
 
 #define SERVO_INSTRUCTION_ERROR   (1 << 6)
 #define SERVO_OVERLOAD_ERROR      (1 << 5)
@@ -41,6 +41,7 @@ on an STM32F4 chip.
 #define CURRENT_ANGLE       0x24
 #define CW_ANGLE_LIMIT      0x06
 #define CCW_ANGLE_LIMIT     0x08
+#define RECIEVE_TRANSMIT_CONTROL_PIN
 
 typedef enum ServoCommand
 {

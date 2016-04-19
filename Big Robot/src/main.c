@@ -23,6 +23,7 @@
 
 #include "usart.h" //обмен с измерительной тележкой
 #include "robot.h"  //определение конфигурации робота и его основных функций
+#include "Manipulators.h"
 
 // обмен с компьютером
 #include "usbd_cdc_core.h"
@@ -65,20 +66,23 @@ int main(void)
        outEnc.Command =  ENC_SET_CUR_POS;
        outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc) - 2);
        sendPacket((char *) &outEnc,sizeof(outEnc));
- //            __enable_irq();
+        //            __enable_irq();
 
      //   char * str ="mobile robot V1.0";
 
-    char ch = 5;
-    float duty = 0.09;
+//    char ch = 5;
+//    float duty1 = 0.12;
+//    float duty2 = 0.045;
 
-
+uint8_t numberOfCubesCatched1;
   while(1)
   {
 
-    //sendAnswer(1,str, strlen(str)+1);
-    //setVoltage(ch - 1, (float)0.12);
-    //setVoltage(ch - 1, (float)0.045);
+        //closeCubesCatcher(&numberOfCubesCatched1);
+        //openCubesCatcher();
+// tVoltage(WHEELS[0], wheelsPidStruct[0].output);
+  //setVoltage(1, duty1);  // пневмы
+    //setVoltage(ch - 1, duty2); // пневмы
 
-  }
+   }
 }

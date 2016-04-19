@@ -5,6 +5,7 @@
 #include "gpio.h"
 #include <math.h>
 #include "adc.h"
+#include "Board.h"
 
 //#define ENCODER_IMITATION // Encoders emulation
 
@@ -28,9 +29,9 @@ struct TVector AccelInc2 = {0, 0};
 struct TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
-                                        {0.0, 2.9, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {1.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {1.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.5, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0, 0.5, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
+                                        {0.0, 0.0, 3.14, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
@@ -39,7 +40,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stop
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 4;// последняя активная точка в очереди
+char lastPoint = 3;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 //vSt    = (*parameters);     normal speed
@@ -480,7 +481,7 @@ int16_t motorSpeedBuf[4];
   for(i = 3; i>=0; i--)
   {
     motorSpeedBuf[i] = *encCnt[i];
-    *encCnt[i] =0;
+    *encCnt[i] = 0;
   }
   #ifdef ENCODER_IMITATION
   for(i =3; i>=0; i--)
