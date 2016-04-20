@@ -7,6 +7,7 @@
 #include <math.h>
 #include "usart.h"
 #include "robot.h"
+#include "board.h"
 
 int indexSpeeds = 0, indexDists = 0;
 char traceFlag, movFlag, endFlag;

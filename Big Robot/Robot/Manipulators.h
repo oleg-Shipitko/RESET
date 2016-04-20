@@ -30,8 +30,8 @@ bool close_tower(int8_t);
 
 extern uint16_t adcData[10];
 
-bool open_cubes();
-bool close_cubes(uint8_t*);
+bool openCubesCatcher();
+bool closeCubesCatcher(uint8_t*);
 void initCubeCatcherPID(void);
 void GetDataForManipulator(void);
 void pidLowLevelManipulator(float, float);

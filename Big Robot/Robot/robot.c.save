@@ -1,6 +1,5 @@
 #include "robot.h"
 #include "pins.h"
-
 #include "usart.h"
 #include "usbd_cdc_core.h"
 #include "usbd_usr.h"
@@ -11,7 +10,8 @@
 #include "string.h"
 #include "regulator.h"
 #include "interrupts.h"
-#include "init.h"
+#include "Board.h"
+#include "Communication.h"
 
 
 float robotCoordTarget[3] = {0,0,0}; // Целевые координаты робота в глоб сис-ме координат
@@ -20,67 +20,13 @@ float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 1};    // состояние регуляторов активен-1/неактвен -0
+robStateStruct curState = {0, 0, 0, 0};    // состояние регуляторов активен-1/неактвен -0
 encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
 
+uint32_t * encCnt[4] ={ENCODER4_CNT, ENCODER3_CNT, ENCODER1_CNT, ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
+char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
 
-uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
-                          BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
-uint32_t  PWM_DIR[10] ={BTN1_DIR_PIN,BTN2_DIR_PIN,
-                          BTN3_DIR_PIN,BTN4_DIR_PIN,
-                          BTN5_DIR_PIN,BTN6_DIR_PIN,
-                          BTN7_DIR_PIN,BTN8_DIR_PIN,
-                          BTN9_DIR_PIN,BTN10_DIR_PIN};
-uint32_t  GENERAL_PIN[10] ={GENERAL_PIN_0,GENERAL_PIN_1,
-                            GENERAL_PIN_2,GENERAL_PIN_3,
-                            GENERAL_PIN_4,GENERAL_PIN_5,
-                            GENERAL_PIN_6,GENERAL_PIN_7,
-                            GENERAL_PIN_8,GENERAL_PIN_9};
-uint32_t  EXTI_PIN[10] ={EXTI1_PIN,EXTI2_PIN,
-                         EXTI3_PIN,EXTI4_PIN,
-                         EXTI5_PIN,EXTI6_PIN,
-                         EXTI7_PIN,EXTI8_PIN,
-                         EXTI9_PIN,EXTI10_PIN};
-uint32_t  V12_PIN[6] ={PIN5_12V,PIN6_12V,
-                            PIN3_12V,PIN4_12V,
-                            PIN5_12V,PIN6_12V};
-
-uint32_t * encCnt[4] ={ENCODER4_CNT,ENCODER3_CNT, ENCODER1_CNT,ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
-char  WHEELS[4]= {WHEEL1_CH,WHEEL2_CH,WHEEL3_CH,WHEEL4_CH}; //каналы подкючения колес
-
-uint16_t adcData[10];
-uint8_t pinType[10];
-uint8_t extiType[10];
-uint16_t extiFlag;
-
-extern CDC_IF_Prop_TypeDef  APP_FOPS;
-
-char setVoltage(char ch, float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
-{
-    if (ch == 255)
-        return 0;
-    if (duty>1 )duty = 1;
-    if (duty<-1 )duty = -1;
-    if (duty < 0)
-    {
-          *PWM_CCR[ch] = (int32_t)(MAX_PWM +  (duty * MAX_PWM));
-          set_pin(PWM_DIR[ch]);
-    }
-  else
-    {
-          *PWM_CCR[ch] = (int32_t) (duty * MAX_PWM);
-          reset_pin(PWM_DIR[ch]);
-    }
-    return 0;
-}
-
-char setPWM(char ch, float duty) // установить заполнение на выходе ШИМ  0 .. 1,0
-{
-    if (duty > 1 ) duty = 1;
-    if (duty < 0 ) duty = 0;
-    *PWM_CCR[ch] = (int32_t)((duty * MAX_PWM));
-    return 0;
-}
+//extern CDC_IF_Prop_TypeDef  APP_FOPS;
 
 char execCommand(InPackStruct* cmd) //обработать входящую команду
 {
@@ -105,16 +51,9 @@ switch(cmd->command)
       robotCoord[0]= temp[0];
       robotCoord[1]= temp[1];
       robotCoord[2]= temp[2];
+      
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-       outEnc.adress=0x02;
-       outEnc.sync = 0xAA;
-       outEnc.Command =  ENC_SET_CUR_POS;
-       outEnc.robotCoord[0]=0;
-       outEnc.robotCoord[1]=0;
-       outEnc.robotCoord[2]=0;
-       outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc)-2);
-       sendPacket((char *) &outEnc,sizeof(outEnc));
 
   }
   break;
@@ -232,7 +171,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x10:  //очистить очередь точек
+  case 0x10:  //Очистить очередь точек
   {
       while(lastPoint>0) removePoint(&points[0],&lastPoint);
       points[0].center[0]= robotCoord[0];
@@ -306,7 +245,7 @@ switch(cmd->command)
   }
   break;
 
-   case 0x16:  //установить режим ножки
+   case 0x16:  //Установить режим ножки
    {
 
     char ch = (*((char *)(cmd->param))) -1;
@@ -328,8 +267,8 @@ switch(cmd->command)
 
   case 0x17:  //отправить состояние выбранного входа АЦП
   {
-      char ch = (*((char *)(cmd->param))) -1;
-    if (ch<10)
+      char ch = (*((char *)(cmd->param))) - 1;
+    if (ch < 10)
       sendAnswer(cmd->command,(char *)&(adcData[ch]), sizeof(uint16_t));
   }
   break;
@@ -554,6 +493,25 @@ switch(cmd->command)
       sendAnswer(cmd->command, str, 3);
   }
   break;
+
+  case 0x2A:  //Open Cubes Catcher
+  {
+      openCubesCatcher();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command, str, 3);
+  }
+  break;
+
+  case 0x2B:  //Close Cubes Catcher
+  {
+      uint8_t numberOfCubesCatched;
+      closeCubesCatcher(&numberOfCubesCatched);
+
+      sendAnswer(cmd->command, numberOfCubesCatched, sizeof(uint8_t));
+  }
+  break;
+
 
   default:
   break;

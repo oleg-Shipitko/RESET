@@ -17,5 +17,6 @@ extern uint16_t extiFlag;
 void initAll(void); // That's all!
 void clear_ext_interrupt(unsigned char pin);
 void add_ext_interrupt(unsigned char pin, char edge);
-
+char setVoltage(char, float);
+char setPWM(char, float);
 #endif
