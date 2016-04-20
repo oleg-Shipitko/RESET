@@ -11,14 +11,15 @@ SNR = '336234893534'
 
 class BigRobot(object):
 
-    def __init__(self):
-        portNumber = self.GetPortNumber()
+    def __init__(self, initialCoordinates):
+        portNumber = self.GetPortNumber()	
         #self.computerPort = serialWrapper.SerialWrapper("/dev/ttyACM2")
         self.computerPort = serialWrapper.SerialWrapper(portNumber)
         self.commands = packetBuilder.CommandsList()
-        self.InitializeRobot()		
+        self.InitializeRobot(initialCoordinates)		
 
-    def InitializeRobot(self):
+    def InitializeRobot(self, initialCoordinates):
+		
 		"""Initialize PID, Trajectory, Kinematics"""
 		# Build packet for sending to robot	command
 		packet = packetBuilder.BuildPacket(self.commands.switchOnPid)
@@ -35,6 +36,16 @@ class BigRobot(object):
 		else:
 			raise Exception('switchOnPid failed')
 		
+		packet = packetBuilder.BuildPacket(self.commands.switchOnKinematicCalculation)
+		startT = time.time()
+		recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+		endT = time.time()
+		print 'Recieved ', (endT - startT)
+		if recievedPacket.reply == 'Ok':
+			print 'Kinematics ON'
+		else:
+			raise Exception('switchOnKinematicCalculation failed')
+					
 		packet = packetBuilder.BuildPacket(self.commands.switchOnTrajectoryRegulator)
 		startT = time.time()	
 		recievedPacket = self.computerPort.sendRequest(packet.bytearray)
@@ -45,23 +56,19 @@ class BigRobot(object):
 		else:
 			raise Exception('switchOnTrajectoryRegulator failed')
 		
-		packet = packetBuilder.BuildPacket(self.commands.switchOnKinematicCalculation)
-		startT = time.time()
-		recievedPacket = self.computerPort.sendRequest(packet.bytearray)
-		endT = time.time()
-		print 'Recieved ', (endT - startT)
-		if recievedPacket.reply == 'Ok':
-			print 'Kinematics ON'
-		else:
-			raise Exception('switchOnKinematicCalculation failed')		
+		self.SetCoordinates(initialCoordinates)	
 		
     def GetPortNumber(self):        
-        """Find all ports, and returns one with defined STM values"""
+        """Find all ports, and returns one with defined STM values"""	
         for port in list_ports.comports():
-            if port[2] == "USB VID:PID=0483:5740 SER=336234893534 LOCATION=1-3.3":
-                return port[0]
-            #if port[2] == 'USB VID:PID=%s:%s SER=%s' %(VID,PID,SNR):
+		print port[2]
+		if port[2] == "USB VID:PID=0483:5740 SER=3079394F3034 LOCATION=1-3.1":
+			return port[0]            
     
+    def SetCoordinates(self, coordinates):
+	packet = packetBuilder.BuildPacket(self.commands.setCoordinates, coordinates)
+	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+	    
     def GetPlayingFieldSide(self):
 	return 0
     
@@ -99,12 +106,12 @@ class BigRobot(object):
 	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
     
     def CheckForEnemy(self):
-	packet = packetBuilder.BuildPacket(self.commands.getADCPinState, 1)
+	'''packet = packetBuilder.BuildPacket(self.commands.getADCPinState, 1)
 	recievedPacket = self.computerPort.sendRequest(packet.bytearray)
 	value = recievedPacket * 0.0822 * 2.54;
 	
 	if value < 5:
-		return true    
+		return true'''    
 	return False
 	
     def ActivateRobotAfterStopping(self):

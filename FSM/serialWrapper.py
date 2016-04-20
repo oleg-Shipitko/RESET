@@ -32,8 +32,7 @@ class SerialWrapper(object) :
 		startT1 = time.time()
 		while (requestRecieved == False): # and (time.time() - sendRequestTime) < timeout):
 			bytesToRead = self.SerialPort.inWaiting()
-			#print 'First bytes: ', bytesToRead
-			print 'hi'
+			#print 'First bytes: ', bytesToRead			
 			if bytesToRead > 0:
 				time.sleep(0.01)
 				bytesToRead2 = self.SerialPort.inWaiting()	
@@ -42,7 +41,7 @@ class SerialWrapper(object) :
 				#	print 'Difference: ', (bytesToRead2 - bytesToRead)
 				#	raise Exception('Too Slow') 					
 				recievedData = self.SerialPort.read(bytesToRead2)
-				print 'Data: ', recievedData		
+				#print 'Data: ', recievedData		
 				if len(recievedData) is not 0:			
 					recievedPacket = packetParser.ParsePacket(recievedData)
 					requestRecieved = True
