@@ -3,6 +3,9 @@ import time
 import socket
 import math
 import random
+import traceback
+from collections import deque
+import robotinitialization.py
 
 ##############################
 ## Hokuyo socket parameters ##
@@ -24,12 +27,11 @@ for i in xrange(3):
 	s.send('GE0000108000\r')
 	data = s.recv(BUFFER_SIZE)
 	time.sleep(0.1)
-
 # Initialize robot and particles
 # HAS TO GO INTO MAIN PROG
-myrobot = Robot(True)
-myrobot.x, myrobot.y, myrobot.orientation = 1587.0, 349.0, 0
-p = [Robot(True) for i in xrange(N)]
+#myrobot = Robot(True)
+#myrobot.x, myrobot.y, myrobot.orientation = 1587.0, 349.0, 0
+#p = [Robot(True) for i in xrange(N)]
 
 N = 100
 # Dimensions of the playing field  
@@ -43,39 +45,42 @@ class Robot(object):
 	def __init__(self, first):
 		"""Initialize robot/particle with random position"""
 		if first:
-			self.x = random.gauss(1587, 5) 
-			self.y = random.gauss(349, 5) 
+			self.x = random.gauss(514.0, 5) 
+			self.y = random.gauss(217.0, 5) 
 			self.orientation = 0.0
 
-	def set(self, new_x, new_y, new_orientation):
+	def set(self, x_new, y_new, orientation_new):
 		"""Set particle position on the field"""
-		if 0 <= new_x <= WORLD_X:
-			self.x = new_x
+		if 0 <= x_new <= WORLD_X:
+			self.x = x_new
 		else:
 			self.x = random.gauss(1587, 5) 
-		if 0 <= new_y <= WORLD_Y:
-			self.y = new_y
+		if 0 <= y_new <= WORLD_Y:
+			self.y = y_new
 		else:
 			self.y = random.gauss(349, 5)
-		self.orientation = new_orientation % (2 * math.pi)
+		self.orientation = orientation_new % (2 * math.pi)
 		
-	def move(self, rel_motion):
+	def move(self, delta):
 		"""Move particle by creating new one and setting position"""
 		# From robot I get relative position. And I can do new relative minus 
 		# old relative to get displacement dx, dy, dtheta
 		#if delta[2] == 0:
-		x_new = self.x + delta[0] + random.gauss(0, 1)
-		y_new = self.y + delta[1] + random.gauss(0, 1)
-		new_orientation = self.orientation + delta[2] + random.gauss(0, 0.05)	
+		x_new = self.x + delta[0] + random.gauss(0, 2)
+		y_new = self.y + delta[1] + random.gauss(0, 2)
+		orientation_new = self.orientation + delta[2] + random.gauss(0, 0.05)	
 		new_robot = Robot(False)
-		new_robot.set(new_x, new_y, new_orientation)
+		new_robot.set(x_new, y_new, orientation_new)
 		return new_robot
 
 	def pose(self):
 		return self.x, self.y, self.orientation
 
 	def weight(self, x_rob, y_rob, BEACONS):			
-		beacons = [(beacon[0] - self.x, beacon[1] - self.y) for beacon in BEACONS]
+		temp_beac = [(beacon[0] - self.x, beacon[1] - self.y) for beacon in BEACONS]
+		beacons = [(math.cos(self.orientation)*beac[0] + math.sin(self.orientation)*beac[1],
+				-math.sin(self.orientation)*beac[0] + math.cos(self.orientation)*beac[1])
+				for beac in temp_beac]
 		beacon = [0, 0, 0]
 		num_point = [0, 0, 0]
 		for j in xrange(len(x_rob)):
@@ -104,14 +109,6 @@ class Robot(object):
 
 ###############################################################################
 
-# Transforms global beacons to robot coord sys
-def beacon_transform1(beacons, pose):
-	beac = [(beacon[0] - pose[0], beacon[1] - pose[1]) for beacon in beacons]
-	rot_mat = np.array([[math.cos(pose[2]), math.sin(pose[2])],
-				[-math.sin(pose[2]), math.cos(pose[2])]])
-	transform = [np.dot(rot_mat, b) for b in beac]
-	return transform
-
 # Calculate robot orientation
 def mean_angl(p, w):
 	x = 0 
@@ -133,13 +130,15 @@ def lidar_scan(answer, pose):
 	step = 0 
 	idxh = 3 			
 	polar_graph = deque()
+	append_pg = polar_graph.append
 	angle = deque()	
+	append_a = angle.append
 	lend = len(dist4)
 	while idxh <= lend:
 		point = dist_val(dist4[idxh-3:idxh])
-		if dist_val(dist4[idxh:idxh+3]) > 1100 and point < 3500:	
-			polar_graph.append(point)
-			angle.append(step)
+		if dist_val(dist4[idxh:idxh+3]) > 1100 and point < 4000:	
+			append_pg(point)
+			append_a(step)
 		idxh += 6		
 		step += 0.004363323129985824
 	return angle, polar_graph
@@ -153,10 +152,9 @@ def p_trans(agl, pit):
 # Transforms lidar point angle in robot coord sys
 def angle5(angle):
 	if angle >= math.pi/4:
-		angle -= math.pi/4
+		return angle - math.pi/4
 	else:
-		angle += 7*math.pi/4
-	return angle
+		return angle + 7*math.pi/4
 
 # Calculate odometry elative motion
 def relative_motion():
@@ -164,17 +162,26 @@ def relative_motion():
 		packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
 		recievedPacket = computerPort.sendRequest(packet.bytearray)
 		old = recievedPacket.reply
-		time.sleep(0.03)
-		packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
+		time.sleep(0.03)	
 		recievedPacket = computerPort.sendRequest(packet.bytearray)
 		new = recievedPacket.reply
 		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]]
 
+# Calculate dist and angle from raw lidar data
+def dist_val(value):	
+	try:	
+		return ((ord(value[0])-48)<<12)|((ord(value[1])-48)<<6)|(ord(value[2])-48)
+	except IndexError:	
+		return 0	
+
 # Localisation
-def localisation(myrobot, particles, s):
+def localisation(myrobot, p, s):
+	#relative_motion = [0,0,0]
+	#last_position
 	while 1:
 		try:
-			relative_motion = relative_motion()		
+			relative_motion = relative_motion()
+			#start = time.time()		
 			p2 = [p[i].move(relative_motion) for i in xrange(N)]
 			p = p2
 			s.send('GE0000108000\r')
@@ -190,13 +197,23 @@ def localisation(myrobot, particles, s):
 				p3 = np.random.choice(p, N, p = w)
 				p = list(p3)
 				center = np.sum(mean_val, axis = 0)
-				myrobot.set() = center[0], center[1], mean_orientation
+				myrobot.x = set(center[0], center[1], mean_orientation)
 			except:
-				print 'error with choice'
 				pass
 	
-			print myrobot
-
+			#print myrobot
+			#end = time.time()
+			#print start - end
 		except:			
+			traceback.print_exc()
 			s.shutdown(2)			
 			s.close()
+try:
+	myrobot = Robot(True)
+	myrobot.x, myrobot.y, myrobot.orientation = 524.0, 225.0, 0
+	p = [Robot(True) for i in xrange(N)]
+	localisation(myrobot, p, s)
+except:			
+	traceback.print_exc()
+	s.shutdown(2)			
+	s.close()
