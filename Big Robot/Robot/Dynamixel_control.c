@@ -121,13 +121,13 @@ bool getServoResponse (void)
 
 inline bool getAndCheckResponse (const uint8_t servoId)
 {
-    set_pin(DYNAMIXEL_IO_CONTROL);
+    //set_pin(DYNAMIXEL_IO_CONTROL);
     if (!getServoResponse())
     {
         #ifdef SERVO_DEBUG
         printf ("Servo error: Servo %d did not respond correctly or at all\n", (int)servoId);
         #endif
-        reset_pin(DYNAMIXEL_IO_CONTROL);
+        //reset_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
 
@@ -136,7 +136,7 @@ inline bool getAndCheckResponse (const uint8_t servoId)
         #ifdef SERVO_DEBUG
         printf ("Servo error: Response ID %d does not match command ID %d\n", (int)response.id);
         #endif
-        reset_pin(DYNAMIXEL_IO_CONTROL);
+        //reset_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
 
@@ -145,10 +145,10 @@ inline bool getAndCheckResponse (const uint8_t servoId)
         #ifdef SERVO_DEBUG
         printf ("Servo error: Response error code was nonzero (%d)\n", (int)response.error);
         #endif
-        reset_pin(DYNAMIXEL_IO_CONTROL);
+        //reset_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
-    reset_pin(DYNAMIXEL_IO_CONTROL);
+    //reset_pin(DYNAMIXEL_IO_CONTROL);
     return true;
 }
 

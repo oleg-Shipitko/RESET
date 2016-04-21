@@ -22,4 +22,5 @@ obj\debug\src\main.o: src\main.c Library/stm32f4xx_conf.h \
  USB\ App/usb_conf.h Library\core\inc/usb_regs.h \
  Library\core\inc/usb_defines.h Library\core\inc/usbd_usr.h \
  Library\core\inc/usbd_ioreq.h USB\ App/usbd_desc.h \
- Library\core\inc/usbd_req.h USB\ App/usbd_cdc_vcp.h USB\ App/usbd_conf.h
+ Library\core\inc/usbd_req.h USB\ App/usbd_cdc_vcp.h USB\ App/usbd_conf.h \
+ Robot/Dynamixel_control.h

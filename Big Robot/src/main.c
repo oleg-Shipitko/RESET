@@ -31,6 +31,7 @@
 #include "usb_conf.h"
 #include "usbd_desc.h"
 #include "usbd_cdc_vcp.h"
+#include "Dynamixel_control.h"
 
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
   #if defined ( __ICCARM__ ) /*!< IAR Compiler */
@@ -66,22 +67,28 @@ int main(void)
        outEnc.Command =  ENC_SET_CUR_POS;
        outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc) - 2);
        sendPacket((char *) &outEnc,sizeof(outEnc));
-        //            __enable_irq();
+//            __enable_irq();
+//      char * str ="mobile robot V1.0";
+//
 
-     //   char * str ="mobile robot V1.0";
+//      char ch = 5;
+//      //float duty1 = 0.12; // analog servo limit
+//      //float duty2 = 0.045; // analog servo limit
+//      float duty_cubes = 0.05;
+//      setVoltage(ch - 1, duty_cubes);
+//uint8_t numberOfCubesCatched;
+  uint8_t id = 1;
+  uint16_t angle1 = 100;
+  uint16_t angle0 = 0;
 
-//    char ch = 5;
-//    float duty1 = 0.12;
-//    float duty2 = 0.045;
-
-uint8_t numberOfCubesCatched1;
   while(1)
   {
+       //setServoAngle(id, angle1);
+      // setServoAngle(id, angle0);
+    //closeCubesCatcher(&numberOfCubesCatched);
+    //openCubesCatcher();
 
-        //closeCubesCatcher(&numberOfCubesCatched1);
-        //openCubesCatcher();
-// tVoltage(WHEELS[0], wheelsPidStruct[0].output);
-  //setVoltage(1, duty1);  // пневмы
+    //setVoltage(1, duty1);  // пневмы
     //setVoltage(ch - 1, duty2); // пневмы
 
    }

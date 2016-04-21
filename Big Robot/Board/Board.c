@@ -114,7 +114,7 @@ PWR->CR|=PWR_CR_DBP;
 __disable_irq();
 
 initRegulators();
-initCubeCatcherPID();
+//initCubeCatcherPID();
 
 
 //___CLOCKS_________________________________________________________________

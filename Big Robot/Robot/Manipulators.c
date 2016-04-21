@@ -93,18 +93,17 @@ void initCubeCatcherPID(void)
 
 void GetDataForManipulator(void)
 {
-  CubesCatcherAngle = adcData[(char)CEBES_CATCHER_ADC - 1] * 360 / 3.3;
+  CubesCatcherAngle = adcData[(char)CUBES_CATCHER_ADC - 1] * 360 / 3.3;
 
 }
 
 void pidLowLevelManipulator(float targetAngle, float currentAngle) //вычисление ПИД регулятора манипулятора
 {
     cubesCatcherPID.target = targetAngle;//
-    cubesCatcherPID.current = currentAngle; // текущие занчения скоростей колес
+    cubesCatcherPID.current = currentAngle; // current manipulator's position
     pidCalc(&cubesCatcherPID);
     setVoltage((char)CUBES_CATCHER_MOTOR_CH, cubesCatcherPID.output);
 }
-
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////PNEUMO//////////////////////////////

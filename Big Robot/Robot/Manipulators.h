@@ -25,7 +25,7 @@ bool close_tower(int8_t);
 #define CLOSED_ANG_LEFT 150
 #define ONE_CUBE_CATCHED_ANGLE 30      // angle defining difference in manipulators angles in 1 cube is caught
 #define TWO_CUBES_CATCHED_ANGLE 90     // angle defining difference in manipulators angles in 2 cubes are caught
-#define CEBES_CATCHER_ADC 1
+#define CUBES_CATCHER_ADC 1
 #define CUBES_CATCHER_MOTOR_CH 5
 
 extern uint16_t adcData[10];

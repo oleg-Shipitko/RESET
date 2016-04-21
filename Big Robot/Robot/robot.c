@@ -48,12 +48,21 @@ switch(cmd->command)
   case 0x02:  //Установить текущие координаты
   {
       float *(temp) ={(float*)cmd->param};
+
       robotCoord[0]= temp[0];
       robotCoord[1]= temp[1];
       robotCoord[2]= temp[2];
-      CreatePath(&points[0], &robotCoord[0], &curPath);
+
+      points[0].center[0]= temp[0];
+      points[0].center[1]= temp[1];
+      points[0].center[2]= temp[2];
+
+
+      CreatePath(&points[0], &points[0], &curPath);
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
+  }
+  break;
 
   }
   break;
@@ -433,7 +442,17 @@ switch(cmd->command)
   }
   break;
 
-  case 0x25:  //set dynamixel angle
+  case 0x25:    // set current coordinate
+  {
+      float *(temp) ={(float*)cmd->param};
+      robotCoord[0]= temp[0];
+      robotCoord[1]= temp[1];
+      robotCoord[2]= temp[2];
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+
+  case 0x26:  //set dynamixel angle
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(angle) ={(uint16_t*)(cmd->param + 1)};
@@ -445,7 +464,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x26:  //set CW angle limit
+  case 0x27:  //set CW angle limit
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(limit) ={(uint16_t*)(cmd->param + 1)};
@@ -457,7 +476,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x27:  //set CCW angle limit
+  case 0x28:  //set CCW angle limit
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(limit) ={(uint16_t*)(cmd->param + 1)};
@@ -469,7 +488,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x28:  //set servo moving speed
+  case 0x29:  //set servo moving speed
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(speed) ={(uint16_t*)(cmd->param + 1)};
@@ -482,7 +501,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x29:  //add a point to the beginning of Queue
+  case 0x2A:  //add a point to the beginning of Queue
   {
       float *(temp) = (float*)(cmd->param);
       char * ch = cmd->param + 12;
@@ -494,7 +513,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x2A:  //Open Cubes Catcher
+  case 0x2B:  //Open Cubes Catcher
   {
       openCubesCatcher();
 
@@ -503,7 +522,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x2B:  //Close Cubes Catcher
+  case 0x2C:  //Close Cubes Catcher
   {
       uint8_t numberOfCubesCatched;
       closeCubesCatcher(&numberOfCubesCatched);
