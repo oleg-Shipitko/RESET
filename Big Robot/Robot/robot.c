@@ -12,6 +12,7 @@
 #include "interrupts.h"
 #include "Board.h"
 #include "Communication.h"
+#include "Manipulators.h"
 
 
 float robotCoordTarget[3] = {0,0,0}; // Целевые координаты робота в глоб сис-ме координат
@@ -61,9 +62,6 @@ switch(cmd->command)
       CreatePath(&points[0], &points[0], &curPath);
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
   }
   break;
 
@@ -244,10 +242,10 @@ switch(cmd->command)
       float *(temp) ={(float*)(cmd->param)};
       char i;
       for (i = 0; i<=4; i++)
-        normalVel[i]= temp[i];
+        normalVelFast[i]= temp[i];
       for (i = 0; i<=4; i++)
-        stopVel[i]= temp[i];
-      stopVel[2]=-0.2;
+        stopVelFast[i]= temp[i];
+      stopVelFast[2]=-0.2;
 
       char * str = "Ok";
       sendAnswer(cmd->command,str, 3);
@@ -531,6 +529,87 @@ switch(cmd->command)
   }
   break;
 
+  case 0x2D:  // Open cubes movers
+  {
+      OpenCubesMovers();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x2E:  // Close  cubes movers
+  {
+      CloseCubesMovers();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x2F:  // Switch On the vibration
+  {
+      switchOnVibration();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x30:  // Switch Off the vibration
+  {
+      switchOffVibration();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x31:  // Set angle of cubes catcher
+  {
+      float *(temp) = (float*)(cmd->param);
+      cubesCatcherPID.target = *temp;
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x32:  // Switch On the belts
+  {
+      switchOnBelts();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x33:  // Switch Off the belts
+  {
+      switchOffBelts();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x34:  // Starting command
+  {
+      if (pin_val (EXTI2_PIN))
+      {
+        char * str = "1";
+        sendAnswer(cmd->command,str, 2);
+        __enable_irq();
+
+      }
+      else
+      {
+        char * str = "0";
+        sendAnswer(cmd->command,str, 2);
+      }
+
+  }
+  break;
 
   default:
   break;

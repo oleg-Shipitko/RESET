@@ -16,11 +16,11 @@ obj\debug\src\main.o: src\main.c Library/stm32f4xx_conf.h \
  Board/Pins.h Board/gpio.h Board/Interrupts.h Robot/regulator.h \
  Robot/Path.h Board/usart.h Robot/robot.h Robot/Communication.h \
  USB\ App/usbd_conf.h USB\ App/usb_conf.h Robot/Manipulators.h \
- Library\cdc\inc/usbd_cdc_core.h Library\core\inc/usbd_ioreq.h \
- Library\core\inc/usbd_def.h Library\core\inc/usbd_core.h \
- Library\core\inc/usb_dcd.h Library\core\inc/usb_core.h \
- USB\ App/usb_conf.h Library\core\inc/usb_regs.h \
- Library\core\inc/usb_defines.h Library\core\inc/usbd_usr.h \
- Library\core\inc/usbd_ioreq.h USB\ App/usbd_desc.h \
- Library\core\inc/usbd_req.h USB\ App/usbd_cdc_vcp.h USB\ App/usbd_conf.h \
- Robot/Dynamixel_control.h
+ Robot/Regulator.h Library\cdc\inc/usbd_cdc_core.h \
+ Library\core\inc/usbd_ioreq.h Library\core\inc/usbd_def.h \
+ Library\core\inc/usbd_core.h Library\core\inc/usb_dcd.h \
+ Library\core\inc/usb_core.h USB\ App/usb_conf.h \
+ Library\core\inc/usb_regs.h Library\core\inc/usb_defines.h \
+ Library\core\inc/usbd_usr.h Library\core\inc/usbd_ioreq.h \
+ USB\ App/usbd_desc.h Library\core\inc/usbd_req.h USB\ App/usbd_cdc_vcp.h \
+ USB\ App/usbd_conf.h Robot/Dynamixel_control.h

@@ -15,4 +15,4 @@ obj\debug\board\interrupts.o: Board\Interrupts.c Board\Interrupts.h \
  Board\gpio.h Library/stm32f4xx_conf.h Robot/Regulator.h Robot/Path.h \
  Robot/Path.h Board\Pins.h Board\usart.h Robot/robot.h Board/gpio.h \
  Robot/Communication.h USB\ App/usbd_conf.h USB\ App/usb_conf.h \
- Board\board.h
+ Board\board.h Robot/Manipulators.h Robot/Regulator.h Board/Pins.h

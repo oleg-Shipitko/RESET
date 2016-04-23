@@ -7,6 +7,7 @@
 #include "tim.h"
 #include "adc.h"
 #include "Regulator.h"
+#include "Manipulators.h"
 
 uint16_t adcData[10];
 uint8_t pinType[10];
@@ -114,8 +115,7 @@ PWR->CR|=PWR_CR_DBP;
 __disable_irq();
 
 initRegulators();
-//initCubeCatcherPID();
-
+initCubeCatcherPID();
 
 //___CLOCKS_________________________________________________________________
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);   // PORTA
@@ -198,9 +198,9 @@ initRegulators();
 
 
   timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1); // 1000Hz
-  timPWMConfigure(TIM11, 2*1667, MAX_PWM, 1, 0, 0, 0); // 50 HZ // timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
+  timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM10, 14, MAX_PWM, 1, 0, 0, 0);
-  timPWMConfigure(TIM9, 14, MAX_PWM, 1, 1, 0, 0);
+  timPWMConfigure(TIM9, 2*1667, MAX_PWM, 1, 1, 0, 0); // 50Hz
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);
 
 //___PID_TIM________________________________________________________________
@@ -305,7 +305,7 @@ initRegulators();
 //  NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 //___Dynamixel IO control____________________________________________________________________
-  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
+//  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
 
 //___I2C_____________________________________________________________________
 //conf_af(I2C_SDA_PIN, AF4);
@@ -316,8 +316,9 @@ initRegulators();
 //RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);  //I2C2
 //NVIC_EnableIRQ(I2C2_ER_IRQn);
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
-__enable_irq();
 
+CloseCubesMovers();
+__enable_irq();
 
 }
 ////////////////////////////////////////////////////////////////////////////////

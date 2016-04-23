@@ -1,6 +1,7 @@
 #include "Manipulators.h"
 #include "Dynamixel_control.h"
-#include "Regulator.h"
+
+#include "Board.h"
 
 void softDelay(__IO unsigned long int ticks)
 {
@@ -30,8 +31,6 @@ float right_servo_angle = 0;
 float left_servo_angle = 0;
 float prev_right_servo_angle = 1;
 float prev_left_servo_angle = 1;
-
-float CubesCatcherAngle;
 
 bool openCubesCatcher()
 {
@@ -78,31 +77,29 @@ bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
     return 0;
 }
 
-void initCubeCatcherPID(void)
+bool initCubeCatcherPID(void)
 {
-  	cubesCatcherPID.p_k = 5.00;
-  	cubesCatcherPID.i_k = 0.0;
-  	cubesCatcherPID.d_k = 0.0;
+    cubesCatcherPID.target = 270.0;
+  	cubesCatcherPID.p_k = 0.007;
+  	cubesCatcherPID.i_k = 0.002;
+  	cubesCatcherPID.d_k = 0.002;
   	cubesCatcherPID.pid_on = 1;
   	cubesCatcherPID.pid_error_end  = 3;
   	cubesCatcherPID.pid_output_end = 1000;
-  	cubesCatcherPID.max_sum_error =16.0;
+  	cubesCatcherPID.max_sum_error = 16.0;
   	cubesCatcherPID.max_output = 1;
   	cubesCatcherPID.min_output = 0.01;
+
+    return 0;
 }
 
-void GetDataForManipulator(void)
+bool pidLowLevelManipulator(void) //вычисление ПИД регулятора манипулятора
 {
-  CubesCatcherAngle = adcData[(char)CUBES_CATCHER_ADC - 1] * 360 / 3.3;
-
-}
-
-void pidLowLevelManipulator(float targetAngle, float currentAngle) //вычисление ПИД регулятора манипулятора
-{
-    cubesCatcherPID.target = targetAngle;//
-    cubesCatcherPID.current = currentAngle; // current manipulator's position
+    cubesCatcherPID.current = adcData[(char)CUBES_CATCHER_ADC - 1] * 360.0 / 4096.0;; // current manipulator's position
     pidCalc(&cubesCatcherPID);
-    setVoltage((char)CUBES_CATCHER_MOTOR_CH, cubesCatcherPID.output);
+    setVoltage((char)CUBES_CATCHER_MOTOR_CH - 1, cubesCatcherPID.output);
+
+    return 0;
 }
 ///////////////////////////////////////////////////////////////
 
@@ -110,24 +107,67 @@ void pidLowLevelManipulator(float targetAngle, float currentAngle) //вычис�
 
 bool pneumoIn()
 {
-
+    return 0;
 }
 
 bool pneumoOut()
 {
-
+    return 0;
 }
 
 bool switchOnPneumo()
 {
-
+    return 0;
 }
 
 bool switchOffPneumo()
 {
+    return 0;
+}
+///////////////////////////////////////////////////////////////
 
+///////////////////////////CUBES MOVERS////////////////////////
+bool OpenCubesMovers()
+{
+    setVoltage((char)RIGHT_CUBES_MOVER_CH - 1, (float)RIGHT_MOVER_IS_OPEN);
+    setVoltage((char)LEFT_CUBES_MOVER_CH - 1, (float)LEFT_MOVER_IS_OPEN);
+    return 0;
 }
 
+bool CloseCubesMovers()
+{
+    setVoltage((char)RIGHT_CUBES_MOVER_CH - 1, (float)RIGHT_MOVER_IS_CLOSED);
+    setVoltage((char)LEFT_CUBES_MOVER_CH - 1, (float)LEFT_MOVER_IS_CLOSED);
+    return 0;
+}
+///////////////////////////////////////////////////////////////
 
+///////////////////////////VIBRATING TABLE/////////////////////
+bool switchOnVibration()
+{
+   set_pin(VIBRATING_MOTOR_PIN);
+   return 0;
+}
 
+bool switchOffVibration()
+{
+   reset_pin(VIBRATING_MOTOR_PIN);
+   return 0;
+}
+///////////////////////////////////////////////////////////////
+
+//////////////////////////BELTS////////////////////////////////
+bool switchOnBelts(void)
+{
+   set_pin(RIGHT_BELT_PIN);
+   set_pin(LEFT_BELT_PIN);
+   return 0;
+}
+
+bool switchOffBelts(void)
+{
+   reset_pin(RIGHT_BELT_PIN);
+   reset_pin(LEFT_BELT_PIN);
+   return 0;
+}
 ///////////////////////////////////////////////////////////////

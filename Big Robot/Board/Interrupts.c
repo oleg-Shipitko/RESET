@@ -8,6 +8,7 @@
 #include "usart.h"
 #include "robot.h"
 #include "board.h"
+#include "Manipulators.h"
 
 int indexSpeeds = 0, indexDists = 0;
 char traceFlag, movFlag, endFlag;
@@ -36,6 +37,8 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регулятор
   GetDataForRegulators(); // обновление входных данных для ПИД
   NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
   pidLowLevel();       // рассчет ПИД
+  pidLowLevelManipulator();
+
    //   reset_pin(PWM_DIR[8]);
 }
 ////////////////////////////////////////////////////////////////////////////////
