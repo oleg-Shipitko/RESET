@@ -22,7 +22,7 @@ float motorCoord[4] = {0,0,0};      // общий пройденный коле�
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
 robStateStruct curState = {1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
-encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
+float distance[4] = {0,0,0};;                      // расстояния по показаниям дальномеров
 
 uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
@@ -242,10 +242,10 @@ switch(cmd->command)
       float *(temp) ={(float*)(cmd->param)};
       char i;
       for (i = 0; i<=4; i++)
-        normalVel[i]= temp[i];
+        normalVelFast[i]= temp[i];
       for (i = 0; i<=4; i++)
-        stopVel[i]= temp[i];
-      stopVel[2]=-0.2;
+        stopVelFast[i]= temp[i];
+      stopVelFast[2]=-0.2;
 
       char * str = "Ok";
       sendAnswer(cmd->command,str, 3);
@@ -597,14 +597,17 @@ switch(cmd->command)
   {
       if (pin_val (EXTI2_PIN))
       {
-        char * str ="Ok";
-        sendAnswer(cmd->command,str, 3);
+        char * str = "1";
+        sendAnswer(cmd->command,str, 2);
         __enable_irq();
 
       }
+      else
+      {
+        char * str = "0";
+        sendAnswer(cmd->command,str, 2);
+      }
 
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
   }
   break;
 

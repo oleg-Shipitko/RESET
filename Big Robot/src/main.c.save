@@ -45,6 +45,7 @@ char command = 0;
 
 char mode;
 
+float distance;
 
 int main(void)
 {
@@ -72,16 +73,44 @@ int main(void)
 
 //switchOnVibration();
 //switchOnBelts();
-__disable_irq();
+
+
   while(1)
    {
-          if (pin_val (EXTI2_PIN))
+        char temp = pin_val (EXTI1_PIN);
+      if (temp)
       {
-        char * str = "1";
-        putchar(1');
-        __enable_irq();
-
+        curState.trackEn = 1;
+      } else
+      {
+          curState.trackEn = 0;
+        vTargetGlob[0] = 0;
+        vTargetGlob[1] = 0;
+        vTargetGlob[2] = 0;
       }
+      if (robotSpeed[0] > robotSpeed[1])
+      {
+          if (robotSpeed[0] > robotSpeed[2])
+          {
+              distance = adcData[] * 0.0822 * 2.54;
+          }
+          else
+          {
+              distance = adcData[] * 0.0822 * 2.54;
+          }
       }
-    }
+      else
+      {
+          if (robotSpeed[1] > robotSpeed[2])
+          {
+              distance = adcData[] * 0.0822 * 2.54;
+          }
+          else
+          {
+              distance = adcData[] * 0.0822 * 2.54;
+          }
+      }
+  }
 }
+
+// 2 right_servo_angle

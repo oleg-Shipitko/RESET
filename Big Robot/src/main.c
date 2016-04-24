@@ -76,17 +76,68 @@ int main(void)
 
   while(1)
    {
-        char temp = pin_val (EXTI1_PIN);
+      char temp = pin_val (EXTI1_PIN);
       if (temp)
       {
         curState.trackEn = 1;
       } else
       {
-          curState.trackEn = 0;
+        curState.trackEn = 0;
         vTargetGlob[0] = 0;
         vTargetGlob[1] = 0;
         vTargetGlob[2] = 0;
       }
 
+      if (robotSpeed[0] > robotSpeed[1] )
+      {
+          if (robotSpeed[0] > 0)
+          {
+              distance[4] = adcData[4] * 0.0822 * 2.54;
+          }
+          else
+          {
+              distance[2] = adcData[2] * 0.0822 * 2.54;
+          }
+      }
+      else
+      {
+          if (robotSpeed[1] > 0)
+          {
+              distance[1] = adcData[1] * 0.0822 * 2.54;
+          }
+          else
+          {
+              distance[3] = adcData[3] * 0.0822 * 2.54;
+          }
+      }
+
+      if (robotSpeed[2] > 1.5)
+      {
+              distance[1] = adcData[1] * 0.0822 * 2.54;
+              distance[2] = adcData[2] * 0.0822 * 2.54;
+              distance[3] = adcData[3] * 0.0822 * 2.54;
+              distance[4] = adcData[4] * 0.0822 * 2.54;
+      }
+
+      for (int i = 0; i < 5; i++)
+      {
+          if (distance[i] < 10)
+          {
+              curState.trackEn = 0;
+              vTargetGlob[0] = 0;
+              vTargetGlob[1] = 0;
+              vTargetGlob[2] = 0;
+          }
+          else
+          {
+              curState.trackEn = 1;
+          }
+            distance[i] = 0;
+      }
   }
 }
+
+// 2 right
+//3 back
+//4 left
+//5 front
