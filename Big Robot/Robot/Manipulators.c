@@ -79,7 +79,7 @@ bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 
 bool initCubeCatcherPID(void)
 {
-    cubesCatcherPID.target = 275.0;
+    cubesCatcherPID.target = 260.0;
   	cubesCatcherPID.p_k = 0.007;
   	cubesCatcherPID.i_k = 0.002;
   	cubesCatcherPID.d_k = 0.002;

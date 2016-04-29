@@ -63,13 +63,13 @@ int main(void)
             &USR_cb);
 
        //сброс координат измерительной тележки в случае перезапуска контроллера
-       command = 0;
+     /*  command = 0;
        outEnc.adress = 0x02;
        outEnc.sync = 0xAA;
        outEnc.Command =  ENC_SET_CUR_POS;
        outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc) - 2);
        sendPacket((char *) &outEnc,sizeof(outEnc));
-
+*/
 //switchOnVibration();
 //switchOnBelts();
 
@@ -87,8 +87,13 @@ int main(void)
         vTargetGlob[1] = 0;
         vTargetGlob[2] = 0;
       }
+//      switchOnBelts();
+//      switchOnVibration();
+//      switchOffVibration();
+//      switchOffBelts();
 
-      if (robotSpeed[0] > robotSpeed[1] )
+
+   /*   if (robotSpeed[0] > robotSpeed[1] )
       {
           if (robotSpeed[0] > 0)
           {
@@ -133,7 +138,7 @@ int main(void)
               curState.trackEn = 1;
           }
             distance[i] = 0;
-      }
+      }*/
   }
 }
 
