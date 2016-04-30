@@ -7,11 +7,13 @@
 #include <math.h>
 #include "usart.h"
 #include "robot.h"
+#include "board.h"
+#include "Manipulators.h"
 
 int indexSpeeds = 0, indexDists = 0;
 char traceFlag, movFlag, endFlag;
 
-int16_t int_cnt=0;
+int16_t int_cnt = 0;
 
 
 
@@ -23,6 +25,7 @@ void TIM2_IRQHandler(void)
   //USB_OTG_BSP_TimerIRQ();
 }
 ////////////////////////////////////////////////////////////////////////////////
+
 void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регуляторов колес
 {
 //static char i=0; // Divider by 2 to get 10Hz frequency
@@ -34,6 +37,8 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регулятор
   GetDataForRegulators(); // обновление входных данных для ПИД
   NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
   pidLowLevel();       // рассчет ПИД
+  pidLowLevelManipulator();
+
    //   reset_pin(PWM_DIR[8]);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,9 +95,13 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
 {
    TrackRegulator(&robotCoord[0],&robotSpeed[0], (&curPath),&vTargetGlob[0]); // расчет глобальных скоростей
 }
-   //
-   if (curState.filtering) SpeedFiltration(&vTargetGlob[0]);
-   if (curState.kinemEn) FunctionalRegulator(&vTargetGlob[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
+   if (curState.filtering) SpeedFiltration(&vTargetGlob[0],&vTargetGlobF[0]); else
+   {
+      vTargetGlobF[0] =vTargetGlob[0];
+      vTargetGlobF[1] =vTargetGlob[1];
+      vTargetGlobF[2] =vTargetGlob[2];
+   }
+   if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
 
   ////////////////////////////////////////////////////////////////////////////////
   NVIC_EnableIRQ(TIM6_DAC_IRQn); //включение ПИД

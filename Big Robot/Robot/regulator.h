@@ -9,6 +9,9 @@
 #define LINE_SPEED_WEIGHT   0.8
 #define ROTATE_SPEED_WEIGHT 1-LINE_SPEED_WEIGHT
 
+
+
+
 #define JOYST_LIN_VEL_KOFF  MAX_WHEEL_SPEED/128.0
 #define JOYST_TO_PWM        2.0
 #define PHI_DEG             30
@@ -83,6 +86,8 @@ extern float standRotFast[5];
 extern float * speedType[3];
 extern float * rotType[3];
 extern PidStruct wheelsPidStruct[4];
+extern float vTargetGlob[3];
+extern float vTargetGlobF[3];
 extern float regulatorOut[4];
 extern uint16_t totalPointComplite;
 extern float MLineSpeed[4][3];          //
@@ -110,6 +115,7 @@ void moving2(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_
 signed char digitalize(char data, char lowerLevel, char upperLevel);
 void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out);
 void removePoint(pathPointStr * points,char *lastPoint);
+void SpeedFiltration(float *V,float *vF);
 
 
 

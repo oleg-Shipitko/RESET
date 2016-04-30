@@ -13,20 +13,21 @@
 
 float regulatorOut[4] = {0, 0, 0, 0};  //выход обратной кинематики, рассчетные скорости двигателей
 float vTargetGlob[3] = {0, 0, 0};// вектор глобальных скоростей робота
+float vTargetGlobF[3] = {0, 0, 0};// вектор глобальных скоростей робота
 PidStruct wheelsPidStruct[4]; //структура ПИД регуляторов колес
 PidStruct radSpeed; // структура ПИД регулятора уголовой скорости
 PidStruct ortoPos;  // структура ПИД отклонения от траектории
 
 uint16_t totalPointComplite = 0;  //Всего пройдено точек
 
-float MAX_ACCEL = 0.5;
-float MAX_ACCEL_INC = 0.1;
+float MAX_ACCEL = 0.1;
+float MAX_ACCEL_INC = 0.02;
 float ACCEL_INC = 0.2;
-struct TVector CurSpeed = {0, 0};
-struct TVector CurAccel = {0, 0};
-struct TVector AccelInc1 = {0, 0};
-struct TVector AccelInc2 = {0, 0};
-struct TVector TargSpeed = {0, 0};
+ TVector CurSpeed = {0, 0};
+ TVector CurAccel = {0, 0};
+ TVector AccelInc1 = {0, 0};
+ TVector AccelInc2 = {0, 0};
+ TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },  //Стек точек траектории
                                         {0.0, 0.0, 3.14, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
@@ -42,12 +43,6 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,
 
 char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
-
-//vSt    = (*parameters);     normal speed
-//vStart = (*(parameters+1)); minimum speed at the start
-//vEnd   = (*(parameters+2)); minimum speed at the end
-//acc    = (*(parameters+3)); acceleration
-//decc   = (*(parameters+4));  deceleration
 
 float normalVelFast[5] = {0.3, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopVelFast[5] = {0.3, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
@@ -641,34 +636,37 @@ else
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SpeedFiltration(float *V)
+void SpeedFiltration(float *V,float *vF)
   {
         TargSpeed.x = V[0];
         TargSpeed.y = V[1];
 
-        struct TVector temp;
-        subtraction(CurSpeed,TargSpeed, &temp);
+         TVector temp;
+        CurSpeed.x = vF[0];
+        CurSpeed.y = vF[1];
+
+        temp = subtraction(CurSpeed,TargSpeed);
         ACCEL_INC = pow(mod(temp) * 10.0, 2) / 10.0 + 0.001 + mod(CurAccel) / 2.0;
         if (ACCEL_INC > MAX_ACCEL_INC) { ACCEL_INC = MAX_ACCEL_INC;}
         if (ACCEL_INC < -MAX_ACCEL_INC) { ACCEL_INC = -MAX_ACCEL_INC;}
-        struct TVector accelInc;
-        subtraction(TargSpeed, CurSpeed, &temp);
-        subtraction(temp, CurAccel, &temp);
-        normalization(temp, ACCEL_INC, &temp);
+         TVector accelInc;
+        temp = subtraction(TargSpeed, CurSpeed);
+        temp = subtraction(temp, CurAccel);
+        temp = normalization(temp, ACCEL_INC);
         accelInc = temp;
-        subtraction(TargSpeed, CurSpeed, &temp);
-        subtraction(CurAccel, temp, &temp);
-        normalization(temp, ACCEL_INC, &temp);
-        struct TVector accelDec = temp;
+        temp = subtraction(TargSpeed, CurSpeed);
+        temp = subtraction(CurAccel, temp );
+        temp = normalization(temp, ACCEL_INC);
+        TVector accelDec = temp;
 
-        struct TVector newAccelInc, newAccelDec;
-        addition(CurAccel, accelInc, &newAccelInc);
-        addition(CurAccel, accelDec, &newAccelDec);
+        TVector newAccelInc, newAccelDec;
+        newAccelInc = addition(CurAccel, accelInc);
+        newAccelDec = addition(CurAccel, accelDec);
 
-        struct TVector newSpeedInc, newSpeedDec, newSpeedZer;
-        addition(CurSpeed, newAccelInc, &newSpeedInc);
-        addition(CurSpeed, newAccelDec, &newSpeedDec);
-        addition(CurSpeed, CurAccel, &newSpeedZer);
+         TVector newSpeedInc, newSpeedDec, newSpeedZer;
+        newSpeedInc = addition(CurSpeed, newAccelInc);
+        newSpeedDec = addition(CurSpeed, newAccelDec);
+        newSpeedZer = addition(CurSpeed, CurAccel);
         float timeToStop;
         if (mod(accelInc) > 0)
 			 timeToStop = abs(mod(CurAccel)/mod(accelInc))/2.0 + 0.50;
@@ -713,7 +711,7 @@ void SpeedFiltration(float *V)
             }
         }
         if (mod(CurAccel) > MAX_ACCEL)
-   			    normalization(CurAccel, MAX_ACCEL, &CurAccel);
-        V[0] = CurSpeed.x;
-        V[1] = CurSpeed.y;
+   			    CurAccel = normalization(CurAccel, MAX_ACCEL);
+        vF[0] = CurSpeed.x;
+        vF[1] = CurSpeed.y;
   }

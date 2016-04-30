@@ -79,7 +79,7 @@ extern float robotCoord[3] ;
 extern float robotSpeed[3] ;
 extern robStateStruct curState;
 extern encOutPackStruct outEnc;
-extern float vTargetGlob[3];
+
 
 extern uint32_t  PWM_DIR[10];
 extern uint32_t * PWM_CCR[10];

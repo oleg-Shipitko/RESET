@@ -35,7 +35,7 @@
 
 #ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
   #if defined ( __ICCARM__ ) /*!< IAR Compiler */
-    #pragma data_alignment=4
+    #pragma data_alignment = 4
   #endif
 #endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
 
@@ -62,18 +62,6 @@ int main(void)
             &USBD_CDC_cb,
             &USR_cb);
 
-       //сброс координат измерительной тележки в случае перезапуска контроллера
-     /*  command = 0;
-       outEnc.adress = 0x02;
-       outEnc.sync = 0xAA;
-       outEnc.Command =  ENC_SET_CUR_POS;
-       outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc) - 2);
-       sendPacket((char *) &outEnc,sizeof(outEnc));
-*/
-//switchOnVibration();
-//switchOnBelts();
-
-
   while(1)
    {
       char temp = pin_val (EXTI1_PIN);
@@ -87,10 +75,6 @@ int main(void)
         vTargetGlob[1] = 0;
         vTargetGlob[2] = 0;
       }
-//      switchOnBelts();
-//      switchOnVibration();
-//      switchOffVibration();
-//      switchOffBelts();
 
 
    /*   if (robotSpeed[0] > robotSpeed[1] )

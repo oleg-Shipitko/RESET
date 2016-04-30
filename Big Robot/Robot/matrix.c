@@ -201,36 +201,44 @@ for (i = 1; i <= size; i++)
 matrixTranspose(&buf3[0][0], size, size, new_m);
 }
 
-void subtraction(struct TVector a, struct TVector b, struct TVector *result)
+TVector subtraction( TVector a,  TVector b)
 {
-  result->x = a.x - b.x;
-  result->y = a.y - b.y;
+     TVector result   ;
+  result.x = a.x - b.x;
+  result.y = a.y - b.y;
+    return result;
 }
 
-void addition(struct TVector a, struct TVector b, struct TVector *result)
+TVector addition( TVector a,  TVector b)
 {
-  result->x = a.x + b.x;
-  result->y = a.y + b.y;
+     TVector result   ;
+  result.x = a.x + b.x;
+  result.y = a.y + b.y;
+    return result;
 }
 
-void normalization(struct TVector a, float len, struct TVector *result)
+TVector normalization( TVector a, float len)
 {
+     TVector result   ;
   float mod = pow(a.x * a.x + a.y * a.y, 0.5) ;
   if (mod > 0) {
 	float k = len/mod;
 
-	 result->x = a.x * k;
-	 result->y = a.y * k;
+	 result.x = a.x * k;
+	 result.y = a.y * k;
   }
+    return result;
 }
 
-void scale(struct TVector a, float k, struct TVector *result)
+TVector scale( TVector a, float k)
 {
-  result->x = a.x * k;
-  result->y = a.y * k;
+  TVector result   ;
+  result.x = a.x * k;
+  result.y = a.y * k;
+  return result;
 }
 
-float mod(struct TVector a)
+float mod( TVector a)
 {
   return pow(a.x * a.x + a.y * a.y, 0.5);
 }
