@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "Regulator.h"
+#include "Pins.h"
 
 void softDelay(unsigned long int);
 
@@ -19,22 +21,21 @@ bool close_tower(int8_t);
 ///////////////////////////CUBES CATCHER///////////////////////
 #define ID_RIGHT 18                     // If to look on robot from the front
 #define ID_LEFT 1
-#define OPEN_ANG_RIGHT 300
-#define OPEN_ANG_LEFT 0
+#define OPEN_ANG_RIGHT 290//300
+#define OPEN_ANG_LEFT 10 //0
 #define CLOSED_ANG_RIGHT 150
 #define CLOSED_ANG_LEFT 150
 #define ONE_CUBE_CATCHED_ANGLE 30      // angle defining difference in manipulators angles in 1 cube is caught
 #define TWO_CUBES_CATCHED_ANGLE 90     // angle defining difference in manipulators angles in 2 cubes are caught
-#define CEBES_CATCHER_ADC 1
-#define CUBES_CATCHER_MOTOR_CH 5
+#define CUBES_CATCHER_ADC 1
+#define CUBES_CATCHER_MOTOR_CH 6
 
 extern uint16_t adcData[10];
-
-bool open_cubes();
-bool close_cubes(uint8_t*);
-void initCubeCatcherPID(void);
-void GetDataForManipulator(void);
-void pidLowLevelManipulator(float, float);
+extern PidStruct cubesCatcherPID;
+bool openCubesCatcher();
+bool closeCubesCatcher(uint8_t*);
+bool initCubeCatcherPID(void);
+bool pidLowLevelManipulator(void);
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////PNEUMO//////////////////////////////
@@ -43,6 +44,34 @@ bool pneumoIn();
 bool pneumoOut();
 bool switchOnPneumo();
 bool switchOffPneumo();
+///////////////////////////////////////////////////////////////
+
+///////////////////////////CUBES MOVERS////////////////////////
+#define RIGHT_CUBES_MOVER_CH 7
+#define LEFT_CUBES_MOVER_CH 8
+#define RIGHT_MOVER_IS_OPEN 0.08
+#define LEFT_MOVER_IS_OPEN 0.09
+#define RIGHT_MOVER_IS_CLOSED 0.125
+#define LEFT_MOVER_IS_CLOSED 0.04
+
+
+bool OpenCubesMovers();
+bool CloseCubesMovers();
+///////////////////////////////////////////////////////////////
+
+///////////////////////////VIBRATING TABLE/////////////////////
+#define VIBRATING_MOTOR_PIN PIN3_12V
+
+bool switchOnVibration();
+bool switchOffVibration();
+///////////////////////////////////////////////////////////////
+
+//////////////////////////BELTS////////////////////////////////
+#define RIGHT_BELT_PIN PIN1_12V
+#define LEFT_BELT_PIN PIN2_12V
+
+bool switchOnBelts(void);
+bool switchOffBelts(void);
 ///////////////////////////////////////////////////////////////
 
 

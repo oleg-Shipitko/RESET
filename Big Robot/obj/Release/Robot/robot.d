@@ -22,4 +22,5 @@ obj\release\robot\robot.o: Robot\Robot.c Robot\robot.h Board/gpio.h \
  Library\core\inc/usbd_ioreq.h USB\ App/usbd_desc.h \
  Library\core\inc/usbd_req.h USB\ App/stm32fxxx_it.h \
  USB\ App/usbd_cdc_vcp.h USB\ App/usbd_conf.h Robot\regulator.h \
- Robot\Path.h Board/interrupts.h Board/Board.h
+ Robot\Path.h Board/interrupts.h Board/Board.h Robot\Manipulators.h \
+ Robot\Regulator.h Board/Pins.h

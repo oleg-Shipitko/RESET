@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBlocks_debug_session>
 	<debuggerLastSession>
+		<breakpoints>
+			<break type="0" file="src/main.c" line="91" />
+		</breakpoints>
 		<watches>
+			<watch key="EXTI2_PIN" format="0" array="0" start="0" count="0" />
+			<watch key="close" format="0" array="0" start="0" count="0" />
+			<watch key="curState" format="0" array="0" start="0" count="0" />
+			<watch key="open" format="0" array="0" start="0" count="0" />
+			<watch key="pin_val (EXTI2_PIN)" format="0" array="0" start="0" count="0" />
+			<watch key="temp" format="0" array="0" start="0" count="0" />
 			<watch key="left_servo_angle" format="0" array="0" start="0" count="0" />
 			<watch key="num" format="1" array="0" start="0" count="0" />
 			<watch key="right_servo_angle" format="1" array="0" start="0" count="0" />

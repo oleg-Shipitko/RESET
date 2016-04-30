@@ -5,6 +5,7 @@
 #include "gpio.h"
 #include <math.h>
 #include "adc.h"
+#include "Board.h"
 
 //#define ENCODER_IMITATION // Encoders emulation
 
@@ -27,19 +28,19 @@ struct TVector AccelInc1 = {0, 0};
 struct TVector AccelInc2 = {0, 0};
 struct TVector TargSpeed = {0, 0};
 
-pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },  //Стек точек траектории
-                                        {0.0, 2.9, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {1.0, 1.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {1.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVel,stopRot,0,1 },};
+pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },  //Стек точек траектории
+                                        {0.0, 0.0, 3.14, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.5, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 3.14, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },};
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 4;// последняя активная точка в очереди
+char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 //vSt    = (*parameters);     normal speed
@@ -48,16 +49,26 @@ Path curPath; //параметры активной прямой для траекторного регулятора
 //acc    = (*(parameters+3)); acceleration
 //decc   = (*(parameters+4));  deceleration
 
-float normalVel[5] = {0.6, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVel[5] = {0.6, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVel[5] = {0.6, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
+float normalVelFast[5] = {0.3, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVelFast[5] = {0.3, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVelFast[5] = {0.3, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
 
-float normalRot[5] = {3.0, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopRot[5] = {3.0, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
-float standRot[5] = {4.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
+float normalVelSlow[5] = {0.1, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVelSlow[5] = {0.1, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVelSlow[5] = {0.1, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
 
-float * speedType[3] = {normalVel, stopVel, standVel};                            // типы  линейный скоростей
-float * rotType[3] = {normalRot, stopRot, standRot};                              // типы угловых скоростей
+
+float normalRotFast[5] = {3.0, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopRotFast[5] = {3.0, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRotFast[5] = {4.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
+
+float normalRotSlow[5] = {1.5, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopRotSlow[5] = {1.5, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRotSlow[5] = {1.5 , 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
+
+
+float * speedType[3] = {normalVelFast, stopVelFast, standVelFast, normalVelSlow, stopVelSlow, standVelSlow };// типы  линейный скоростей
+float * rotType[3] = {normalRotFast, stopRotFast, standRotFast, normalRotSlow, stopRotSlow, standRotSlow};// типы угловых скоростей
 //______________________________________________________________________________
 ////////////////////////////////////////////////////////////////////////////////
 void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из очереди
@@ -480,7 +491,7 @@ int16_t motorSpeedBuf[4];
   for(i = 3; i>=0; i--)
   {
     motorSpeedBuf[i] = *encCnt[i];
-    *encCnt[i] =0;
+    *encCnt[i] = 0;
   }
   #ifdef ENCODER_IMITATION
   for(i =3; i>=0; i--)
@@ -619,11 +630,11 @@ void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out)
   out->lengthTrace = sqrt((delta_x*delta_x)+(delta_y*delta_y));
   //out->phiDir = next_point->rotateDir;
 if (out->lengthTrace == 0)
-   out->traceVel=&standVel[0];
+   out->traceVel=&standVelFast[0];
 else
   out->traceVel=next_point->speedVelTipe;
 if (delta_phi == 0)
-   out->omegaVel=&standRot[0];
+   out->omegaVel=&standRotFast[0];
 else
   out->omegaVel=next_point->speedRotTipe;
 

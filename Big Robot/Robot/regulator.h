@@ -15,8 +15,9 @@
 #define PHI_RAD             0.5236
 #define distA	 	    0.31819
 #define distB		    0.2625
-#define RO                  (0.024)           // Радиус колес
-#define L                   (0.14)         // Расстояние от центра робота до плоскости колеса энкодера
+#define RO                  (0.023)          // Радиус колес
+#define L1                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
+#define L2                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
 #define JOYST_RAD_VEL_KOFF  MAX_RAD_SPEED/128.0 //(MAX_WHEEL_SPEED/distA/128.0/5.0)
 #define DISKR_TO_REAL       (2.0*PI*RO/2800.0)
 #define ONE_RO_COS_PHI      1.0                   // 23.0947
@@ -72,13 +73,13 @@ extern Path curPath;
 //extern float Coord_local_track[3];
 extern pathPointStr points[POINT_STACK_SIZE];
 extern char lastPoint;
-extern float normalVel[5];//V_уст, V_нач, V_кон, А_уск, А_торм
-extern float stopVel[5]; //{0.2,0.1,-0.05,0.2,0.7};
-extern float standVel[5];
+extern float normalVelFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм
+extern float stopVelFast[5]; //{0.2,0.1,-0.05,0.2,0.7};
+extern float standVelFast[5];
 
-extern float normalRot[5];//V_уст, V_нач, V_кон, А_уск, А_торм
-extern float stopRot[5]; //{0.2,0.1,-0.1,0.3,0.6};
-extern float standRot[5];
+extern float normalRotFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм
+extern float stopRotFast[5]; //{0.2,0.1,-0.1,0.3,0.6};
+extern float standRotFast[5];
 extern float * speedType[3];
 extern float * rotType[3];
 extern PidStruct wheelsPidStruct[4];

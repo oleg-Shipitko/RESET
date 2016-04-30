@@ -12,6 +12,7 @@
 #include "interrupts.h"
 #include "Board.h"
 #include "Communication.h"
+#include "Manipulators.h"
 
 
 float robotCoordTarget[3] = {0,0,0}; // Целевые координаты робота в глоб сис-ме координат
@@ -20,10 +21,10 @@ float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 1};    // состояние регуляторов активен-1/неактвен -0
-encOutPackStruct outEnc;              //буфер данных отправляемых измерительной тележке
+robStateStruct curState = {1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
+float distance[4] = {0,0,0,0};                      // расстояния по показаниям дальномеров
 
-uint32_t * encCnt[4] ={ENCODER4_CNT, ENCODER3_CNT, ENCODER1_CNT, ENCODER2_CNT};  //массив указателей на счетчики энкодеров колес
+uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
 
 //extern CDC_IF_Prop_TypeDef  APP_FOPS;
@@ -48,20 +49,19 @@ switch(cmd->command)
   case 0x02:  //Установить текущие координаты
   {
       float *(temp) ={(float*)cmd->param};
+
       robotCoord[0]= temp[0];
       robotCoord[1]= temp[1];
       robotCoord[2]= temp[2];
+
+      points[0].center[0]= temp[0];
+      points[0].center[1]= temp[1];
+      points[0].center[2]= temp[2];
+
+
+      CreatePath(&points[0], &points[0], &curPath);
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-       outEnc.adress=0x02;
-       outEnc.sync = 0xAA;
-       outEnc.Command =  ENC_SET_CUR_POS;
-       outEnc.robotCoord[0]=0;
-       outEnc.robotCoord[1]=0;
-       outEnc.robotCoord[2]=0;
-       outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc)-2);
-       sendPacket((char *) &outEnc,sizeof(outEnc));
-
   }
   break;
 
@@ -242,10 +242,10 @@ switch(cmd->command)
       float *(temp) ={(float*)(cmd->param)};
       char i;
       for (i = 0; i<=4; i++)
-        normalVel[i]= temp[i];
+        normalVelFast[i]= temp[i];
       for (i = 0; i<=4; i++)
-        stopVel[i]= temp[i];
-      stopVel[2]=-0.2;
+        stopVelFast[i]= temp[i];
+      stopVelFast[2]=-0.2;
 
       char * str = "Ok";
       sendAnswer(cmd->command,str, 3);
@@ -440,7 +440,17 @@ switch(cmd->command)
   }
   break;
 
-  case 0x25:  //set dynamixel angle
+  case 0x25:    // set current coordinate
+  {
+      float *(temp) ={(float*)cmd->param};
+      robotCoord[0]= temp[0];
+      robotCoord[1]= temp[1];
+      robotCoord[2]= temp[2];
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+
+  case 0x26:  //set dynamixel angle
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(angle) ={(uint16_t*)(cmd->param + 1)};
@@ -452,7 +462,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x26:  //set CW angle limit
+  case 0x27:  //set CW angle limit
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(limit) ={(uint16_t*)(cmd->param + 1)};
@@ -464,7 +474,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x27:  //set CCW angle limit
+  case 0x28:  //set CCW angle limit
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(limit) ={(uint16_t*)(cmd->param + 1)};
@@ -476,7 +486,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x28:  //set servo moving speed
+  case 0x29:  //set servo moving speed
   {
       uint8_t *(ID) ={(uint8_t*)cmd->param};
       uint16_t *(speed) ={(uint16_t*)(cmd->param + 1)};
@@ -489,7 +499,7 @@ switch(cmd->command)
   }
   break;
 
-  case 0x29:  //add a point to the beginning of Queue
+  case 0x2A:  //add a point to the beginning of Queue
   {
       float *(temp) = (float*)(cmd->param);
       char * ch = cmd->param + 12;
@@ -498,6 +508,106 @@ switch(cmd->command)
 
       char * str ="Ok";
       sendAnswer(cmd->command, str, 3);
+  }
+  break;
+
+  case 0x2B:  //Open Cubes Catcher
+  {
+      openCubesCatcher();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command, str, 3);
+  }
+  break;
+
+  case 0x2C:  //Close Cubes Catcher
+  {
+      uint8_t numberOfCubesCatched;
+      closeCubesCatcher(&numberOfCubesCatched);
+
+      sendAnswer(cmd->command, numberOfCubesCatched, sizeof(uint8_t));
+  }
+  break;
+
+  case 0x2D:  // Open cubes movers
+  {
+      OpenCubesMovers();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x2E:  // Close  cubes movers
+  {
+      CloseCubesMovers();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x2F:  // Switch On the vibration
+  {
+      switchOnVibration();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x30:  // Switch Off the vibration
+  {
+      switchOffVibration();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x31:  // Set angle of cubes catcher
+  {
+      float *(temp) = (float*)(cmd->param);
+      cubesCatcherPID.target = *temp;
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x32:  // Switch On the belts
+  {
+      switchOnBelts();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x33:  // Switch Off the belts
+  {
+      switchOffBelts();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x34:  // Starting command
+  {
+      if (pin_val (EXTI2_PIN))
+      {
+        char * str = "1";
+        sendAnswer(cmd->command,str, 2);
+        __enable_irq();
+
+      }
+      else
+      {
+        char * str = "0";
+        sendAnswer(cmd->command,str, 2);
+      }
+
   }
   break;
 

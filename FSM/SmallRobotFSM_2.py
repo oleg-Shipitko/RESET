@@ -35,10 +35,10 @@ class BaseState(object):
                 return newState
     
     def check_for_enemy(self):
-	if robot.CheckForEnemy():
-		robot.StopRobot()
-		robot.WaitForEnemyDesapearing()
-		return trajectoryPoints[stateNumber]
+        if robot.CheckForEnemy():
+            robot.StopRobot()
+            robot.WaitForEnemyDesapearing()
+            return trajectoryPoints[stateNumber]
     
     def check_game_time(self):
         currentTime = time.time()
@@ -108,8 +108,7 @@ class UnloadAllCubesState(object):
 	
 	def check_cube_was_sucked():
 		print "Cube was sucked"
-		return GoToNextAction()
-		 			
+		return GoToNextAction()		 			
 
 class PickTower(BaseState):
     def __init__(self, level):
@@ -123,6 +122,14 @@ class PickTower(BaseState):
         global stateNumber
         stateNumber = stateNumber + 1
         return trajectoryPoints[stateNumber]
+        
+class PutDownCubesManipulatorState(BaseState):
+    def Execute(self):
+        print "Cubes manipulator was puted down"
+    
+    def check_time_wait(self):
+        time.sleep(2)
+        return GoToNextAction()
                 
 class MoveToPointState(BaseState):
     def __init__(self, x, y, alpha):                
@@ -140,6 +147,27 @@ class MoveToPointState(BaseState):
             print "Point ", self.x, self.y, self.alpha, " was reached"
 	    return GoToNextAction()
             #return MoveToPointState(self.robot, trajectoryPoints[stateNumber][0], trajectoryPoints[stateNumber][1], trajectoryPoints[stateNumber][2])             
+
+class UnloadCubes(object):
+    def __init__(self):
+        self.startTime = time.time()
+        
+    def Execute(self):
+        robot.SwitchOnVibrationTrack()
+        robot.SwitchOnTrack()
+        
+    def check_all_cubes_were_unloaded(self):
+        if robot.IsCubeInRobot() is not True:
+            robot.SwitchOnVibrationTrack()
+            robot.SwitchOnTrack()
+            return GoToNextAction()
+    
+    def check_time_for_operation(self):
+        if time.time() - self.startTime > 10:
+            robot.SwitchOnVibrationTrack()
+            robot.SwitchOnTrack()
+            return GoToNextAction()
+        
 
 class BigRobot(object):
 	
@@ -163,10 +191,8 @@ class BigRobot(object):
             time.sleep(1)
         self.robot.ActivateRobotAfterStopping()			
             
-    def GoToPoint(self, x, y, alpha):
-        currentCoordinates = self.robot.GetCurrentCoordinates()
-        desiredRelativeCoordinates = [x - currentCoordinates[0], y - currentCoordinates[1], alpha - currentCoordinates[2]]
-        self.robot.RelativeMovement(desiredRelativeCoordinates)
+    def GetCoordinates(self):
+        return self.robot.GetCurrentCoordinates()
         
     def TakeCubes(self):
     	print "PickUpCubesManipulator"
@@ -179,32 +205,37 @@ class BigRobot(object):
         print "PickUpCubesManipulator"
         print "OpenCubesManipulator"
     
-    def ReleaseStick():
+    def ReleaseStick(self):
         print "Stick was released"
     
-    def RaiseStick():   
+    def RaiseStick(self):   
         print "Stick was raised"
     
-    def UnloadCubesState():
+    def UnloadCubesState(self):
         #While we have cubes unload cubes
         print "cubes were unloaded"
+        
+    def SwitchOnVibrationTrack(self):
+        print "Vibration track was switched on"
+    
+    def SwitchOffVibrationTrack(self):
+        print "Vibration track was switced off"
+    
+    def SwitchOnTrack(self):
+        print "Track was switched on"
+    
+    def SwitchOfTrack(self):
+        print "Track was switched off"
+    
+    def IsCubeInRobot(self):
+        print "Check is cube in robot"
+        return True
     
     #def PickTower(self, activeSide, floor):
 		
 	#def CheckTower(self, activeSide):
 		
 	#def MoveTrack(self, positionNumber):
-		
-	#def PickCubes(self, floor):	
-		
-	#def ThrowTower(self, activeSide):
-		
-	#def ThrowCubes(self, cubesNumber):
-		
-	#def TurnOnGrab(self):
-		
-	#def TurnOffGrab(self):
-
 #### BEGINNING OF THE MAIN PROGRAM ####
 
 
@@ -224,11 +255,19 @@ trajectoryPoints_left = [
     MoveToPointState(0.462, 1.332, -1.046),
 ]
 
-'''trajectoryPoints_right = MoveToPointState(0, 0, 0), \
-PickCubes(2, 2), \
-PickTower(1), \
-MoveToPointState(0.1, 0.1, 1.57), \
-MoveToPointState(0, 0, 0)'''
+trajectoryPoints_right = [
+MoveToPointState(0.60, 0.91, 0), 
+MoveToPointState(0.10, 0.91, 0),
+MoveToPointState(0.60, 0.91, 0), 
+MoveToPointState(0.96, 0.27, 0),
+ReleaseStickState(),
+
+ 
+
+PickCubes(2, 2), 
+PickTower(1), 
+MoveToPointState(0.1, 0.1, 1.57), 
+MoveToPointState(0, 0, 0)]
 
 '''if GetPlayingFieldSide is 0:
 	trajectoryPoints = trajectoryPoints_left
@@ -253,7 +292,3 @@ except:
     traceback.print_exc()
     robot.robot.s.shutdown(2)			
     robot.robot.s.close()
-
-
-
-
