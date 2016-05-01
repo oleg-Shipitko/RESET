@@ -95,7 +95,7 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
 {
    TrackRegulator(&robotCoord[0],&robotSpeed[0], (&curPath),&vTargetGlob[0]); // расчет глобальных скоростей
 }
-   if (curState.filtering) SpeedFiltration(&vTargetGlob[0],&vTargetGlobF[0]); else
+   if (curState.filtering) SpeedFiltration(&vTargetGlob[0],&vTargetGlobF[0]) else
    {
       vTargetGlobF[0] =vTargetGlob[0];
       vTargetGlobF[1] =vTargetGlob[1];

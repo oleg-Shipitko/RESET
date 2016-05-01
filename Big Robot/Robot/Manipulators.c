@@ -95,7 +95,7 @@ bool initCubeCatcherPID(void)
 
 bool pidLowLevelManipulator(void) //вычисление ПИД регулятора манипулятора
 {
-    cubesCatcherPID.current = adcData[(char)CUBES_CATCHER_ADC - 1] * 360.0 / 4096.0;; // current manipulator's position
+    cubesCatcherPID.current = adcData[(char)CUBES_CATCHER_ADC - 1] * 360.0 / 4096.0; // current manipulator's position
     pidCalc(&cubesCatcherPID);
     setVoltage((char)CUBES_CATCHER_MOTOR_CH - 1, cubesCatcherPID.output);
 
@@ -127,19 +127,19 @@ bool switchOffPneumo()
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////CUBES MOVERS////////////////////////
-bool OpenCubesMovers()
-{
-    setVoltage((char)RIGHT_CUBES_MOVER_CH - 1, (float)RIGHT_MOVER_IS_OPEN);
-    setVoltage((char)LEFT_CUBES_MOVER_CH - 1, (float)LEFT_MOVER_IS_OPEN);
-    return 0;
-}
-
-bool CloseCubesMovers()
-{
-    setVoltage((char)RIGHT_CUBES_MOVER_CH - 1, (float)RIGHT_MOVER_IS_CLOSED);
-    setVoltage((char)LEFT_CUBES_MOVER_CH - 1, (float)LEFT_MOVER_IS_CLOSED);
-    return 0;
-}
+//bool OpenCubesMovers()
+//{
+//    setVoltage((char)RIGHT_CUBES_MOVER_CH - 1, (float)RIGHT_MOVER_IS_OPEN);
+//    setVoltage((char)LEFT_CUBES_MOVER_CH - 1, (float)LEFT_MOVER_IS_OPEN);
+//    return 0;
+//}
+//
+//bool CloseCubesMovers()
+//{
+//    setVoltage((char)RIGHT_CUBES_MOVER_CH - 1, (float)RIGHT_MOVER_IS_CLOSED);
+//    setVoltage((char)LEFT_CUBES_MOVER_CH - 1, (float)LEFT_MOVER_IS_CLOSED);
+//    return 0;
+//}
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////VIBRATING TABLE/////////////////////
@@ -157,17 +157,31 @@ bool switchOffVibration()
 ///////////////////////////////////////////////////////////////
 
 //////////////////////////BELTS////////////////////////////////
-bool switchOnBelts(void)
+//bool switchOnBelts(void)
+//{
+//   set_pin(RIGHT_BELT_PIN);
+//   set_pin(LEFT_BELT_PIN);
+//   return 0;
+//}
+//
+//bool switchOffBelts(void)
+//{
+//   reset_pin(RIGHT_BELT_PIN);
+//   reset_pin(LEFT_BELT_PIN);
+//   return 0;
+//}
+///////////////////////////////////////////////////////////////
+
+//////////////////////////WALL////////////////////////////////
+bool openWall(void)
 {
-   set_pin(RIGHT_BELT_PIN);
-   set_pin(LEFT_BELT_PIN);
-   return 0;
+    setVoltage((char)WALL_CH - 1, (float)WALL_IS_OPEN);
+    return 0;
 }
 
-bool switchOffBelts(void)
+bool closeWall(void)
 {
-   reset_pin(RIGHT_BELT_PIN);
-   reset_pin(LEFT_BELT_PIN);
-   return 0;
+    setVoltage((char)WALL_CH - 1, (float)WALL_IS_CLOSED);
+    return 0;
 }
 ///////////////////////////////////////////////////////////////

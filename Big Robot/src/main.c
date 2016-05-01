@@ -45,6 +45,8 @@ char command = 0;
 
 char mode;
 
+//char pwm_ch = 9;
+//float pwm = 0.9;
 
 int main(void)
 {
@@ -76,6 +78,10 @@ int main(void)
         vTargetGlob[2] = 0;
       }
 
+//switchOnVibration();
+//openWall();
+//setVoltage(pwm_ch - 1, pwm);
+//set_pin(PIN1_12V);
 
    /*   if (robotSpeed[0] > robotSpeed[1] )
       {
@@ -126,7 +132,7 @@ int main(void)
   }
 }
 
-// 2 right
+//2 right
 //3 back
 //4 left
 //5 front

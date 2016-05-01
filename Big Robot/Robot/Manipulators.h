@@ -47,32 +47,40 @@ bool switchOffPneumo();
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////CUBES MOVERS////////////////////////
-#define RIGHT_CUBES_MOVER_CH 7
-#define LEFT_CUBES_MOVER_CH 8
-#define RIGHT_MOVER_IS_OPEN 0.08
-#define LEFT_MOVER_IS_OPEN 0.09
-#define RIGHT_MOVER_IS_CLOSED 0.125
-#define LEFT_MOVER_IS_CLOSED 0.04
-
-
-bool OpenCubesMovers();
-bool CloseCubesMovers();
+//#define RIGHT_CUBES_MOVER_CH 7
+//#define LEFT_CUBES_MOVER_CH 8
+//#define RIGHT_MOVER_IS_OPEN 0.08
+//#define LEFT_MOVER_IS_OPEN 0.09
+//#define RIGHT_MOVER_IS_CLOSED 0.125
+//#define LEFT_MOVER_IS_CLOSED 0.04
+//
+//
+//bool OpenCubesMovers();
+//bool CloseCubesMovers();
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////VIBRATING TABLE/////////////////////
-#define VIBRATING_MOTOR_PIN PIN3_12V
+#define VIBRATING_MOTOR_PIN PIN1_12V
 
 bool switchOnVibration();
 bool switchOffVibration();
 ///////////////////////////////////////////////////////////////
 
 //////////////////////////BELTS////////////////////////////////
-#define RIGHT_BELT_PIN PIN1_12V
-#define LEFT_BELT_PIN PIN2_12V
-
-bool switchOnBelts(void);
-bool switchOffBelts(void);
+//#define RIGHT_BELT_PIN PIN1_12V
+//#define LEFT_BELT_PIN PIN2_12V
+//
+//bool switchOnBelts(void);
+//bool switchOffBelts(void);
 ///////////////////////////////////////////////////////////////
 
+//////////////////////////WALL////////////////////////////////
+#define WALL_CH 7
+#define WALL_IS_OPEN 0.05
+#define WALL_IS_CLOSED 0.123
+
+bool openWall(void);
+bool closeWall(void);
+///////////////////////////////////////////////////////////////
 
 #endif

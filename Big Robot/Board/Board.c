@@ -197,10 +197,11 @@ initCubeCatcherPID();
   conf_af(BTN10_PWM_PIN, AF9);
 
 
-  timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1); // 1000Hz
+  timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1);
   timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM10, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM9, 2*1667, MAX_PWM, 1, 1, 0, 0); // 50Hz
+  //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);
 
 //___PID_TIM________________________________________________________________
@@ -317,7 +318,8 @@ initCubeCatcherPID();
 //NVIC_EnableIRQ(I2C2_ER_IRQn);
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
 
-CloseCubesMovers();
+//CloseCubesMovers();
+closeWall();
 __enable_irq();
 
 }

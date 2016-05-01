@@ -529,23 +529,23 @@ switch(cmd->command)
   }
   break;
 
-  case 0x2D:  // Open cubes movers
-  {
-      OpenCubesMovers();
-
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x2E:  // Close  cubes movers
-  {
-      CloseCubesMovers();
-
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
+//  case 0x2D:  // Open cubes movers
+//  {
+//      OpenCubesMovers();
+//
+//      char * str ="Ok";
+//      sendAnswer(cmd->command,str, 3);
+//  }
+//  break;
+//
+//  case 0x2E:  // Close  cubes movers
+//  {
+//      CloseCubesMovers();
+//
+//      char * str ="Ok";
+//      sendAnswer(cmd->command,str, 3);
+//  }
+//  break;
 
   case 0x2F:  // Switch On the vibration
   {
@@ -575,23 +575,23 @@ switch(cmd->command)
   }
   break;
 
-  case 0x32:  // Switch On the belts
-  {
-      switchOnBelts();
-
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x33:  // Switch Off the belts
-  {
-      switchOffBelts();
-
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
+//  case 0x32:  // Switch On the belts
+//  {
+//      switchOnBelts();
+//
+//      char * str ="Ok";
+//      sendAnswer(cmd->command,str, 3);
+//  }
+//  break;
+//
+//  case 0x33:  // Switch Off the belts
+//  {
+//      switchOffBelts();
+//
+//      char * str ="Ok";
+//      sendAnswer(cmd->command,str, 3);
+//  }
+//  break;
 
   case 0x34:  // Starting command
   {
