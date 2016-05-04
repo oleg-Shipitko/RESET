@@ -105,13 +105,13 @@ def switch_off_vibration_table():
     reply_on_request = send_request(packet)
     return reply_on_request
 
-def switch_on_belts(): 
-    packet = packetBuilder.BuildPacket(commands_to_stm.switchOnBelts)
+def open_cubes_border(): 
+    packet = packetBuilder.BuildPacket(commands_to_stm.openCubeBorder)
     reply_on_request = send_request(packet)
     return reply_on_request
 
-def switch_off_belts(): 
-    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffBelts)
+def close_cubes_border(): 
+    packet = packetBuilder.BuildPacket(commands_to_stm.closeCubeBorder)
     reply_on_request = send_request(packet)
     return reply_on_request
 
