@@ -64,7 +64,7 @@ def update_di(answer):
 	while idxh <= len(dist4):
 		point = dist_val(dist4[idxl:idxh])
 		#strength = dist_val(dist4[idxh:idxh+3])
-		if dist_val(dist4[idxh:idxh+3]) > 1600:	
+		if dist_val(dist4[idxh:idxh+3]) > 1100 and point < 4000:	
 			polar_graph.append(point)
 			angle.append(step)
 		idxl = idxh + 3
@@ -154,7 +154,7 @@ def init_polar_plot():
 					marker=".", 
 					markersize=3, 
 					markerfacecolor="blue")
-	ax.set_rmax(3000)
+	ax.set_rmax(4000)
 	ax.set_theta_direction(1) #set to clockwise
 	ax.set_theta_offset(-np.pi/4) #offset by 90 degree so that 0 degree is at 12 o'clock
 	#ax.grid()
@@ -274,6 +274,7 @@ if __name__ == '__main__':
 				#angle = np.arange(0,len(dist4)/24.0,0.25)
 				#angle = np.radians(angle)
 				angle = deque()
+				stre = deque()
 				step = 0
 				print 'len angle ', len(angle)	
 				while idxh <= len(dist4):
@@ -282,9 +283,10 @@ if __name__ == '__main__':
 					if strength > maxs:
 						maxs = strength
 					#print 'strenght ', strength
-					if strength > 1600:	
+					if strength > 1100 and point < 4000:	
 						polar_graph.append(point)
 						angle.append(step)
+						stre.append(strength)
 					idxl = idxh + 3
 					idxh += 6		
 					step += np.radians(0.25)	
@@ -295,10 +297,9 @@ if __name__ == '__main__':
 				try:
 					update_polar_plot(angle, polar_graph)
 					print 'max strength ', maxs
-					print zip(angle, polar_graph)
+					print zip(angle, polar_graph, stre)
 				except:
-					pri
-nt 'not same length'	
+					print 'not same length'	
 		except KeyboardInterrupt:
 			s.shutdown(2)
 			s.close()	

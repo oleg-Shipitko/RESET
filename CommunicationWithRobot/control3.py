@@ -1,4 +1,3 @@
-import prob_motion_model as pmm
 from serial.tools import list_ports
 import numpy as np
 import serialWrapper 
@@ -10,10 +9,12 @@ import socket
 import math
 import random
 import traceback
-import ttest
-import matplotlib.pyplot as plt
- 
+from collections import deque
 # STM32 USB microcontroller ID
+#VID = 1155
+#PID = 22336
+#SNR = '336234893534'
+
 VID = 1155
 PID = 22336
 SNR = '336234893534'
@@ -29,64 +30,58 @@ WORLD_X = 3000
 WORLD_Y = 2000
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 BEACONS = [(-56,1000),(3062,-56),(3055,2014)]
-#BEACONS = [(2994,0),(2994,1996),(0,962)]
 
 
 class Robot(object):
-	def __init__(self):
-		self.x = random.gauss(1587, 50) 
-		self.y = random.gauss(349, 50) 
-		self.orientation = random.gauss(math.pi/2, 0.1)
-		# Dummy sensor noise
-		self.sense_noise = 50
-		self.sense_angle_noise = math.radians(5)
 
-	def set(self, new_x, new_y, new_orientation):
-		if new_x < 0 or new_x > WORLD_X:
-			pass
+	def __init__(self, first):
+		"""Initialize robot/particle with random position"""
+		if first:
+			self.x = random.gauss(514.0, 5) 
+			self.y = random.gauss(217.0, 5) 
+			self.orientation = 0.0
+
+	def set(self, x_new, y_new, orientation_new):
+		"""Set particle position on the field"""
+		if 0 <= x_new <= WORLD_X:
+			self.x = x_new
 		else:
-			self.x = new_x
-		if new_y < 0 or new_y > WORLD_Y:
-			pass
+			self.x = random.gauss(1587, 5) 
+		if 0 <= y_new <= WORLD_Y:
+			self.y = y_new
 		else:
-			self.y = new_y
-		self.orientation = new_orientation % (2 * math.pi)
+			self.y = random.gauss(349, 5)
+		self.orientation = orientation_new % (2 * math.pi)
 		
-	def move(self, rel_motion):
-		new_x, new_y, new_orientation = pmm.prob(self.pose(), rel_motion)	
-		new_robot = Robot()
-		new_robot.set(new_x, new_y, new_orientation)
+	def move(self, delta):
+		"""Move particle by creating new one and setting position"""
+		# From robot I get relative position. And I can do new relative minus 
+		# old relative to get displacement dx, dy, dtheta
+		#if delta[2] == 0:
+		x_new = self.x + delta[0] + random.gauss(0, 3)
+		y_new = self.y + delta[1] + random.gauss(0, 3)
+		orientation_new = self.orientation + delta[2] + random.gauss(0, 0.05)	
+		new_robot = Robot(False)
+		new_robot.set(x_new, y_new, orientation_new)
 		return new_robot
 
-	def r_motion(self):
-		"""Return robot current coordinates"""	
-		time.sleep(0.03)
-		packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
-		recievedPacket = computerPort.sendRequest(packet.bytearray)
-		old = recievedPacket.reply
-		#print 'old', old
-		time.sleep(0.03)
-		packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
-		recievedPacket = computerPort.sendRequest(packet.bytearray)
-		new = recievedPacket.reply
-		#print 'new', new
-		#print 'difference: ', [new[0]-old[0], new[1]-old[1],new[2]-old[2]]
-		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000,new[2]-old[2]]
-		
 	def pose(self):
 		return self.x, self.y, self.orientation
 
-	def weight(self, x_rob, y_rob):		
-		beacons = ttest.beacon_transform1(BEACONS, self.pose())
-		#bx = [beacons[0][0],beacons[1][0],beacons[2][0]]
-		#by = [beacons[0][1],beacons[1][1],beacons[2][1]]
-		#update_xy_plot(bx + x_rob, by+y_rob)	
+	def weight(self, x_rob, y_rob, BEACONS):			
+		temp_beac = [(beacon[0] - self.x, beacon[1] - self.y) for beacon in BEACONS]
+		beacons = [(math.cos(self.orientation)*beac[0] + math.sin(self.orientation)*beac[1],
+				-math.sin(self.orientation)*beac[0] + math.cos(self.orientation)*beac[1])
+				for beac in temp_beac]
 		beacon = [0, 0, 0]
 		num_point = [0, 0, 0]
 		for j in xrange(len(x_rob)):
-			l1 = abs(math.sqrt((beacons[0][0] - x_rob[j])**2 + (beacons[0][1] - y_rob[j])**2) - 40)
-			l2 = abs(math.sqrt((beacons[1][0] - x_rob[j])**2 + (beacons[1][1] - y_rob[j])**2) - 40)
-			l3 = abs(math.sqrt((beacons[2][0] - x_rob[j])**2 + (beacons[2][1] - y_rob[j])**2) - 40)
+			l1 = abs(math.sqrt((beacons[0][0] - x_rob[j])**2 + 
+					(beacons[0][1] - y_rob[j])**2) - 40)
+			l2 = abs(math.sqrt((beacons[1][0] - x_rob[j])**2 + 
+					(beacons[1][1] - y_rob[j])**2) - 40)
+			l3 = abs(math.sqrt((beacons[2][0] - x_rob[j])**2 + 
+					(beacons[2][1] - y_rob[j])**2) - 40)
 			lmin = l1
 			num = 0
 			if l2 < lmin:
@@ -98,13 +93,17 @@ class Robot(object):
 			beacon[num] += lmin
 			num_point[num] += 1
 		median =[(beacon[i]/num_point[i]) for i in xrange(3) if num_point[i] != 0]
-		return 1.0/sum(median)
-	
+		try:
+			return 1.0/sum(median)
+		except ZeroDivisionError:
+			return 0
+			
 	def __str__(self):
-		return 'Particle pose: x = %i mm, y = %i mm, theta = %.2f deg' \
+		return 'Particle pose: x = %.2f mm, y = %.2f mm, theta = %.2f deg' \
 			%(self.x, self.y, np.degrees(self.orientation))
-
 def init_lidar():
+	global myrobot
+	global p
 	global s
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	print 'test'	
@@ -119,125 +118,154 @@ def init_lidar():
 		time.sleep(0.1)
 	print 'Ready'
 
-def  lidar_scan():
+
+def localisation():
+	#relative_motion = [0,0,0]
+	#last_position
 	global myrobot
 	global p
 	global s
-	switch = True
-	
-	try:	
-		while switch:
-			rel_motion = myrobot.r_motion()
-			#print 'REL MOTION: ', rel_motion
-			if rel_motion[0] < 0.000001 and rel_motion[1] < 0.000001 and rel_motion[2] < 0.00000001:
+	global old
+	while 1:
+		try:
+			rel_motion, old = relative_motion()
+			print 'rel motion', rel_motion
+			if abs(rel_motion[0]) < 0.001 and abs(rel_motion[1]) < 0.001 and abs(rel_motion[2]) < 0.000001:
+				print 'Stopped moving'
 				print myrobot
-				break    
+				break 
+			start = time.time()		
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
-
 			s.send('GE0000108000\r')
 			data_lidar = s.recv(BUFFER_SIZE)
-			# Lidar sense - returns distance to 3 beacons
-			angle, distance = ttest.update_di2(data_lidar, myrobot.pose())
-			# Calculate the weights 			
-			x_rob, y_rob = ttest.p_trans(angle, distance) 			
-			w =[p[i].weight2(x_rob, y_rob) for i in xrange(N)]
+			angle, distance = lidar_scan(data_lidar, myrobot.pose()) 
+			x_rob, y_rob = p_trans(angle, distance)			
+			w =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
 			w = np.asarray(w)
 			w /= w.sum()
 			mean_orientation = mean_angl(p, w)
 			try:
-				# Probability random pick - use np.random alg
-				mean_val = [(p[i].x*w[i], p[i].y*w[i], p[i].orientation*w[i]) for i in xrange(len(p))]
+				mean_val = [(p[i].x*w[i], p[i].y*w[i]) for i in xrange(N)]
 				p3 = np.random.choice(p, N, p = w)
 				p = list(p3)
-	
 				center = np.sum(mean_val, axis = 0)
-				myrobot.x, myrobot.y, myrobot.orientation = center[0], center[1], mean_orientation
+				myrobot.set(center[0], center[1], mean_orientation)
 			except:
-				print 'error with choice'
-				pass			
-			print myrobot
-	except:			
-		print 'Traceback line in lidar: ' 
-		traceback.print_exc()
-		s.shutdown(2)			
-		s.close()
+				pass
+	
+			#print myrobot
+			end = time.time()
+			#print start - end
+		except:			
+			traceback.print_exc()
+			s.shutdown(2)			
+			s.close()
 
 def  lidar_scan2():
 	global myrobot
 	global p
 	global s
+	global old
 	iteration = int(raw_input('How many time to scan: '))
 	try:	
 		for numb in xrange(iteration):
-			rel_motion2 = myrobot.r_motion()
-			rel_motion = [rel_motion2[0]*1000, rel_motion2[1]*1000, rel_motion2[2]]
-			# Move particles	
+			rel_motion, old = relative_motion()
+			print rel_motion
+			start = time.time()		
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
-
 			s.send('GE0000108000\r')
 			data_lidar = s.recv(BUFFER_SIZE)
-			# Lidar sense - returns distance to 3 beacons
-			angle, distance = ttest.update_di2(data_lidar, myrobot.pose())
-			# Calculate the weights
-			x_rob, y_rob = ttest.p_trans(angle, distance) 			
-			w =[p[i].weight2(x_rob, y_rob) for i in xrange(N)]
+			angle, distance = lidar_scan(data_lidar, myrobot.pose()) 
+			x_rob, y_rob = p_trans(angle, distance)			
+			w =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
 			w = np.asarray(w)
 			w /= w.sum()
 			mean_orientation = mean_angl(p, w)
 			try:
-			# Probability random pick - use np.random alg
-				mean_val = [(p[i].x*w[i], p[i].y*w[i], p[i].orientation*w[i]) for i in xrange(len(p))]
-				max_w = np.max(w)
+				mean_val = [(p[i].x*w[i], p[i].y*w[i]) for i in xrange(N)]
 				p3 = np.random.choice(p, N, p = w)
 				p = list(p3)
-	
-				# Set myrobot to particle with max w
 				center = np.sum(mean_val, axis = 0)
-				myrobot.x, myrobot.y, myrobot.orientation = center[0], center[1], mean_orientation
+				myrobot.set(center[0], center[1], mean_orientation)
 			except:
-				print 'error with choice'
-				pass			
+				pass
+					
 			print myrobot
+			end = time.time()
+			print start - end
 	except:			
 		print 'Traceback line in lidar: ' 
 		traceback.print_exc()
 		s.shutdown(2)			
 		s.close()
 
-def mean_angl(particles, w):
-	x, y = 0, 0
-	for i, p in enumerate(particles):
-		x += w[i]*math.cos(p.orientation)
-		y += w[i]*math.sin(p.orientation)
+# Calculate robot orientation
+def mean_angl(p, w):
+	x = 0 
+	y = 0
+	for i in xrange(100):
+		x += w[i]*math.cos(p[i].orientation)
+		y += w[i]*math.sin(p[i].orientation)
 	angle = math.atan2(y,x)
 	if angle < 0:
 		return angle + (2*math.pi)
 	return angle
 
-def init_xy_plot():
-	""" setup an XY plot canvas """
-	plt.ion()
-	figure = plt.figure(figsize=(6, 4),
-						dpi=200,
-						facecolor="w",
-						edgecolor="k")
-	ax = figure.add_subplot(111)
-	lines, = ax.plot([],[],linestyle="none",
-						marker=".",
-						markersize=1,
-						markerfacecolor="blue")
-	ax.set_xlim(-200, 3000)
-	ax.set_ylim(-200, 2000)
-	ax.grid()
-	return figure, lines
+# Extract data form lidar scan
+def lidar_scan(answer, pose):		
+	answer = answer.split('\n')		
+	dist = answer[2:-2]
+	dist2 = [item[:-1] for item in dist]
+	dist4 = ''.join(dist2)			
+	step = 0 
+	idxh = 3 			
+	polar_graph = deque()
+	append_pg = polar_graph.append
+	angle = deque()	
+	append_a = angle.append
+	lend = len(dist4)
+	while idxh <= lend:
+		point = dist_val(dist4[idxh-3:idxh])
+		if dist_val(dist4[idxh:idxh+3]) > 1100 and point < 4000:	
+			append_pg(point)
+			append_a(step)
+		idxh += 6		
+		step += 0.004363323129985824
+	return angle, polar_graph
 
-def update_xy_plot(x, y):
-	""" re-draw the XY plot with new current_frame """
-	lines.set_xdata(x)
-	lines.set_ydata(y)
-	figure.canvas.draw()
+# Transforms lidar measurement to xy in robot coord sys
+def p_trans(agl, pit):
+	x_rob = [pit[i] * math.cos(angle5(agl[i])) for i in xrange(len(agl))]
+	y_rob = [pit[i] * math.sin(angle5(agl[i])) for i in xrange(len(agl))]
+	return x_rob, y_rob
+
+# Transforms lidar point angle in robot coord sys
+def angle5(angle):
+	if angle >= math.pi/4:
+		return angle - math.pi/4
+	else:
+		return angle + 7*math.pi/4
+
+# Calculate odometry elative motion
+def relative_motion():
+	"""Return robot current coordinates"""
+	global old
+	time.sleep(0.08)
+	print 'old', old
+	packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
+	recievedPacket = computerPort.sendRequest(packet.bytearray)
+	new = recievedPacket.reply
+	print 'new', new
+	return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]], new
+
+# Calculate dist and angle from raw lidar data
+def dist_val(value):	
+	try:	
+		return ((ord(value[0])-48)<<12)|((ord(value[1])-48)<<6)|(ord(value[2])-48)
+	except IndexError:	
+		return 0
 
 ####################
 #      CONTROL     #
@@ -283,6 +311,7 @@ def initPTC():
 def portNumber():
 	"""Find all ports, and returns one with defined STM values"""	
 	for port in list_ports.comports():
+		print port.serial_number, port.pid, port.vid
 		if (port.serial_number == SNR) and (port.pid == PID) and (port.vid == VID):	
 			return port.name
 
@@ -301,7 +330,7 @@ def globMov():
 	
 	if recievedPacket.reply != 'Ok':
 		raise Exception('add PointToStack failed')
-	lidar_scan()
+	localisation()
 
 def relMov(x = False, y = False, fi = False, speed = False):
 	"""Move robot relative to its current coord"""
@@ -328,7 +357,7 @@ def relMov(x = False, y = False, fi = False, speed = False):
 	recievedPacket = computerPort.sendRequest(packet.bytearray)
 	#old2 = [round(i,6) for i in oldCoord]
 	#old = oldCoord
-	lidar_scan()
+	localisation()
 	
 def setCoord():
 	print '\nSet current robot coordinates'	
@@ -388,12 +417,12 @@ commands = packetBuilder.CommandsList()
 # Connect to lidar 
 init_lidar()
 # Set Robot randomly 
-myrobot = Robot()
-myrobot.x, myrobot.y, myrobot.orientation = 1587.0, 349.0, math.pi/2
+myrobot = Robot(True)
+myrobot.x, myrobot.y, myrobot.orientation = 514.0, 217.0, 0.0
 print 'First: ', myrobot
 # Set N random particles
-p = [Robot() for i in xrange(N)]
-
+p = [Robot(True) for i in xrange(N)]
+old = [0.0, 0.0, 0.0]
 # Initialize PID, Trajectory and Kinematics
 initPTC()
 iteration = 0
@@ -407,7 +436,10 @@ while True:
 		print '\nList of available commands: \n1 Global Movement\n2 Relative Movement'\
 			'\n3 Set Coordinates\n4 Get Coordinates\n5 Stop Movement\n6 Lidar Scan' 	
 		command = int(raw_input('Command number: '))
-		print comm_list[command]()
+		if command == 1 or command == 2 or command == 6:
+			print comm_list[command]()
+		else:
+			print comm_list[command]()
 		print 'Command ended'
 	except:
 		print 'Traceback line in main: '

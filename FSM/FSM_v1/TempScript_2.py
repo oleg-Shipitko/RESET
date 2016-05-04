@@ -9,8 +9,6 @@ import math
 
 #TODO: Calculate number of cubes inside
 stateNumber = 0
-startTime = 0
-checkTime = 0
 
 def get_angles_diff(a1, a2):
     target = (a1 + 180) % 360 - 180
@@ -46,8 +44,7 @@ class BaseState(object):
                     return newState
     
     def check_for_enemy(self):
-        is_enemy = False
-        #is_enemy = robot.CheckForEnemy()
+        is_enemy = robot.CheckForEnemy()        
         if is_enemy:
             robot.StopRobot()
             robot.WaitForEnemyDesapearing()
@@ -55,38 +52,20 @@ class BaseState(object):
     
     def check_game_time(self):
         currentTime = time.time()
-        print "curTime: ", currentTime
-        print "strTime", startTime
-        print "diference: ", currentTime - startTime
-        if (currentTime - startTime >= 85 and checkTime == 1):
-            print "stop work"
-            robot.GoToPoint(0.8655, 0.915, -3.14)
-            time.sleep(1)
+        if (startTime - currentTime >= 88):
             robot.StopRobot()
-            
 		
     def execute(self):
         raise NotImplementedError
-        
-class OpenCubesManipulatorState(BaseState):
-    def __init__(self,angle):
-        self.angle = angle
-    
-    def Execute(self):
-        self.capturedCubes = robot.OpenCubeManipulator(self.angle) 
-       
-    def check_cubes_were_taken(self):
-       return GoToNextAction() 
 
 class CaptureCubesState(BaseState):
     def __init__(self, angle):
         self.angle = angle
         
     def Execute(self):
-        self.capturedCubes = robot.TakeCubes(self.angle) 
+        self.capturedCubes = robot.TakeCubes(self.angle)        
        
     def check_cubes_were_taken(self):
-       time.sleep(1)
        return GoToNextAction() 
 
 class ReleaseStickState(BaseState):
@@ -103,45 +82,6 @@ class RaiseStickState(BaseState):
 	def check_stick_was_raised(self):		
 		return GoToNextAction()
 
-class SwitchOnVibrationTableState(BaseState):
-	def Execute(self):
-		robot.robot.SwitchOnVibrateTable()
-	
-	def check_stick_was_released(self):		
-		return GoToNextAction()
-		
-class SwitchOffVibrationTableState(BaseState):
-	def Execute(self):
-		robot.robot.SwitchOffVibrationTable()
-	
-	def check_stick_was_raised(self):		
-		return GoToNextAction()
-
-class GetCurrentTimeState(BaseState):
-	def Execute(self):
-		global startTime
-		startTime = time.time()
-		global checkTime
-		checkTime = 1
-		print 'set strat time :',startTime 
-	
-	def check_time(self):		
-		return GoToNextAction()
-
-class SwitchOffBeltsState(BaseState):
-	def Execute(self):
-		robot.robot.SwitchOffBelts()
-	
-	def check_stick_was_released(self):		
-		return GoToNextAction()
-		
-class SwitchOnBeltsState(BaseState):
-	def Execute(self):
-		robot.robot.SwitchOnBelts()
-	
-	def check_stick_was_raised(self):		
-		return GoToNextAction()
-
 class UnloadAllCubesState(BaseState):
 	def Execute(self):
 		print "Use sucker"
@@ -151,10 +91,6 @@ class UnloadAllCubesState(BaseState):
 		print "Cube was sucked"
 		return 0
 
-class WaitUntillTheEndOfTheGame(BaseState):
-    def Execute(self):
-     print "Wait End"
-
  
 class PutDownCubesManipulatorState(BaseState):
     def Execute(self):
@@ -163,64 +99,25 @@ class PutDownCubesManipulatorState(BaseState):
     def check_time_wait(self):
         time.sleep(2)
         return GoToNextAction()
-        
-class CorrectCoordinatesState_1(BaseState):
-    def __init__(self, x, y, alpha):
-        self.x = x
-        self.y = y
-        self.alpha = alpha
-        
-    def Execute(self):
-        robot.GoToPoint(self.x, self.y, self.alpha)
-    
-    def check_coordinates(self):        
-        currentCoordinates = robot.GetRelative()        
-        if abs(currentCoordinates[0] - self.x) <= 0.005  and abs(currentCoordinates[1] - self.y) <=0.005 and abs(get_angles_diff(math.degrees(self.alpha),math.degrees(currentCoordinates[2]))) <= 1:
-            coordinates = (0.12, currentCoordinates[1], -1.57)
-            robot.robot.SetCoordinates(coordinates)
-            return GoToNextAction()
-            
-class CorrectCoordinatesState_2(BaseState):
-    def __init__(self, x, y, alpha):
-        self.x = x
-        self.y = y
-        self.alpha = alpha
-        
-    def Execute(self):
-        robot.GoToPoint(self.x, self.y, self.alpha)
-    
-    def check_coordinates(self):
-        currentCoordinates = robot.GetRelative()
-        if abs(currentCoordinates[0] - self.x) <= 0.005  and abs(currentCoordinates[1] - self.y) <=0.005 and abs(get_angles_diff(math.degrees(self.alpha),math.degrees(currentCoordinates[2]))) <= 1:
-            coordinates = (currentCoordinates[0], 0.12, -1.57)
-            robot.robot.SetCoordinates(coordinates)
-            return GoToNextAction()
-
+                
 class MoveToPointState(BaseState):
-    def __init__(self, x, y, alpha):
+    def __init__(self, x, y, alpha):                
         self.x = x
         self.y = y
         self.alpha = alpha
         
     def Execute(self):
-        print "Go to point ", self.x, self.y, self.alpha
-        robot.GoToPoint(self.x, self.y, self.alpha)
-        
-    def check_coordinates(self):        
-        currentCoordinates = robot.GetRelative()        
-        if abs(currentCoordinates[0] - self.x) <= 0.005  and abs(currentCoordinates[1] - self.y) <=0.005 and abs(get_angles_diff(math.degrees(self.alpha),math.degrees(currentCoordinates[2]))) <= 1:
-            print 'reached end point', currentCoordinates            
-            return GoToNextAction()
+        print "Go to point ", self.x, self.y, self.alpha      
+        robot.GoToPoint(self.x, self.y, self.alpha)    
   
     def check_coordinates(self):        
         currentCoordinates = robot.GetRelative()
         #robot.SetCorrectCoordinates(currentCoordinates)
         #print 'Displ: ', [abs(currentCoordinates[0] - self.x), abs(currentCoordinates[1] - self.y),abs(get_angles_diff(math.degrees(self.alpha),math.degrees(currentCoordinates[2])))]
-        if abs(currentCoordinates[0] - self.x) <= 0.005  and abs(currentCoordinates[1] - self.y) <=0.005 and abs(get_angles_diff(math.degrees(self.alpha),math.degrees(currentCoordinates[2]))) <= 1:
-            #time.sleep(2)
-            #ScurrentCoordinates = robot.GetCoordinates()
-            print 'erached end point', currentCoordinates
-            #robot.SetCorrectCoordinates(currentCoordinates)
+        if abs(currentCoordinates[0] - self.x) <= 0.02  and abs(currentCoordinates[1] - self.y) <=0.02 and abs(get_angles_diff(math.degrees(self.alpha),math.degrees(currentCoordinates[2]))) <= 4:
+            time.sleep(2)
+            currentCoordinates = robot.GetCoordinates()
+            robot.SetCorrectCoordinates(currentCoordinates)
             return GoToNextAction()
         #if abs(currentCoordinates[0] - self.x) <= 0.02  and abs(currentCoordinates[1] - self.y) <=0.02: 
         #    #robot.SetCorrectCoordinates(currentCoordinates)
@@ -266,8 +163,6 @@ class BigRobot(object):
         self.robot.globMov(x,y,alpha)
         
     def StopRobot(self):
-        self.robot.SwitchOffVibrationTable()
-        self.robot.SwitchOffBelts()
         self.robot.StopRobot()
 	
     def CheckForEnemy(self):
@@ -276,38 +171,31 @@ class BigRobot(object):
     def WaitForEnemyDesapearing():
         while(self.robot.CheckForEnemy()):
             time.sleep(1)
-        self.robot.ActivateRobotAfterStopping()	
+        self.robot.ActivateRobotAfterStopping()			
         
-    def GetCoordinates(self):
-        time.sleep(0.05)
-        #lock_val.acquire()
-        #print 'control in main'
-        coords = shared[:]
-        #lock_val.release()
-        return [(coords[0]-47.0)/1000, (coords[1]+20.0)/1000, coords[2]]
+        def GetCoordinates(self):
+            time.sleep(0.05)
+            #lock_val.acquire()
+            #print 'control in main'
+            coords = shared[:]
+            #lock_val.release()
+            return [(coords[0]-47.0)/1000, (coords[1]+20.0)/1000, coords[2]]
             
     def GetRelative(self):
         return self.robot.GetCurrentCoordinates()
         
     def SetCorrectCoordinates(self, coordinates):
         self.robot.SetCoordCont(coordinates)
-    
-    def OpenCubeManipulator(self, angle):
-        self.robot.OpenCubeCollector()
-        time.sleep(1)
-        self.robot.SetManipulatorAngle(angle)
-        time.sleep(1)
-                
+        
     def TakeCubes(self, manipulatorAngle):
         self.robot.OpenCubeCollector()
-        time.sleep(2)
-        self.robot.SetManipulatorAngle(manipulatorAngle)
-        time.sleep(3)
-        self.robot.CloseCubeCollector()
-        time.sleep(2)
-        self.robot.SetManipulatorAngle(290)
         time.sleep(1)
-        self.robot.SetManipulatorAngle(280)
+        self.robot.SetManipulatorAngle(manipulatorAngle)
+        time.sleep(2)
+        self.robot.CloseCubeCollector()
+        time.sleep(1)
+        self.robot.SetManipulatorAngle(270)
+        time.sleep(2)
         self.robot.OpenCubeCollector()
         
     def ThrowCubes(self):
@@ -351,64 +239,43 @@ class BigRobot(object):
 
 
 trajectory_right = [
-MoveToPointState(0.4244, 0.72, 0),
-MoveToPointState(0.4244, 0.935, 0), # start to move cubes
-GetCurrentTimeState(),
-MoveToPointState(1.161, 0.935, 0),
-MoveToPointState(0.4244, 0.935, 0),
-CorrectCoordinatesState_1(-0.03, 0.935, -1.57),
-#MoveToPointState(0.6025, 0.4375, 0),
+MoveToPointState(0.4244, 0.915, 0),
+MoveToPointState(1.161, 0.915, 0),
+MoveToPointState(0.4244, 0.915, 0),
+MoveToPointState(0.6025, 0.4375, 0),
 MoveToPointState(0.6025, 0.4375, -1.57),
-MoveToPointState(1.05, 0.4375, -1.57),
-CorrectCoordinatesState_2(1.085, -0.03, -1.57),#near cube
-MoveToPointState(1.08, 0.25, -1.57),
-MoveToPointState(0.94, 0.24, -1.57),
-OpenCubesManipulatorState(180),
-MoveToPointState(1.08, 0.25, -1.57),
-OpenCubesManipulatorState(275),
-MoveToPointState(0.97, 0.4, -1.57),
-MoveToPointState(0.97, 0.4, -1.8),
+MoveToPointState(1.032, 0.4375, -1.57),
+MoveToPointState(1.032, 0.4375, -1.8),
+MoveToPointState(1.032, 0.2755, -1.8),
 ReleaseStickState(),
-MoveToPointState(0.97, 0.22, -1.8),
-MoveToPointState(1.04, 0.23, -1.57),
-MoveToPointState(0.97, 0.26, -1.57),
+MoveToPointState(1.082, 0.2855, -1.57),
+MoveToPointState(1.022, 0.2855, -1.57),
 RaiseStickState(),
+CaptureCubesState(180),
 CaptureCubesState(165),
-SwitchOnVibrationTableState(),
-MoveToPointState(0.97, 0.27, -1.57),
-CaptureCubesState(125),
-SwitchOffVibrationTableState(),
+CaptureCubesState(130),
 MoveToPointState(0.962, 0.4375, -1.57),
 MoveToPointState(0.6025, 0.4375, -1.57),
-
-MoveToPointState(0.65, 0.11, -1.57), # clse the doors
-MoveToPointState(0.65, 0.18, -1.57),
-MoveToPointState(0.35, 0.18, -1.57),
-MoveToPointState(0.35, 0.11, -1.57),
-
-MoveToPointState(0.6025, 0.4375, -3.14),#
-MoveToPointState(0.6025, 0.915, -3.14),
-MoveToPointState(0.9655, 0.915, -3.14),
-SwitchOnVibrationTableState(),
-SwitchOnBeltsState(),
-WaitUntillTheEndOfTheGame()]
+MoveToPointState(0.6025, 0.4375, 0),
+MoveToPointState(0.6025, 0.915, 0),
+MoveToPointState(0.9655, 0.915, 0)]
 
 trajectory_left = [
-MoveToPointState(2.847, 0.72, 0),
-MoveToPointState(2.6, 0.915, 0),
-MoveToPointState(1.855, 0.915, 0),
-MoveToPointState(2.326, 0.915, 0),
-MoveToPointState(2.326, 0.915, -1.57),
-MoveToPointState(2.326, 0.352, -1.57),
-#CaptureCubesState(130),
-MoveToPointState(2.175, 0.352, -1.57),
-#CaptureCubesState(270),
-MoveToPointState(2.013, 0.352, -1.57),
-MoveToPointState(2.013, 0.312, -1.57),
-MoveToPointState(2.013, 0.362, -1.57),
-MoveToPointState(2.625, 0.951, -1.57),
-MoveToPointState(2.625, 0.951, -3.14),
-MoveToPointState(2.043, 0.251, -3.14)]
+MoveToPointState(2.886, 0.788, 3.14),
+MoveToPointState(2.6, 0.985, 3.14),
+MoveToPointState(1.915, 0.985, 3.14),
+MoveToPointState(2.600, 0.985, 3.14),
+MoveToPointState(2.588, 0.193, 3.14),
+MoveToPointState(2.389, 0.183, 3.14),
+MoveToPointState(2.311, 0.449, 3.14),
+MoveToPointState(2.311, 0.449, -1.57),
+MoveToPointState(1.991, 0.527, -1.57),
+MoveToPointState(1.991, 0.308, -1.57),
+MoveToPointState(1.991, 0.527, -1.57),
+MoveToPointState(2.311, 0.449, -1.57),
+MoveToPointState(2.600, 0.985, 3.14),
+MoveToPointState(2.600, 0.985, 0),
+MoveToPointState(2.088, 0.92, 0)]
 
 '''if GetPlayingFieldSide is 0:
 	trajectoryPoints = trajectoryPoints_left
@@ -440,11 +307,11 @@ shared = multiprocessing.Array('d', [0.0, 0.0, 0.0], lock = False)
 robot = BigRobot(lock)
 computerPort = robot.robot.computerPort
 commands = robot.robot.commands
-#l = multiprocessing.Process(target=lidar3.localisation, args =(lock, lock_val, shared, computerPort, commands))
-#l.start()
+l = multiprocessing.Process(target=lidar3.localisation, args =(lock, lock_val, shared, computerPort, commands))
+l.start()
 time.sleep(2)
 startTime = time.time()
 currentState = trajectoryPoints[stateNumber]
 while currentState is not 0:    
-    #raw_input("Press enter...")
+    raw_input("Press enter...")
     currentState = currentState.run()

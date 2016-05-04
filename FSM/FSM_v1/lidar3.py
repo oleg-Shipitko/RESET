@@ -53,8 +53,8 @@ class Robot(object):
 	def __init__(self, first):
 		"""Initialize robot/particle with random position"""
 		if first:
-			self.x = random.gauss(514.0, 5) 
-			self.y = random.gauss(951.0, 5) 
+			self.x = random.gauss(199.5, 5) 
+			self.y = random.gauss(700.0, 5)  
 			self.orientation = random.gauss(0.0, 0.1)
 
 	def set(self, x_new, y_new, orientation_new):
@@ -62,11 +62,11 @@ class Robot(object):
 		if 0 <= x_new <= WORLD_X:
 			self.x = x_new
 		else:
-			self.x = random.gauss(1587, 5) 
+			self.x = random.gauss(151.0, 5) 
 		if 0 <= y_new <= WORLD_Y:
 			self.y = y_new
 		else:
-			self.y = random.gauss(349, 5)
+			self.y = random.gauss(756.5, 5)
 		self.orientation = orientation_new % (2 * math.pi)
 		
 	def move(self, delta):
@@ -171,12 +171,13 @@ def angle5(angle):
 def relative_motion(old, computerPort, commands, lock):
 		"""Return robot current coordinates"""	
 		#print 'old', old
-		time.sleep(0.05)
+		#time.sleep(0.05)
 		packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
 		with lock:
+			#print 'lidar has lock'
 			recievedPacket = computerPort.sendRequest(packet.bytearray)
 		new = recievedPacket.reply	
-		#print 'new', new
+		#print 'new=========', new
 		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]], new
 
 # Calculate dist and angle from raw lidar data
@@ -187,8 +188,9 @@ def dist_val(value):
 		return 0	
 	
 # Localisation
-def localisation(lock, shared, computerPort, commands):
+def localisation(lock, lock_val, shared, computerPort, commands):
 	lock = lock
+	lock_val = lock_val
 	shared = shared
 	computerPort = computerPort 
 	commands = commands
@@ -207,10 +209,10 @@ def localisation(lock, shared, computerPort, commands):
 		time.sleep(0.1)
 	
 	myrobot = Robot(True)
-	myrobot.x, myrobot.y, myrobot.orientation = 514.0, 951.0, 0.0
-	#print myrobot
+	myrobot.x, myrobot.y, myrobot.orientation = 199.5, 700.0, 0.0
+	print myrobot
 	p = [Robot(True) for i in xrange(N)]
-	old = [0.0, 0.0, 0.0]
+	old = [152.5, 720.0, 0.0]
 	try:
 		while 1:
 			rel_motion, old2 = relative_motion(old, computerPort, commands, lock)
@@ -232,6 +234,7 @@ def localisation(lock, shared, computerPort, commands):
 				w /= w.sum()
 			else: 
 				w = np.zeros(100)
+				print 'zero weights in lidar'
 			mean_orientation = mean_angl(p, w)
 			try:
 				mean_val = [(p[i].x*w[i], p[i].y*w[i]) for i in xrange(N)]
@@ -241,11 +244,17 @@ def localisation(lock, shared, computerPort, commands):
 				myrobot.set(center[0], center[1], mean_orientation)
 			except:
 				pass
-            
-			with shared.get_lock():
-				shared[0] = myrobot.x
-				shared[1] = myrobot.y
-				shared[2] = myrobot.orientation
+			#packet2 = packetBuilder.BuildPacket(commands.setCorectCoordinates, [myrobot.x/1000, myrobot.y/1000, myrobot.orientation])
+			#with lock:
+			#print 'lidar has lock'
+			#	recievedPacket = computerPort.sendRequest(packet2.bytearray)
+			#lock_val.acquire()
+				#print 'control in lidar'
+			#print myrobot
+			shared[0] = myrobot.x
+			shared[1] = myrobot.y
+			shared[2] = myrobot.orientation
+			#lock_val.release()
 			#end = time.time()
 			#print start - end
 	except:			

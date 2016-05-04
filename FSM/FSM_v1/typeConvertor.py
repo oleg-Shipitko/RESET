@@ -33,8 +33,7 @@ class TypeConvertor(object):
 		for index in range(0, len(stringArray)):
 			if index % 2 == 1:
 				invertedArray = stringArray[index - 1: index + 1] + invertedArray
-		return invertedArray		
-
+		return invertedArray
 
 
 

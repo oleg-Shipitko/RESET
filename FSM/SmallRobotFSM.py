@@ -2,7 +2,7 @@ import packetBuilder
 import robotInitialization
 import BigRobotTrajectories
 import time
-#import lidar
+import lidar2
 import traceback
 
 #GLOBAL VARIABLES:

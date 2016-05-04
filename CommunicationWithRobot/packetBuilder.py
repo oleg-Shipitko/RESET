@@ -28,7 +28,7 @@ class BuildPacket(object):
 	def GetParametersInHexForm(self, comand, parameters):
 		if comand == CommandsList.echo:
 			return self.GetByteStringFormString(parameters)
-		elif comand == CommandsList.setCoordinates:
+		elif comand == CommandsList.setCoordinates or comand == CommandsList.setCorectCoordinates:
 			return self.GetByteStringFromFloatList(parameters)
 		elif comand == CommandsList.dutyCycle:
 			return self.typeConvertor.IntToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1])
@@ -126,9 +126,11 @@ class CommandsList(object):
 	switchOffPid = 0x23
 	switchOnPid = 0x24
 	stopAllMotors = 0x29
-
-	# TODO: implement commands listed below
-	setManipulatorState = 0x25
+	setCorectCoordinates = 0x25
+	
+	# TODO: playing field side
+	# TODO: beginning of the competition sign
+	# TODO: implement commands listed below	
 	getManipulatorState = 0x26
 	changeSuckerState = 0x27	#expected parameters: int[1]
 	uploadPuck = 0x28

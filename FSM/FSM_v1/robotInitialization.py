@@ -5,16 +5,16 @@ import sys
 import time
 from serial.tools import list_ports
 import socket
+import multiprocessing
 
-VID = '0483'
-PID = '5740'
-SNR = '336234893534'
+VID = 1155
+PID = 22336
+SNR = '3677346C3034'
 
 class BigRobot(object):
 
     def __init__(self, initialCoordinates, lock):
         portNumber = self.GetPortNumber()	
-        #self.computerPort = serialWrapper.SerialWrapper("/dev/ttyACM2")
         self.computerPort = serialWrapper.SerialWrapper(portNumber)
         self.commands = packetBuilder.CommandsList()
         self.lock = lock
@@ -64,18 +64,24 @@ class BigRobot(object):
 		
 		self.SetCoordinates(initialCoordinates)	
         
-    def GetPortNumber(self):        
-        """Find all ports, and returns one with defined STM values"""	
+    def GetPortNumber(self):
         for port in list_ports.comports():
-		print port[2]
-		if port[2] == "USB VID:PID=0483:5740 SER=336234893534 LOCATION=1-3.3.2":
-			return port[0]            
+            print port.serial_number, port.pid, port.vid
+            if (port.serial_number == SNR) and (port.pid == PID) and (port.vid == VID):	
+                return ('/dev/'+ port.name)
     
     def SetCoordinates(self, coordinates):
+        print 'set this: ', coordinates
         packet = packetBuilder.BuildPacket(self.commands.setCoordinates, coordinates)
         with self.lock:
 			recievedPacket = self.computerPort.sendRequest(packet.bytearray)
-	    
+    
+    def SetCoordCont(self,coordinates):
+        print 'Set coord: ', coordinates
+        packet = packetBuilder.BuildPacket(self.commands.setCorectCoordinates, coordinates)
+        with self.lock:
+			recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+    
     def GetPlayingFieldSide(self):
         return 0
     
@@ -89,7 +95,7 @@ class BigRobot(object):
         return recievedPacket.GetReply()
     
     def StopRobot(self):
-        packet = packetBuilder.BuildPacket(self.commands.switchOffKinematicCalculation)
+        packet = packetBuilder.BuildPacket(self.commands.switchOffTrajectoryRegulator)
         recievedPacket = self.computerPort.sendRequest(packet.bytearray)
         movementSpeed = [0, 0, 0]	
         packet = packetBuilder.BuildPacket(self.commands.setMovementSpeed, movementSpeed)
@@ -97,36 +103,102 @@ class BigRobot(object):
 			recievedPacket = self.computerPort.sendRequest(packet.bytearray)
     
     def CheckForEnemy(self):
-        '''packet = packetBuilder.BuildPacket(self.commands.getADCPinState, 1)
+        packet_1 = packetBuilder.BuildPacket(self.commands.getADCPinState, 2)
+        packet_2 = packetBuilder.BuildPacket(self.commands.getADCPinState, 3)
+        packet_3 = packetBuilder.BuildPacket(self.commands.getADCPinState, 4)
+        packet_4 = packetBuilder.BuildPacket(self.commands.getADCPinState, 5)
         with self.lock:
-            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
-        value = recievedPacket * 0.0822 * 2.54;
-	
-        if value < 5:
-            return true'''    
-        return False
-		
-    def RelativeMovement(self, coordinates):
-        dsplcmnt = [coordinates[0], coordinates[1], coordinates[2], 1]
-        startT = time.time()	
-        oldCoord = self.GetCurrentCoordinates()
-        newCoord = [oldCoord[0] + dsplcmnt[0], oldCoord[1] + dsplcmnt[1], oldCoord[2] + dsplcmnt[2], 1]
-        endT = time.time()		
+            right = self.computerPort.sendRequest(packet_1.bytearray).reply * 0.0822 * 2.54
+            back = self.computerPort.sendRequest(packet_2.bytearray).reply * 0.0822 * 2.54
+            left = self.computerPort.sendRequest(packet_3.bytearray).reply * 0.0822 * 2.54
+            front = self.computerPort.sendRequest(packet_4.bytearray).reply * 0.0822 * 2.54
+        return 	front, left, back, right
+        
+    def RelativeMovement(self, coordinates,currentCoordinates):
+        dsplcmnt = [coordinates[0], coordinates[1], coordinates[2], 1]	
+        oldCoord = currentCoordinates
+        newCoord = [oldCoord[0] + dsplcmnt[0], oldCoord[1] + dsplcmnt[1], oldCoord[2] + dsplcmnt[2], 1]	
         packet = packetBuilder.BuildPacket(self.commands.addPointToStack, newCoord)
         with self.lock:	
             recievedPacket = self.computerPort.sendRequest(packet.bytearray)
 			
     def globMov(self, x, y, fi):
         coordinates = [x, y, fi, 1]	
-        packet = packetBuilder.BuildPacket(commands.addPointToStack, coordinates)
-        with lock:
-            recievedPacket = computerPort.sendRequest(packet.bytearray)		
+        packet = packetBuilder.BuildPacket(self.commands.addPointToStack, coordinates)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)		
 	
     def ActivateRobotAfterStopping(self):
         packet = packetBuilder.BuildPacket(self.commands.switchOnKinematicCalculation)
         with self.lock:
             recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+    
+    def ReleaseCubeMoovers(self):
+        packet = packetBuilder.BuildPacket(self.commands.releaseCubeMoovers)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
 	
+    def RaiseCubeMoovers(self):
+        packet = packetBuilder.BuildPacket(self.commands.raiseCubeMoovers   )
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+        
+    def SetManipulatorAngle(self, angle):
+        packet = packetBuilder.BuildPacket(self.commands.setManipulatorAngle, angle)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+    
+    def CloseCubeCollector(self):
+        packet = packetBuilder.BuildPacket(self.commands.closeCubeCollector)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def OpenCubeCollector(self):
+        packet = packetBuilder.BuildPacket(self.commands.openCubeCollector)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def SwitchOnVibrationTable(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOnVibrationTable)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def SwitchOnBelts(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOnBelts)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def SwitchOffBelts(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOffBelts)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def StartGame(self):
+        packet = packetBuilder.BuildPacket(self.commands.startGame)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def SwitchOnVibrateTable(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOnVibrationTable)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+    
+    def SwitchOffVibrationTable(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOffVibrationTable)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def SwitchOffBelts(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOffBelts)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+            
+    def SwitchOnBelts(self):
+        packet = packetBuilder.BuildPacket(self.commands.switchOnBelts)
+        with self.lock:
+            recievedPacket = self.computerPort.sendRequest(packet.bytearray)
+    
+        
     def translation(self, ruler, robot_global):
 		"""Translates points from origin coord system, to left point coord
 		system coordnate system. New coord sys is paralel with X and Y axis, 
