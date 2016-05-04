@@ -30,9 +30,9 @@ float ACCEL_INC = 0.2;
  TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,stopRotFast,0,1 },  //Стек точек траектории
-                                        {1.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,stopRotFast,0,1 },
-                                        {1.0, 0.5, 0.0, NULL,NULL,0,normalVelFast,stopRotFast,0,1 },
-                                        {1.5, 0.5, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {30.5, 0.0, 0.0, NULL,NULL,0,normalVelFast,stopRotFast,0,1 },
+                                        {0.5, 0.5, 0.0, NULL,NULL,0,normalVelFast,stopRotFast,0,1 },
+                                        {0.0, 0.5, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
@@ -41,7 +41,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFas
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 0;// последняя активная точка в очереди
+char lastPoint = 1;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 float normalVelFast[5] = {0.3, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение

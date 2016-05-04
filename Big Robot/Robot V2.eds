@@ -2,20 +2,11 @@
 <EmBlocks_debug_session>
 	<debuggerLastSession>
 		<watches>
-			<watch key="**encCnt" format="0" array="0" start="0" count="0" />
-			<watch key="CurSpeed" format="0" array="0" start="0" count="0" />
-			<watch key="TargSpeed" format="0" array="0" start="0" count="0" />
 			<watch key="adcData" format="0" array="1" start="0" count="0" />
-			<watch key="adcData[(char)CUBES_CATCHER_ADC - 1] * 360.0 / 4096.0" format="0" array="0" start="0" count="0" />
-			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
 			<watch key="curState" format="0" array="0" start="0" count="0" />
-			<watch key="dir" format="0" array="0" start="0" count="0" />
-			<watch key="lastPoint" format="0" array="0" start="0" count="0" />
-			<watch key="motorSpeed" format="0" array="0" start="0" count="0" />
-			<watch key="pwm" format="0" array="0" start="0" count="0" />
+			<watch key="distance" format="0" array="0" start="0" count="0" />
 			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
-			<watch key="speed" format="0" array="0" start="0" count="0" />
-			<watch key="temp" format="0" array="0" start="0" count="0" />
+			<watch key="robotSpeed" format="0" array="0" start="0" count="0" />
 			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
 		</watches>
 	</debuggerLastSession>

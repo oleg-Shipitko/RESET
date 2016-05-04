@@ -343,7 +343,7 @@ initCubeCatcherPID();
 //  NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 //___Dynamixel IO control____________________________________________________________________
-//  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
+// conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, PULL_DOWN);
 
 //___I2C_____________________________________________________________________
 //conf_af(I2C_SDA_PIN, AF4);

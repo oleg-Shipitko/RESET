@@ -22,12 +22,34 @@ float motorCoord[4] = {0,0,0};      // общий пройденный коле�
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
 robStateStruct curState = {1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
-float distance[4] = {0,0,0,0};                      // расстояния по показаниям дальномеров
+float distance[4][3] = {{100, 100, 100}, {100, 100, 100}, {100, 100, 100}, {100, 100, 100}};                      // расстояния по показаниям дальномеров
+float distance_front = 100;
 
 uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
 
 //extern CDC_IF_Prop_TypeDef  APP_FOPS;
+
+void getSonarData(char ADC_ch, char side) // Reads data from ADC, filter with running mean (window = 3) it and transfers to cm
+{
+    // side:
+    // 0 - right
+    // 1 - left
+    // 2 - front
+    // 3 - back
+
+    distance[side][2] = distance[side][1];
+    distance[side][1] = distance[side][0];
+    distance[side][0] = (adcData[ADC_ch - 1] * 0.0822 * 2.54 + distance[side][1] + distance[side][2]) / 3.0;
+}
+
+void stopTheRobot(void)
+{
+    curState.trackEn = 0;
+    vTargetGlob[0] = 0;
+    vTargetGlob[1] = 0;
+    vTargetGlob[2] = 0;
+}
 
 char execCommand(InPackStruct* cmd) //обработать входящую команду
 {
@@ -529,23 +551,23 @@ switch(cmd->command)
   }
   break;
 
-//  case 0x2D:  // Open cubes movers
-//  {
-//      OpenCubesMovers();
-//
-//      char * str ="Ok";
-//      sendAnswer(cmd->command,str, 3);
-//  }
-//  break;
-//
-//  case 0x2E:  // Close  cubes movers
-//  {
-//      CloseCubesMovers();
-//
-//      char * str ="Ok";
-//      sendAnswer(cmd->command,str, 3);
-//  }
-//  break;
+  case 0x2D:  // Open wall
+  {
+      openWall();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x2E:  // Close wall
+  {
+      closeWall();
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
 
   case 0x2F:  // Switch On the vibration
   {
@@ -572,42 +594,6 @@ switch(cmd->command)
 
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-//  case 0x32:  // Switch On the belts
-//  {
-//      switchOnBelts();
-//
-//      char * str ="Ok";
-//      sendAnswer(cmd->command,str, 3);
-//  }
-//  break;
-//
-//  case 0x33:  // Switch Off the belts
-//  {
-//      switchOffBelts();
-//
-//      char * str ="Ok";
-//      sendAnswer(cmd->command,str, 3);
-//  }
-//  break;
-
-  case 0x34:  // Starting command
-  {
-      if (pin_val (EXTI2_PIN))
-      {
-        char * str = "1";
-        sendAnswer(cmd->command,str, 2);
-        __enable_irq();
-
-      }
-      else
-      {
-        char * str = "0";
-        sendAnswer(cmd->command,str, 2);
-      }
-
   }
   break;
 

@@ -92,6 +92,11 @@ extern char inData[64];
 extern char dataIndex;
 extern struct InPackStruct;
 
+extern float distance[4][3];
+extern float distance_front;
+
 char execCommand(InPackStruct* cmd);
+void getSonarData(char ADC_ch, char side);
+void stopTheRobot(void);
 
 #endif
