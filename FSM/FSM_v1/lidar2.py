@@ -6,23 +6,33 @@ import random
 import traceback
 from collections import deque
 
+
 ##############################
 ## Hokuyo socket parameters ##
 ## Should go into main prog ##
 ##############################
-TCP_IP = '192.168.0.10'
-TCP_PORT = 10940
+#TCP_IP = '192.168.0.10'
+#TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 
 # Initialize socket connection
 # HAS TO GO INTO MAIN PROG
-
+#s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)	
+#s.connect((TCP_IP, TCP_PORT))
+#time.sleep(0.1)
+#s.send('BM\r')
+#data = s.recv(BUFFER_SIZE)
+#time.sleep(0.1)	
+#for i in xrange(3):
+#	s.send('GE0000108000\r')
+#	data = s.recv(BUFFER_SIZE)
+#	time.sleep(0.1)
 # Initialize robot and particles
 # HAS TO GO INTO MAIN PROG
 #myrobot = Robot(True)
 #myrobot.x, myrobot.y, myrobot.orientation = 1587.0, 349.0, 0
 #p = [Robot(True) for i in xrange(N)]
-
+old = [151.0, 920.0, 0.0]
 N = 100
 # Dimensions of the playing field  
 WORLD_X = 3000
@@ -35,8 +45,8 @@ class Robot(object):
 	def __init__(self, first):
 		"""Initialize robot/particle with random position"""
 		if first:
-			self.x = random.gauss(800.0, 5) 
-			self.y = random.gauss(1200.0, 5) 
+			self.x = random.gauss(151.0, 5) 
+			self.y = random.gauss(920.0, 5) 
 			self.orientation = 0.0
 
 	def set(self, x_new, y_new, orientation_new):
@@ -65,9 +75,6 @@ class Robot(object):
 
 	def pose(self):
 		return self.x, self.y, self.orientation
-		
-	def pose_str(self):
-		return '%i, %i, %i' %(self.x, self.y, self.orientation)
 
 	def weight(self, x_rob, y_rob, BEACONS):			
 		temp_beac = [(beacon[0] - self.x, beacon[1] - self.y) for beacon in BEACONS]
@@ -94,7 +101,10 @@ class Robot(object):
 			beacon[num] += lmin
 			num_point[num] += 1
 		median =[(beacon[i]/num_point[i]) for i in xrange(3) if num_point[i] != 0]
-		return 1.0/sum(median)
+		try:
+			return 1.0/sum(median)
+		except ZeroDivisionError:
+			return 0
 
 	def __str__(self):
 		return 'Particle pose: x = %.2f mm, y = %.2f mm, theta = %.2f deg' \
@@ -150,15 +160,14 @@ def angle5(angle):
 		return angle + 7*math.pi/4
 
 # Calculate odometry elative motion
-def relative_motion():
+def relative_motion(robot):
 		"""Return robot current coordinates"""	
-		packet = packetBuilder.BuildPacket(commands.getCurentCoordinates)	
-		recievedPacket = computerPort.sendRequest(packet.bytearray)
-		old = recievedPacket.reply
-		time.sleep(0.03)	
-		recievedPacket = computerPort.sendRequest(packet.bytearray)
-		new = recievedPacket.reply
-		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]]
+		global old
+		print 'old', old
+		time.sleep(0.05)
+		new = robot.robot.GetCurrentCoordinates()	
+		print 'new', new
+		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]], new
 
 # Calculate dist and angle from raw lidar data
 def dist_val(value):	
@@ -168,33 +177,27 @@ def dist_val(value):
 		return 0	
 
 # Localisation
-def localisation(lock,shared):
-	relative_motion = [0,0,0]
-	print 'here'
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)	
-	s.connect((TCP_IP, TCP_PORT))
-	print '2'
-	time.sleep(0.1)
-	s.send('BM\r')
-	data = s.recv(BUFFER_SIZE)
-	time.sleep(0.1)	
-	for i in xrange(3):
-		s.send('GE0000108000\r')
-		data = s.recv(BUFFER_SIZE)
-		time.sleep(0.1)
-	
-
-	myrobot = Robot(True)
-	myrobot.x, myrobot.y, myrobot.orientation = 800.0, 1200.0, 0
-	p = [Robot(True) for i in xrange(N)]
-	while 1:
+def localisation(robot, myrobot, p):
+	#relative_motion = [0,0,0]
+	#last_position
+    global old
+    myrobot2 = myrobot
+    print 'first one', myrobot2
+    p = p
+    #myrobot = Robot(True)
+    #myrobot.x, myrobot.y, myrobot.orientation = 151.0, 920.0, 0
+    #p = [Robot(True) for i in xrange(N)]
+    while 1:
 		try:
-			#relative_motion = relative_motion()
+			rel_motion, old = relative_motion(robot)
+			if abs(rel_motion[0]) < 0.001 and abs(rel_motion[1]) < 0.001 and abs(rel_motion[2]) < 0.000001:
+				print 'Stopped moving'
+				return myrobot2.x, myrobot2.y, myrobot2.orientation, myrobot2, p
 			#start = time.time()		
-			p2 = [p[i].move(relative_motion) for i in xrange(N)]
+			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
-			s.send('GE0000108000\r')
-			data_lidar = s.recv(BUFFER_SIZE)
+			robot.robot.s.send('GE0000108000\r')
+			data_lidar = robot.robot.s.recv(BUFFER_SIZE)
 			angle, distance = lidar_scan(data_lidar, myrobot.pose()) 
 			x_rob, y_rob = p_trans(angle, distance)			
 			w =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
@@ -206,44 +209,23 @@ def localisation(lock,shared):
 				p3 = np.random.choice(p, N, p = w)
 				p = list(p3)
 				center = np.sum(mean_val, axis = 0)
-				myrobot.set(center[0], center[1], mean_orientation)
+				myrobot2.set(center[0], center[1], mean_orientation)
 			except:
 				pass
-				
-			#with lock:
-			#	print myrobot
-			with shared.get_lock():
-				shared[0] = myrobot.x
-				shared[1] = myrobot.y
-				shared[2] = myrobot.orientation
-			#gui = socket.socket()
-			#gui.connect(('192.168.1.146', 9090))
-			#gui.send(myrobot.pose_str())
+            
+			print 'second one', myrobot2
 			#end = time.time()
 			#print start - end
-		except:
-			with lock:		
-				traceback.print_exc()
-			s.shutdown(2)			
-			s.close()
-if __name__ == '__main__':
-	try:
-		#s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)	
-		#s.connect((TCP_IP, TCP_PORT))
-		#time.sleep(0.1)
-		#s.send('BM\r')
-		#data = s.recv(BUFFER_SIZE)
-		#time.sleep(0.1)	
-		#for i in xrange(3):
-		#	s.send('GE0000108000\r')
-		#	data = s.recv(BUFFER_SIZE)
-		#	time.sleep(0.1)
-	
-		#myrobot = Robot(True)
-		#myrobot.x, myrobot.y, myrobot.orientation = 524.0, 225.0, 0
-		#p = [Robot(True) for i in xrange(N)]
-		localisation()
-	except:			
-		traceback.print_exc()
-		s.shutdown(2)
-		s.close()
+		except:			
+			traceback.print_exc()
+			robot.robot.s.shutdown(2)			
+			robot.robot.s.close()
+#try:
+#	myrobot = Robot(True)
+#	myrobot.x, myrobot.y, myrobot.orientation = 524.0, 225.0, 0
+#	p = [Robot(True) for i in xrange(N)]
+#	localisation(myrobot, p, s)
+#except:			
+#	traceback.print_exc()
+#	s.shutdown(2)			
+#	s.close()

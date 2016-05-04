@@ -29,11 +29,10 @@ class SerialWrapper(object) :
 		requestRecieved = False
 		recievedPacket = ""
 
-		#startT1 = time.time()
+		startT1 = time.time()
 		while (requestRecieved == False): # and (time.time() - sendRequestTime) < timeout):
 			bytesToRead = self.SerialPort.inWaiting()
-			#print 'First bytes: ', bytesToRead
-			#print 'hi'
+			#print 'First bytes: ', bytesToRead			
 			if bytesToRead > 0:
 				time.sleep(0.01)
 				bytesToRead2 = self.SerialPort.inWaiting()	
@@ -49,8 +48,7 @@ class SerialWrapper(object) :
 
 		if recievedPacket == "" or requestRecieved == False:
 			raise Exception("Reply was not recieved")			
-		#endT1 = time.time()
-		#print 'While loop ', (endT1 - startT1)
+		endT1 = time.time()		
 		return recievedPacket
 
 

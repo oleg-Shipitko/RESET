@@ -163,16 +163,11 @@ class BigRobot(object):
             time.sleep(1)
         self.robot.ActivateRobotAfterStopping()			
             
-    def GetCoordinates(self):
-        return self.robot.GetCurrentCoordinates()
-        #global lidar_robot
-        #global particle
-        #x, y, alfa, lidar_robot2, particle2 = lidar2.localisation(robot, lidar_robot, particle)
-        #lidar_robot = lidar_robot2
-        #particle = particle2
-        #return x/1000, y/1000, alfa
-        #pass
-		
+    def GoToPoint(self, x, y, alpha):
+        currentCoordinates = self.robot.GetCurrentCoordinates()
+        desiredRelativeCoordinates = [x - currentCoordinates[0], y - currentCoordinates[1], alpha - currentCoordinates[2]]
+        self.robot.RelativeMovement(desiredRelativeCoordinates)
+        
     def TakeCubes(self):
     	print "PickUpCubesManipulator"
         print "OpenCubesManipulator"
@@ -241,23 +236,13 @@ else:
 	trajectoryPoints = trajectoryPoints_right'''
 
 trajectoryPoints = trajectoryPoints_left
-
-robot = BigRobot()
-#l = multiprocessing.Process(target=lidar.localisation)
-#l.start()
-'''startTime = time.time()
-currentState = trajectoryPoints[stateNumber]
-while currentState is not 0:    
-	raw_input("Press enter...")
-	currentState = currentState.run()''' 
-
-'''try:
+try:
     robot = BigRobot()
     lidar_robot = lidar2.Robot(True)
     lidar_robot.set(151.0, 920.0, 0.0)
     particle = [lidar2.Robot(True) for i in xrange(100)]
-    while (robot.CheckForTheBegginigOfGame())
-        time.sleep(1)
+    '''while (robot.CheckForTheBegginigOfGame())
+        time.sleep(1)'''
 
     startTime = time.time()
     currentState = trajectoryPoints[stateNumber]
@@ -267,7 +252,7 @@ while currentState is not 0:
 except:
     traceback.print_exc()
     robot.robot.s.shutdown(2)			
-    robot.robot.s.close()'''
+    robot.robot.s.close()
 
 
 

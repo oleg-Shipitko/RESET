@@ -1,6 +1,9 @@
 from collections import deque
 import numpy as np
 import math
+import multiprocessing
+import lidar
+import time
 
 def time_val(value):	
 	return ((ord(value[0])-48)<<18)|((ord(value[1])-48)<<12)|((ord(value[2])-48)<<6)|(ord(value[3])-48)
@@ -130,19 +133,31 @@ def update_di2(answer, pose):
 		step += 0.004363323129985824
 	#print 'point ', polar_graph
 	#print 'angle ', angle 
-	#combined = zip(angle, polar_graph)
+	combined = zip(angle, polar_graph)
 	#print 'zip ', combined	
 	#print len(combined)
-	#x_glob, y_glob = point_transform(combined, pose)
-	return angle, polar_graph#, x_glob, y_glob
+	x_glob, y_glob = point_transform(combined, pose)
+	print x_glob, y_glob
+	return angle, polar_graph, x_glob, y_glob
 	 
 
 if __name__ == '__main__':
-	lidar = update_di(data_3)
-	print lidar
-	print len(lidar)
-
-
+	lock = multiprocessing.Lock()
+	shared = multiprocessing.Array('f', [0.0, 0.0, 0.0])
+	l = multiprocessing.Process(target=lidar.localisation, args=(lock,shared))
+	l.start()
+	
+	while 1:
+		try:
+			#with lock:
+			#	print 'this is main process'
+			print shared[:]
+			#time.sleep(1)
+			#lock.release()
+			time.sleep(0.1)
+		except KeyboardInterrupt:
+			l.terminate()
+			l.join()
 # i need to build beacons on the assumption what robot sees
 
 # fov_start = self.orientation - 135

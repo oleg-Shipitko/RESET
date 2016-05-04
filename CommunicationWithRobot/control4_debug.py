@@ -10,7 +10,7 @@ import math
 import random
 import traceback
 import multiprocessing
-import lidar3
+import lidar3_debug
 import lidarGui
 from ctypes import Structure, c_double
 import matplotlib.pyplot as plt
@@ -232,7 +232,7 @@ shared = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 sharedcor = multiprocessing.Value('i', 0)
 wlidar = multiprocessing.Array('d', 200)
 plidar = multiprocessing.Array(Pose, [(0.0, 0.0, 0.0) for i in xrange(200)])
-l = multiprocessing.Process(target=lidar3.localisation, args =(lock,shared,computerPort,commands,sharedcor))
+l = multiprocessing.Process(target=lidar3_debug.localisation, args =(lock,shared,computerPort,commands,plidar,wlidar,sharedcor))
 l.start()
 g = multiprocessing.Process(target=lidarGui.begin, args =(shared,))
 g.start()
