@@ -9,6 +9,8 @@ class BuildPacket(object):
 	crcCalculator = crc.CrcCalculator()
 	
 	def __init__(self, comand, parameters = None):
+		#print comand
+		#rint parameters
 		self.comand = self.typeConvertor.IntToHex(comand)		
 		self.parameters = self.GetParametersInHexForm(comand, parameters)
 		self.packetLenght = self.typeConvertor.IntToHex(6 + len(self.parameters) / 2)
@@ -28,10 +30,12 @@ class BuildPacket(object):
 	def GetParametersInHexForm(self, comand, parameters):
 		if comand == CommandsList.echo:
 			return self.GetByteStringFormString(parameters)
-		elif comand == CommandsList.setCoordinates:
+		elif comand == CommandsList.setCoordinates or comand == CommandsList.setCorectCoordinates:
 			return self.GetByteStringFromFloatList(parameters)
 		elif comand == CommandsList.dutyCycle:
 			return self.typeConvertor.IntToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1])
+		elif comand == CommandsList.setManipulatorAngle:
+			return self.typeConvertor.FloatToHex(parameters)
 		elif comand == CommandsList.setDirectionBit or comand == CommandsList.removeDirectionBit:
 			return self.typeConvertor.IntToHex(parameters)
 		elif comand == CommandsList.setMotorVoltage:
@@ -126,16 +130,25 @@ class CommandsList(object):
 	switchOffPid = 0x23
 	switchOnPid = 0x24
 	stopAllMotors = 0x29
+	setCorectCoordinates = 0x25
 	
 	# TODO: playing field side
 	# TODO: beginning of the competition sign
-	# TODO: implement commands listed below
-	setManipulatorState = 0x25
-	getManipulatorState = 0x26
-	changeSuckerState = 0x27	#expected parameters: int[1]
-	uploadPuck = 0x28
-	unloadAllPucks = 0x29	#expected parameters: int[1]
-	changeFishingRodState = 0x30	#expected parameters: int[1]
-	changeFishingLatchState = 0x2A	#expected parameters: int[1]
-	openCubeCollector = 0x2A
-	closeCubeCollector = 0x2B
+	# TODO: implement commands listed below	
+	#getManipulatorState = 0x26
+	#changeSuckerState = 0x27	#expected parameters: int[1]
+	#uploadPuck = 0x28
+	#unloadAllPucks = 0x29	#expected parameters: int[1]
+	#changeFishingRodState = 0x30	#expected parameters: int[1]
+	#changeFishingLatchState = 0x2A	#expected parameters: int[1]
+	openCubeCollector = 0x2B
+	closeCubeCollector = 0x2C
+	setManipulatorAngle = 0x31 # expected parameter: flot[1]
+	releaseCubeMoovers = 0x2D
+	raiseCubeMoovers = 0x2E
+	switchOnVibrationTable = 0x2F
+	switchOffVibrationTable = 0x30
+	switchOnBelts = 0x32
+	switchOffBelts = 0x33
+	startGame = 0x34
+	

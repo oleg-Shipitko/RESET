@@ -34,8 +34,9 @@ class ParsePacket(object):
 			return coordinatesList
 			
 		if self.listOfComands.closeCubeCollector == self.command or self.listOfComands.getADCPinState == self.command:
-			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])			
-			return recievedPametersString
+			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
+			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
+			return int(invertedParametersString, 16)
 
 		return self.byteArray[4:len(self.byteArray) - 2][:-1]
 

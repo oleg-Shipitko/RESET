@@ -1,0 +1,102 @@
+initialCoordinates = [0.1525, 0.72, 0]
+
+
+trajectory_right = [
+MoveToPointState(0.4244, 0.72, 0),
+MoveToPointState(0.4244, 0.935, 0), # start to move cubes
+GetCurrentTimeState(),
+MoveToPointState(1.161, 0.935, 0),
+MoveToPointState(0.4244, 0.935, 0),
+CorrectCoordinatesState_1(-0.03, 0.935, -1.57),
+#MoveToPointState(0.6025, 0.4375, 0),
+MoveToPointState(0.6025, 0.4375, -1.57),
+MoveToPointState(1.05, 0.4375, -1.57),
+CorrectCoordinatesState_2(1.085, -0.03, -1.57),#near cube
+MoveToPointState(1.08, 0.25, -1.57),
+MoveToPointState(0.94, 0.24, -1.57),
+OpenCubesManipulatorState(180),
+MoveToPointState(1.08, 0.25, -1.57),
+OpenCubesManipulatorState(275),
+MoveToPointState(0.97, 0.4, -1.57),
+MoveToPointState(0.97, 0.4, -1.8),
+ReleaseStickState(),
+MoveToPointState(0.97, 0.22, -1.8),
+MoveToPointState(1.04, 0.23, -1.57),
+MoveToPointState(0.97, 0.26, -1.57),
+RaiseStickState(),
+CaptureCubesState(165),
+SwitchOnVibrationTableState(),
+MoveToPointState(0.97, 0.27, -1.57),
+CaptureCubesState(125),
+SwitchOffVibrationTableState(),
+MoveToPointState(0.962, 0.4375, -1.57),
+MoveToPointState(0.6025, 0.4375, -1.57),
+
+MoveToPointState(0.65, 0.11, -1.57), # clse the doors
+MoveToPointState(0.65, 0.18, -1.57),
+MoveToPointState(0.35, 0.18, -1.57),
+MoveToPointState(0.35, 0.11, -1.57),
+
+MoveToPointState(0.6025, 0.4375, -3.14),#
+MoveToPointState(0.6025, 0.915, -3.14),
+MoveToPointState(0.9655, 0.915, -3.14),
+SwitchOnVibrationTableState(),
+SwitchOnBeltsState(),
+WaitUntillTheEndOfTheGame()]
+
+trajectory_left = [
+MoveToPointState(2.847, 0.72, 0),
+MoveToPointState(2.6, 0.915, 0),
+MoveToPointState(1.855, 0.915, 0),
+MoveToPointState(2.326, 0.915, 0),
+MoveToPointState(2.326, 0.915, -1.57),
+MoveToPointState(2.326, 0.352, -1.57),
+#CaptureCubesState(130),
+MoveToPointState(2.175, 0.352, -1.57),
+#CaptureCubesState(270),
+MoveToPointState(2.013, 0.352, -1.57),
+MoveToPointState(2.013, 0.312, -1.57),
+MoveToPointState(2.013, 0.362, -1.57),
+MoveToPointState(2.625, 0.951, -1.57),
+MoveToPointState(2.625, 0.951, -3.14),
+MoveToPointState(2.043, 0.251, -3.14)]
+
+
+initialCoordinates = [0.149, 0.734, 0]
+
+trajectory_right = [
+MoveToPointState(0.149, 0.734, 0),
+MoveToPointState(0.403, 0.942, 0),
+MoveToPointState(1.089, 0.942, 1.57),
+MoveToPointState(0.403, 0.932, 0),
+MoveToPointState(0.567, 0.410, 0),
+MoveToPointState(0.945, 0.478, 0),
+MoveToPointState(0.945, 0.478, 1.57),
+MoveToPointState(0.945, 0.312, 1.57),
+MoveToPointState(1.003, 0.302, 1.57),
+MoveToPointState(0.945, 0.312, 1.57),
+MoveToPointState(0.945, 0.312, 0),
+MoveToPointState(0.945, 0.312, -1.57),
+MoveToPointState(0.945, 0.478, -1.57),
+MoveToPointState(0.567, 0.410, -1.57),
+MoveToPointState(0.567, 0.410, 0),
+MoveToPointState(0.789, 1.004, 0),
+MoveToPointState(0.789, 1.004, 3.14),
+MoveToPointState(0.984, 1.011, 3.14)]
+
+trajectory_left = [
+MoveToPointState(2.886, 0.788, 3.14),
+MoveToPointState(2.6, 0.985, 3.14),
+MoveToPointState(1.915, 0.985, 3.14),
+MoveToPointState(2.600, 0.985, 3.14),
+MoveToPointState(2.588, 0.193, 3.14),
+MoveToPointState(2.389, 0.183, 3.14),
+MoveToPointState(2.311, 0.449, 3.14),
+MoveToPointState(2.311, 0.449, -1.57),
+MoveToPointState(1.991, 0.527, -1.57),
+MoveToPointState(1.991, 0.308, -1.57),
+MoveToPointState(1.991, 0.527, -1.57),
+MoveToPointState(2.311, 0.449, -1.57),
+MoveToPointState(2.600, 0.985, 3.14),
+MoveToPointState(2.600, 0.985, 0),
+MoveToPointState(2.088, 0.92, 0)]
