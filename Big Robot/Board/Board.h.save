@@ -3,10 +3,7 @@
 
 #include "stdint.h"
 
-#define MAX_RPM 13100 // Maxon max rpm
-#define REDUCTION 26 // Gearbox reduction
-#define MAX_MAXON_PWM 0.9
-#define MIN_MAXON_PWM 0.1
+#define MAX_RPM 13100
 
 extern uint32_t * PWM_CCR[10];  //регистры сравнения каналов ШИМ
 extern uint32_t  PWM_DIR[10];

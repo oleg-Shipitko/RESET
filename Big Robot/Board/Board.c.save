@@ -89,7 +89,7 @@ char setSpeedMaxon(char ch, float targetSpeed) // V can be positive and negative
     {
         pwm_dir = -1;
     }
-    float pwm =  (MAX_MAXON_PWM - MIN_MAXON_PWM) * REDUCTION * 60 * fabs(targetSpeed) / (MAX_RPM * 2.0 * PI * RO)   + MIN_MAXON_PWM;
+    float pwm =  0.8 / (MAX_RPM * 2.0 * PI * RO) *  + 0.1;
     setVoltageMaxon(ch, pwm_dir,  pwm);
 }
 
@@ -234,11 +234,11 @@ initCubeCatcherPID();
 
 
   timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1);
-  //timPWMConfigure(TIM11, 2*33600, MAX_PWM, 1, 0, 0, 0); Maxons
-  timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
+  timPWMConfigure(TIM11, 2*33600, MAX_PWM, 1, 0, 0, 0);
+  //timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM10, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM9, 2*1667, MAX_PWM, 1, 1, 0, 0); // 50Hz
-  //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz Maxons
+  //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);
 
 //___PID_TIM________________________________________________________________

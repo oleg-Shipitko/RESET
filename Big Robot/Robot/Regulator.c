@@ -7,7 +7,7 @@
 #include "adc.h"
 #include "Board.h"
 
-#define ENCODER_IMITATION // Encoders emulation
+//#define ENCODER_IMITATION // Encoders emulation
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +41,7 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFas
 
 //pathPointStr defaultPoint;
 
-char lastPoint = 3;// последняя активная точка в очереди
+char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
 float normalVelFast[5] = {0.3, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
@@ -497,7 +497,7 @@ int16_t motorSpeedBuf[4];
   #else
   for(i =3; i>=0; i--)
   {
-    motorSpeed[i] =  motorSpeedBuf[i] * DISKR_TO_REAL/PID_PERIOD;
+    motorSpeed[i] =  motorSpeedBuf[i] * DISKR_TO_REAL / PID_PERIOD ;
     motorCoord[i] += motorSpeed[i] * PID_PERIOD;
   }
    #endif

@@ -45,8 +45,9 @@ char command = 0;
 
 char mode;
 
-//char pwm_ch = 9;
-//float pwm = 0.9;
+char pwm_ch = 5;
+float dir = 1;
+float speed= 0.7;
 
 int main(void)
 {
@@ -80,8 +81,9 @@ int main(void)
 
 //switchOnVibration();
 //openWall();
-//setVoltage(pwm_ch - 1, pwm);
-//set_pin(PIN1_12V);
+
+//setSpeedMaxon(pwm_ch - 1, speed); // Maxons
+//set_pin(PIN6_12V);
 
    /*   if (robotSpeed[0] > robotSpeed[1] )
       {
