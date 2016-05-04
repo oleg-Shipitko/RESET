@@ -151,4 +151,5 @@ class CommandsList(object):
 	switchOnBelts = 0x32
 	switchOffBelts = 0x33
 	startGame = 0x34
-	
+	openCubeBorder = 0x2D
+	closeCubeBorder = 0x2E	

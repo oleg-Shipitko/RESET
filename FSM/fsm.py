@@ -13,11 +13,7 @@ check_time = False
 
 cubes_in_trunk = 0
 trunk_capacity = 12
-
-def get_angles_diff(a1, a2):
-    target = (a1 + 180) % 360 - 180
-    cur = (a2 + 180) % 360 - 180
-    return (target - cur + 180) % 360 - 180
+unloading_cubes_position = 0
 
 class SwitchOnKinematicsAction(object):
     def run_action(self):
@@ -49,7 +45,7 @@ class OpenCubesManipulatorAction(object):
         self.start_time = time.time()
 
     def check_action(self):
-        if time.time() - self.start_time > 2:
+        if time.time() - self.start_time > 1.5:
             print time.time() - self.start_time
             return True
 
@@ -63,6 +59,38 @@ class SetCubesManipulatorAngleAction(object):
 
     def check_action(self):
         if time.time() - self.start_time > 2:
+            return True
+
+class SwitchOnVibrationTableAction():
+    def run_action(self):
+        stm_driver('switch_on_vibration_table')
+
+    def check_action(self):
+            print 'Vibration table was activated'
+            return True
+
+class SwitchOnBeltsAction():
+    def run_action(self):
+        stm_driver('switch_on_belts')
+
+    def check_action(self):
+            print 'Belts were activated'
+            return True
+
+class SwitchOffVibrationTableAction():
+    def run_action(self):
+        stm_driver('switch_off_vibration_table')
+
+    def check_action(self):
+            print 'Vibration table was disactivated'
+            return True
+
+class SwitchOffBeltsAction():
+    def run_action(self):
+        stm_driver('switch_off_belts')
+
+    def check_action(self):
+            print 'Belts were disactivated'
             return True
 
 class CloseCubesManipulatorAction(object):
@@ -180,6 +208,59 @@ class SetInitialCoordinateTask(object):
     def check_task(self):
             print 'coordinates', self.initial_coordinates, 'were setted as initial coordinates'
             return True
+
+class ActivateCubesUnloadingTask(object):
+    all_actions_were_completed = False
+
+    def __init__(self):
+        self.future_actions = [
+            SwitchOnVibrationTableAction(),
+            SwitchOnBeltsAction()]
+        self.future_actions.reverse()
+        self.current_action = self.future_actions.pop()
+
+    def run_task(self):
+        self.current_action.run_action()
+
+    def check_task(self):
+        self.check_actions_in_task()
+        if self.all_actions_were_completed is True:
+            return True
+
+    def check_actions_in_task(self):
+        if self.current_action.check_action() is True:
+            if len(self.future_actions) is not 0:
+                self.current_action = self.future_actions.pop()
+                self.current_action.run_action()
+            else:
+                self.all_actions_were_completed = True
+
+
+class DisactivateCubesUnloadingTask(object):
+    all_actions_were_completed = False
+
+    def __init__(self):
+        self.future_actions = [
+            SwitchOffVibrationTableAction(),
+            SwitchOffBeltsAction()]
+        self.future_actions.reverse()
+        self.current_action = self.future_actions.pop()
+
+    def run_task(self):
+        self.current_action.run_action()
+
+    def check_task(self):
+        self.check_actions_in_task()
+        if self.all_actions_were_completed is True:
+            return True
+
+    def check_actions_in_task(self):
+        if self.current_action.check_action() is True:
+            if len(self.future_actions) is not 0:
+                self.current_action = self.future_actions.pop()
+                self.current_action.run_action()
+            else:
+                self.all_actions_were_completed = True
 
 class MainState(object):
     def __init__(self, states_list):
@@ -309,12 +390,51 @@ class CollectCubesStates(MainState):
         else:
             return None
 
+class UnloadCubesState(MainState):
+    all_tasks_were_completed = False
+
+    def __init__(self):
+        global unloading_cubes_position
+        self.coordinates_for_unloading_cubes =  [
+            [0.9655, 0.915, -3.14],
+            [0.9655, 1.015, -3.14],
+            [0.9655, 1.115, -3.14]]
+        self.future_tasks = [
+            MoveToPointTask(self.coordinates_for_unloading_cubes[unloading_cubes_position][0], self.coordinates_for_unloading_cubes[unloading_cubes_position][1], self.coordinates_for_unloading_cubes[unloading_cubes_position][2]),
+            ActivateCubesUnloadingTask(),
+            DisactivateCubesUnloadingTask()]
+        if unloading_cubes_position < len(self.coordinates_for_unloading_cubes):
+            unloading_cubes_position = unloading_cubes_position + 1
+        self.future_tasks.reverse()
+        self.current_task = self.future_tasks.pop()
+
+    def run_state(self):
+        self.current_task.run_task()
+
+    def check_state(self):
+        self.check_tasks_in_state()
+        if self.all_tasks_were_completed is True:
+            return True
+
+    def check_tasks_in_state(self):
+        if self.current_task.check_task() is True:
+            if len(self.future_tasks) is not 0:
+                self.current_task = self.future_tasks.pop()
+                self.current_task.run_task()
+            else:
+                self.all_tasks_were_completed = True
+
 def stm_driver(command, parameters = ''):
     command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
     input_command_queue.put(command)
     return reply_to_fsm_queue.get()
 
+def get_angles_diff(a1, a2):
+    target = (a1 + 180) % 360 - 180
+    cur = (a2 + 180) % 360 - 180
+    return (target - cur + 180) % 360 - 180
+
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
 stm.start()
-states_list = [InitializeRobotState(), CollectCubesStates()]
+states_list = [InitializeRobotState(), CollectCubesStates(), UnloadCubesState()]
 MainState(states_list).run_game()
