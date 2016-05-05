@@ -10,7 +10,7 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
-need_to_update_coordinates = False
+current_coordinate = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 
 cubes_in_trunk = 0
 trunk_capacity = 12
@@ -545,7 +545,9 @@ def get_angles_diff(a1, a2):
     return (target - cur + 180) % 360 - 180
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
+localization = multiprocessing.Process(target=localizaion.main, args=(input_command_queue,reply_to_localization_queue, current_coordinate))
 stm.start()
+localization.start()
 states_list = [
     InitializeRobotState(),
     CloseDoorsState(),
