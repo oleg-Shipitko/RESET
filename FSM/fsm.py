@@ -10,7 +10,8 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
-current_coordinate = multiprocessing.Array('d', [0.0, 0.0, 0.0])
+current_coordinates = multiprocessing.Array('d', [0.0, 0.0, 0.0])
+correction_is_performed = multiprocessing.Value('i', 0)
 
 cubes_in_trunk = 0
 trunk_capacity = 12
@@ -133,6 +134,20 @@ class MoveToPointAction(object):
         if abs(self.current_coordinates[0] - self.x) <= 0.005  and abs(self.current_coordinates[1] - self.y) <=0.005 and abs(get_angles_diff(math.degrees(self.theta),math.degrees(self.current_coordinates[2]))) <= 1:
             return True
 
+class SetCorrectCoordinatesAction():
+        def __init__(self):
+            global current_coordinates
+            self.x = current_coordinates[0]
+            self.y = current_coordinates[1]
+            self.theta = current_coordinates[2]
+
+        def run_action(self):
+            stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
+
+    def check_action(self):
+            print 'Coordinates in robot were updated'
+            return True
+
 class ThrowCubesTask(object):
     all_actions_were_completed = False
 
@@ -142,7 +157,8 @@ class ThrowCubesTask(object):
             MoveToPointAction(initial_coordinates[0]-0.1, initial_coordinates[1], initial_coordinates[2]),
             WaitTimeAction(3),
             MoveToPointAction(initial_coordinates[0]-0.2, initial_coordinates[1], initial_coordinates[2]),
-            WaitTimeAction(3)]
+            WaitTimeAction(3),
+            SetCorrectCoordinatesAction()]
         self.future_actions.reverse()
         self.current_action = self.future_actions.pop()
 
@@ -163,6 +179,8 @@ class ThrowCubesTask(object):
                 self.all_actions_were_completed = True
 
 class MoveToPointTask(object):
+    all_actions_were_completed = False
+
     def __init__(self, x, y, theta):
         self.x = x
         self.y = y
@@ -170,12 +188,24 @@ class MoveToPointTask(object):
 
     def run_task(self):
         parameters = [self.x, self.y, self.theta, 1]
-        stm_driver('go_to_global_point', parameters)
+        self.future_actions= [
+            MoveToPointAction(self.x, self.y, self.theta),
+            SetCorrectCoordinatesAction()]
+        self.future_actions.reverse()
+        self.current_action = self.future_actions.pop()
 
     def check_task(self):
-        self.current_coordinates = stm_driver('get_current_coordinates')
-        if abs(self.current_coordinates[0] - self.x) <= 0.005  and abs(self.current_coordinates[1] - self.y) <=0.005 and abs(get_angles_diff(math.degrees(self.theta),math.degrees(self.current_coordinates[2]))) <= 1:
+        self.check_actions_in_task()
+        if self.all_actions_were_completed is True:
             return True
+
+    def check_actions_in_task(self):
+        if self.current_action.check_action() is True:
+            if len(self.future_actions) is not 0:
+                self.current_action = self.future_actions.pop()
+                self.current_action.run_action()
+            else:
+                self.all_actions_were_completed = True
 
 class TakeCubesTask(object):
     all_actions_were_completed = False
@@ -413,15 +443,18 @@ class CollectCubesStates(MainState):
         MoveToPointTask(0.81, 0.38, -1.57),
         MoveToPointTask(0.81, 0.24, -1.57),
         TakeCubesTask(1)]},
-        { 
+    { 
     'priority': 2, 
     'tasks_list': [
-        MoveToPointTask(0.68, 0.12, -1.57),
-        ResetCoordinatesTask([0.68, 0.16, -1.57]),
-        MoveToPointTask(0.68, 0.38, -1.57),
-        MoveToPointTask(0.81, 0.38, -1.57),
-        MoveToPointTask(0.81, 0.24, -1.57),
-        TakeCubesTask(1)]}]
+        MoveToPointTask(1.6, 0.38, -1.57),
+        TakeCubesTask(1),
+        MoveToPointTask(1.6, 0.33, -1.57),
+        TakeCubesTask(3)]},
+    { 
+    'priority': 3, 
+    'tasks_list': [
+        MoveToPointTask(1.6, 0.46, -1.57),
+        MoveToPointTask(2.168, 0.33, -1.57)]}]
 
     def __init__(self):
         self.future_tasks = self.choose_collect_cubes_option()
@@ -551,5 +584,7 @@ localization.start()
 states_list = [
     InitializeRobotState(),
     CloseDoorsState(),
+    CollectCubesStates(),
+    CollectCubesStates(),
     CollectCubesStates()]
 MainState(states_list).run_game()
