@@ -49,7 +49,6 @@ class SerialWrapper(object) :
 		if recievedPacket == "" or requestRecieved == False:
 			raise Exception("Reply was not recieved")			
 		endT1 = time.time()
-		print 'While loop ', (endT1 - startT1)
 		return recievedPacket
 
 

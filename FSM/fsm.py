@@ -135,18 +135,19 @@ class MoveToPointAction(object):
             return True
 
 class SetCorrectCoordinatesAction():
-        def __init__(self):
-            global current_coordinates
-            self.x = current_coordinates[0]
-            self.y = current_coordinates[1]
-            self.theta = current_coordinates[2]
+    def __init__(self):
+        global current_coordinates
+        self.x = current_coordinates[0]
+        self.y = current_coordinates[1]
+        self.theta = current_coordinates[2]
 
-        def run_action(self):
-            stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
+    def run_action(self):
+        print 'coordinates were setted'
+        #stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
 
     def check_action(self):
-            print 'Coordinates in robot were updated'
-            return True
+        print 'Coordinates in robot were updated'
+        return True
 
 class ThrowCubesTask(object):
     all_actions_were_completed = False
@@ -185,14 +186,14 @@ class MoveToPointTask(object):
         self.x = x
         self.y = y
         self.theta = theta
-
-    def run_task(self):
-        parameters = [self.x, self.y, self.theta, 1]
         self.future_actions= [
             MoveToPointAction(self.x, self.y, self.theta),
             SetCorrectCoordinatesAction()]
         self.future_actions.reverse()
         self.current_action = self.future_actions.pop()
+
+    def run_task(self):
+        self.current_action.run_action()
 
     def check_task(self):
         self.check_actions_in_task()
@@ -210,7 +211,7 @@ class MoveToPointTask(object):
 class TakeCubesTask(object):
     all_actions_were_completed = False
     angle_for_closed_manipulator = 275
-    default_angle = 255
+    default_angle = 265
 
     def __init__(self, layer, expected_number_of_cubes = 1):
         self.layer = layer
@@ -434,42 +435,22 @@ class InitializeRobotState(MainState):
 class CollectCubesStates(MainState):
     all_tasks_were_completed = False
     
-    collect_cubes_options = [{ 
-    'priority': 1, 
-    'tasks_list': [
-        MoveToPointTask(0.68, 0.12, -1.57),
-        ResetCoordinatesTask([0.68, 0.16, -1.57]),
-        MoveToPointTask(0.68, 0.38, -1.57),
-        MoveToPointTask(0.81, 0.38, -1.57),
-        MoveToPointTask(0.81, 0.24, -1.57),
-        TakeCubesTask(1)]},
-    { 
-    'priority': 2, 
-    'tasks_list': [
-        MoveToPointTask(1.6, 0.38, -1.57),
-        TakeCubesTask(1),
-        MoveToPointTask(1.6, 0.33, -1.57),
-        TakeCubesTask(3)]},
-    { 
-    'priority': 3, 
-    'tasks_list': [
-        MoveToPointTask(1.6, 0.46, -1.57),
-        MoveToPointTask(2.168, 0.33, -1.57)]}]
-
     def __init__(self):
+        print 'Run collect cubes state'
+
+    def run_state(self):
         self.future_tasks = self.choose_collect_cubes_option()
         if self.future_tasks is None:
             print "All tasks for Collect Cubes State were completed"
             self.all_tasks_were_completed = True
         else:
             self.current_task = self.future_tasks.pop()
-
-    def run_state(self):
-        self.current_task.run_task()
+            self.current_task.run_task()
 
     def check_state(self):
         self.check_tasks_in_state()
         if self.all_tasks_were_completed is True:
+            self.all_tasks_were_completed = False
             return True
 
     def check_tasks_in_state(self):
@@ -486,18 +467,19 @@ class CollectCubesStates(MainState):
                	    self.current_task.run_task()
 
     def choose_collect_cubes_option(self):
-        choosen_option_priority = None
+        print 'trying to choose cubes for collectioning'
+        choosen_option_priority = 100
         option_number = 0
         choosen_option_number = None
-        for option in self.collect_cubes_options:
-            if option['priority'] > choosen_option_priority and option['priority'] is not 0:
+        global collect_cubes_options
+        for option in collect_cubes_options:
+            if option['priority'] < choosen_option_priority and option['priority'] is not 0:
                 choosen_option_priority = option['priority']
                 choosen_option_number = option_number
-                option_number = option_number + 1 
-
+            option_number = option_number + 1
         if choosen_option_number is not None:
-            self.collect_cubes_options[choosen_option_number]['priority'] = 0
-            option = self.collect_cubes_options[choosen_option_number]['tasks_list']
+            collect_cubes_options[choosen_option_number]['priority'] = 0
+            option = collect_cubes_options[choosen_option_number]['tasks_list']
             option.reverse()
             return option
         else:
@@ -541,12 +523,13 @@ class UnloadCubesState(MainState):
 class CloseDoorsState(object):
     all_tasks_were_completed = False
 
-    def __init__(self):        
+    def __init__(self): 
         self.future_tasks = [
             MoveToPointTask(0.35, 0.10, -1.57),
             MoveToPointTask(0.35, 0.18, -1.57),
             MoveToPointTask(0.55, 0.18, -1.57),
-            MoveToPointTask(0.55, 0.10, -1.57)]
+            MoveToPointTask(0.55, 0.10, -1.57),
+            SetInitialCoordinateTask([0.55, 0.13, -1.57])]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -577,14 +560,31 @@ def get_angles_diff(a1, a2):
     cur = (a2 + 180) % 360 - 180
     return (target - cur + 180) % 360 - 180
 
+collect_cubes_options = [{ 
+        'priority': 1, 
+        'tasks_list': [
+            MoveToPointTask(0.65, 0.12, -1.57),
+            MoveToPointTask(0.65, 0.38, -1.57),
+            MoveToPointTask(0.93, 0.38, -1.57),
+            MoveToPointTask(0.93, 0.28, -1.57),
+            TakeCubesTask(1)]},
+        { 
+        'priority': 2, 
+        'tasks_list': [
+            MoveToPointTask(1.6, 0.48, -1.57),
+            MoveToPointTask(1.6, 0.38, -1.57),
+            TakeCubesTask(1),
+            MoveToPointTask(1.6, 0.33, -1.57),
+            TakeCubesTask(3)]},
+        { 
+        'priority': 3, 
+        'tasks_list': [
+            MoveToPointTask(1.6, 0.46, -1.57),
+            MoveToPointTask(2.168, 0.33, -1.57)]}]
+
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
-localization = multiprocessing.Process(target=localizaion.main, args=(input_command_queue,reply_to_localization_queue, current_coordinate))
+#localization = multiprocessing.Process(target=localizaion.main, args=(input_command_queue,reply_to_localization_queue, current_coordinate))
 stm.start()
-localization.start()
-states_list = [
-    InitializeRobotState(),
-    CloseDoorsState(),
-    CollectCubesStates(),
-    CollectCubesStates(),
-    CollectCubesStates()]
+#localization.start()
+states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()
