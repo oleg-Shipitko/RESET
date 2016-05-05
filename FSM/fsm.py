@@ -114,7 +114,7 @@ class WaitTimeAction(object):
         self.start_time = time.time()
 
     def check_action(self):
-        if time.time() - self.start_time() > self.time_delay:
+        if time.time() - self.start_time > self.time_delay:
             return True
 
 class MoveToPointAction(object):
@@ -137,11 +137,11 @@ class ThrowCubesTask(object):
 
     def __init__(self, initial_coordinates):
         self.future_actions= [
-            WaitTimeAction(3)
+            WaitTimeAction(3),
             MoveToPointAction(initial_coordinates[0]-0.1, initial_coordinates[1], initial_coordinates[2]),
-            WaitTimeAction(3)
+            WaitTimeAction(3),
             MoveToPointAction(initial_coordinates[0]-0.2, initial_coordinates[1], initial_coordinates[2]),
-            WaitTimeAction(3)            ]
+            WaitTimeAction(3)]
         self.future_actions.reverse()
         self.current_action = self.future_actions.pop()
 
@@ -178,8 +178,8 @@ class MoveToPointTask(object):
 
 class TakeCubesTask(object):
     all_actions_were_completed = False
-    angle_for_closed_manipulator = 265
-    default_angle = 250
+    angle_for_closed_manipulator = 275
+    default_angle = 255
 
     def __init__(self, layer, expected_number_of_cubes = 1):
         self.layer = layer
@@ -318,6 +318,16 @@ class DisactivateCubesUnloadingTask(object):
             else:
                 self.all_actions_were_completed = True
 
+class ResetCoordinatesTask(object):
+    def __init__(self, real_coordinates):
+        self.coordinates_to_set = real_coordinates
+
+    def run_task(self):
+        stm_driver('set_coordinates_without_movement', self.coordinates_to_set)
+    
+    def check_task(self):
+        return True
+
 class MainState(object):
     def __init__(self, states_list):
         states_list.reverse()
@@ -396,7 +406,11 @@ class CollectCubesStates(MainState):
     collect_cubes_options = [{ 
     'priority': 1, 
     'tasks_list': [
-        MoveToPointTask(0.2525, 0.72, 0),
+        MoveToPointTask(0.70, 0.10, -1.57),
+        ResetCoordinatesTask([0.68, 0.16, -1.57]),
+        MoveToPointTask(0.68, 0.38, -1.57),
+        MoveToPointTask(0.81, 0.38, -1.57),
+        MoveToPointTask(0.81, 0.38, -1.57),
         TakeCubesTask(1)]}]
 
     def __init__(self):
@@ -486,10 +500,10 @@ class CloseDoorsState(object):
 
     def __init__(self):        
         self.future_tasks = [
-            MoveToPointTask(0.65, 0.11, -1.57),
-            MoveToPointTask(0.65, 0.18, -1.57),
+            MoveToPointTask(0.35, 0.10, -1.57),
             MoveToPointTask(0.35, 0.18, -1.57),
-            MoveToPointTask(0.35, 0.11, -1.57)]
+            MoveToPointTask(0.55, 0.18, -1.57),
+            MoveToPointTask(0.55, 0.10, -1.57)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -522,5 +536,8 @@ def get_angles_diff(a1, a2):
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
 stm.start()
-states_list = [InitializeRobotState(), CollectCubesStates(), UnloadCubesState()]
+states_list = [
+    InitializeRobotState(),
+    CloseDoorsState(),
+    CollectCubesStates()]
 MainState(states_list).run_game()
