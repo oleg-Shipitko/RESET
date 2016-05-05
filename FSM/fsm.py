@@ -10,6 +10,7 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
+need_to_update_coordinates = False
 
 cubes_in_trunk = 0
 trunk_capacity = 12
@@ -406,11 +407,20 @@ class CollectCubesStates(MainState):
     collect_cubes_options = [{ 
     'priority': 1, 
     'tasks_list': [
-        MoveToPointTask(0.70, 0.10, -1.57),
+        MoveToPointTask(0.68, 0.12, -1.57),
         ResetCoordinatesTask([0.68, 0.16, -1.57]),
         MoveToPointTask(0.68, 0.38, -1.57),
         MoveToPointTask(0.81, 0.38, -1.57),
+        MoveToPointTask(0.81, 0.24, -1.57),
+        TakeCubesTask(1)]},
+        { 
+    'priority': 2, 
+    'tasks_list': [
+        MoveToPointTask(0.68, 0.12, -1.57),
+        ResetCoordinatesTask([0.68, 0.16, -1.57]),
+        MoveToPointTask(0.68, 0.38, -1.57),
         MoveToPointTask(0.81, 0.38, -1.57),
+        MoveToPointTask(0.81, 0.24, -1.57),
         TakeCubesTask(1)]}]
 
     def __init__(self):
