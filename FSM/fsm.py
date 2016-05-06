@@ -2,6 +2,7 @@ import stmDriver
 import time
 import multiprocessing
 import math
+import localisation
 
 input_command_queue = multiprocessing.Queue()
 reply_to_fsm_queue = multiprocessing.Queue()
@@ -136,14 +137,14 @@ class MoveToPointAction(object):
 
 class SetCorrectCoordinatesAction():
     def __init__(self):
-        global current_coordinates, correction_performed
-        correction_performed.value = 1
-        self.x = current_coordinates[0]
-        self.y = current_coordinates[1]
-        self.theta = current_coordinates[2]
+        global current_coordinates#, correction_performed
+        #correction_performed.value = 1
+        #self.x = current_coordinates[0]
+        #self.y = current_coordinates[1]
+        #self.theta = current_coordinates[2]
 
     def run_action(self):
-        print 'coordinates were setted'
+        print 'coordinates were set'
         #stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
 
     def check_action(self):
@@ -584,8 +585,9 @@ collect_cubes_options = [{
             MoveToPointTask(2.168, 0.33, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
-#localization = multiprocessing.Process(target=localizaion.main, args=(input_command_queue,reply_to_localization_queue, current_coordinate,correction_performed))
+#localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinates,correction_performed))
 stm.start()
-#localization.start()
+time.sleep(2)
+#localisation.start()
 states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()

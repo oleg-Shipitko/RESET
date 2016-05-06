@@ -126,11 +126,12 @@ def stmMainLoop(input_command_queue, reply_to_fsm_queue):
 
     while(True):
         incoming_command = input_command_queue.get()
+        print incoming_command
         if incoming_command['request_source'] == 'fsm':
             reply = process_request(incoming_command['command'], 
                                     incoming_command['parameters'])
             reply_to_fsm_queue.put(reply)
-        elif incoming_command['request_source'] == 'localization':
+        elif incoming_command['request_source'] == 'localisation':
             reply = process_request(incoming_command['command'], 
                                     incoming_command['parameters'])
             reply_to_fsm_queue.put(reply)

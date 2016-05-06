@@ -154,7 +154,9 @@ def angle5(angle):
 
 def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot):
 		"""Calculate robot's relative motion"""	
-		stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
+		print 'in relative motion'
+		new = stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
+		print 'after stm'
 		if correction_performed.value == 1:
 			old = [myrobot.x/1000, myrobot.y/1000,myrobot.orientation]
 			correction_performed.value = 0
@@ -198,12 +200,16 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 		s.send('GE0000108000\r')
 		data = s.recv(BUFFER_SIZE)
 		time.sleep(0.1)
+	print 'lidar initialized'
 	return s
 
 def stm_driver(input_command_queue, reply_to_localization_queue, command, parameters = ''):
-    command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
+    print 'in stm'
+    command = {'request_source': 'localisation', 'command': command, 'parameters': parameters}
+    print 'this is command: ', command
+    print 'this is after'
     input_command_queue.put(command)
-    return reply_to_localization_queue.get()
+    print 'reply from stmDriver: ',reply_to_localization_queue.get()
 
 ###############################################################################
 
@@ -214,13 +220,15 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 	myrobot.set(200.0, 720.0, 0.0)
 	print myrobot
 	p = [Robot(True) for i in xrange(N)]
-	old = [0.152,0.72,0.0]
+	old = [0.1525,0.72,0.0]
 	w_re = [1.0/N for i in xrange(N)]
 	w_prev = [1.0 for i in xrange(N)]
 	try:
 		while 1:
+			print 'maki'
 			start = time.time()
 			rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot)	
+			print 'after lidar'
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
 			old = old2
@@ -228,7 +236,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 			data_lidar = s.recv(BUFFER_SIZE)
 			angle, distance = lidar_scan(data_lidar) 
 			x_rob, y_rob = p_trans(angle, distance)			
-			
+			print 'kkk'
 			w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
 			w_n_sum = sum(w_next)
 			try:
@@ -250,7 +258,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 			mean_orientation = mean_angl(p, w_norm)
 			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
 			myrobot.set(center[0], center[1], mean_orientation)
-			
+			print myrobot
 			current_coordinate[0] = myrobot.x
 			current_coordinate[1] = myrobot.y
 			current_coordinate[2] = myrobot.orientation
