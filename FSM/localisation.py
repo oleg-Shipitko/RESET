@@ -154,13 +154,12 @@ def angle5(angle):
 
 def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot):
 		"""Calculate robot's relative motion"""	
-		print 'in relative motion'
+		#print 'in relative motion'
 		new = stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
-		print 'after stm'
+		#print 'after stm ===========', new
 		if correction_performed.value == 1:
 			old = [myrobot.x/1000, myrobot.y/1000,myrobot.orientation]
-			correction_performed.value = 0
-		new = recievedPacket.reply	
+			correction_performed.value = 0	
 		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]], new
 
 def dist_val(value):	
@@ -204,16 +203,18 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 	return s
 
 def stm_driver(input_command_queue, reply_to_localization_queue, command, parameters = ''):
-    print 'in stm'
+    #print 'in stm'
     command = {'request_source': 'localisation', 'command': command, 'parameters': parameters}
-    print 'this is command: ', command
-    print 'this is after'
+    #print 'this is command: ', command
+    #print 'this is after'
     input_command_queue.put(command)
-    print 'reply from stmDriver: ',reply_to_localization_queue.get()
+    return reply_to_localization_queue.get()
+    #print 'reply from stmDriver: ', reply
+    #return reply
 
 ###############################################################################
 
-def main(input_command_queue,reply_to_localization_queue, current_coordinate,correction_performed):
+def main(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed):
 	"""Main function for localisation"""
 	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
 	myrobot = Robot(True)
@@ -225,10 +226,10 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 	w_prev = [1.0 for i in xrange(N)]
 	try:
 		while 1:
-			print 'maki'
+			#print 'maki'
 			start = time.time()
 			rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot)	
-			print 'after lidar'
+			#print '=========================after lidar'
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
 			old = old2
@@ -236,7 +237,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 			data_lidar = s.recv(BUFFER_SIZE)
 			angle, distance = lidar_scan(data_lidar) 
 			x_rob, y_rob = p_trans(angle, distance)			
-			print 'kkk'
+			#print 'kkk'
 			w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
 			w_n_sum = sum(w_next)
 			try:
@@ -258,11 +259,11 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 			mean_orientation = mean_angl(p, w_norm)
 			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
 			myrobot.set(center[0], center[1], mean_orientation)
-			print myrobot
-			current_coordinate[0] = myrobot.x
-			current_coordinate[1] = myrobot.y
-			current_coordinate[2] = myrobot.orientation
-
+			#print myrobot
+			current_coordinatess[0] = myrobot.x/1000
+			current_coordinatess[1] = myrobot.y/1000
+			current_coordinatess[2] = myrobot.orientation
+			#print '==================', current_coordinatess[:]
 			w_prev = w_norm
 
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
@@ -274,7 +275,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 				except:
 					print 'error with choice'
 			end = time.time()
-			print end - start
+			#print end - start
 	except:			
 		s.shutdown(2)
 		s.close()

@@ -11,7 +11,7 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
-current_coordinates = multiprocessing.Array('d', [0.0, 0.0, 0.0])
+current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
 
 cubes_in_trunk = 0
@@ -137,18 +137,23 @@ class MoveToPointAction(object):
 
 class SetCorrectCoordinatesAction():
     def __init__(self):
-        global current_coordinates#, correction_performed
-        #correction_performed.value = 1
-        #self.x = current_coordinates[0]
-        #self.y = current_coordinates[1]
-        #self.theta = current_coordinates[2]
+        print 'init'
 
     def run_action(self):
-        print 'coordinates were set'
-        #stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
+        global current_coordinatess, correction_performed
+        correction_performed.value = 1
+        #time.sleep(0.1)
+        self.x = current_coordinatess[0]
+        self.y = current_coordinatess[1]
+        self.theta = current_coordinatess[2]
+        print 'Current coordinates: ++++++++++', current_coordinatess[:] 
+
+        stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
+        print 'coordinates were set', [self.x, self.y, self.theta]
 
     def check_action(self):
         print 'Coordinates in robot were updated'
+        #print 'Value: ==========================++++++++++', correction_performed.value
         return True
 
 class ThrowCubesTask(object):
@@ -584,10 +589,10 @@ collect_cubes_options = [{
             MoveToPointTask(1.6, 0.46, -1.57),
             MoveToPointTask(2.168, 0.33, -1.57)]}]
 
-stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
-#localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinates,correction_performed))
+stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
+localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed))
 stm.start()
 time.sleep(2)
-#localisation.start()
+localisation.start()
 states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()

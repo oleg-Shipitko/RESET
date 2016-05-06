@@ -62,6 +62,7 @@ def set_coordinates_without_movement(parameters):
 
 def set_coordinates_with_movement(parameters):
     packet = packetBuilder.BuildPacket(commands_to_stm.setCorectCoordinates, parameters)
+    print 'Coordinates to set: ', parameters
     reply_on_request = send_request(packet)
     return reply_on_request
 
@@ -120,13 +121,13 @@ def get_playing_field_side():
     return 1
 
 
-def stmMainLoop(input_command_queue, reply_to_fsm_queue):
+def stmMainLoop(input_command_queue, reply_to_fsm_queue, reply_to_localization_queue):
     global com_port
     com_port = create_connection_to_stm()
 
     while(True):
         incoming_command = input_command_queue.get()
-        print incoming_command
+        #print incoming_command
         if incoming_command['request_source'] == 'fsm':
             reply = process_request(incoming_command['command'], 
                                     incoming_command['parameters'])
@@ -134,7 +135,7 @@ def stmMainLoop(input_command_queue, reply_to_fsm_queue):
         elif incoming_command['request_source'] == 'localisation':
             reply = process_request(incoming_command['command'], 
                                     incoming_command['parameters'])
-            reply_to_fsm_queue.put(reply)
+            reply_to_localization_queue.put(reply)
 
 
 
