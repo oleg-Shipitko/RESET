@@ -136,24 +136,17 @@ class MoveToPointAction(object):
             return True
 
 class SetCorrectCoordinatesAction():
-    def __init__(self):
-        print 'init'
-
     def run_action(self):
         global current_coordinatess, correction_performed
         correction_performed.value = 1
-        #time.sleep(0.1)
         self.x = current_coordinatess[0]
         self.y = current_coordinatess[1]
         self.theta = current_coordinatess[2]
-        print 'Current coordinates: ++++++++++', current_coordinatess[:] 
 
         stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
-        print 'coordinates were set', [self.x, self.y, self.theta]
 
     def check_action(self):
         print 'Coordinates in robot were updated'
-        #print 'Value: ==========================++++++++++', correction_performed.value
         return True
 
 class ThrowCubesTask(object):
@@ -218,7 +211,7 @@ class MoveToPointTask(object):
 class TakeCubesTask(object):
     all_actions_were_completed = False
     angle_for_closed_manipulator = 275
-    default_angle = 265
+    default_angle = 275
 
     def __init__(self, layer, expected_number_of_cubes = 1):
         self.layer = layer
@@ -570,18 +563,19 @@ def get_angles_diff(a1, a2):
 collect_cubes_options = [{ 
         'priority': 1, 
         'tasks_list': [
-            MoveToPointTask(0.65, 0.12, -1.57),
-            MoveToPointTask(0.65, 0.38, -1.57),
-            MoveToPointTask(0.93, 0.38, -1.57),
-            MoveToPointTask(0.93, 0.28, -1.57),
-            TakeCubesTask(1)]},
+            MoveToPointTask(0.60, 0.12, -1.57),
+            MoveToPointTask(0.67, 0.12, -1.57),
+            MoveToPointTask(0.67, 0.38, -1.57),
+            MoveToPointTask(0.92, 0.38, -1.57),
+            MoveToPointTask(0.92, 0.28, -1.57),
+            TakeCubesTask(2)]},
         { 
         'priority': 2, 
         'tasks_list': [
-            MoveToPointTask(1.6, 0.48, -1.57),
-            MoveToPointTask(1.6, 0.38, -1.57),
+            MoveToPointTask(1.38, 0.48, -1.57),
+            MoveToPointTask(1.38, 0.43, -1.57),
             TakeCubesTask(1),
-            MoveToPointTask(1.6, 0.33, -1.57),
+            MoveToPointTask(1.38, 0.33, -1.57),
             TakeCubesTask(3)]},
         { 
         'priority': 3, 
@@ -594,5 +588,5 @@ localisation = multiprocessing.Process(target=localisation.main, args=(input_com
 stm.start()
 time.sleep(2)
 localisation.start()
-states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates(), CollectCubesStates()]
+states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()

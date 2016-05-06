@@ -62,7 +62,6 @@ def set_coordinates_without_movement(parameters):
 
 def set_coordinates_with_movement(parameters):
     packet = packetBuilder.BuildPacket(commands_to_stm.setCorectCoordinates, parameters)
-    print 'Coordinates to set: ', parameters
     reply_on_request = send_request(packet)
     return reply_on_request
 
