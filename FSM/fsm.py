@@ -11,7 +11,7 @@ request_source = 'fsm'
 start_time = time.time()
 check_time = False
 current_coordinates = multiprocessing.Array('d', [0.0, 0.0, 0.0])
-correction_is_performed = multiprocessing.Value('i', 0)
+correction_performed = multiprocessing.Value('i', 0)
 
 cubes_in_trunk = 0
 trunk_capacity = 12
@@ -136,7 +136,8 @@ class MoveToPointAction(object):
 
 class SetCorrectCoordinatesAction():
     def __init__(self):
-        global current_coordinates
+        global current_coordinates, correction_performed
+        correction_performed.value = 1
         self.x = current_coordinates[0]
         self.y = current_coordinates[1]
         self.theta = current_coordinates[2]
@@ -583,7 +584,7 @@ collect_cubes_options = [{
             MoveToPointTask(2.168, 0.33, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue))
-#localization = multiprocessing.Process(target=localizaion.main, args=(input_command_queue,reply_to_localization_queue, current_coordinate))
+#localization = multiprocessing.Process(target=localizaion.main, args=(input_command_queue,reply_to_localization_queue, current_coordinate,correction_performed))
 stm.start()
 #localization.start()
 states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates(), CollectCubesStates()]
