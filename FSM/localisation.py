@@ -152,14 +152,12 @@ def angle5(angle):
 	else:
 		return angle + 7*math.pi/4
 
-def relative_motion(old, computerPort, commands, lock, sharedcor, myrobot):
+def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot):
 		"""Calculate robot's relative motion"""	
-		input_command_queue.put('get_current_coordinates')
-		if sharedcor.value == 1:
-			print old
+		stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
+		if correction_performed.value == 1:
 			old = [myrobot.x/1000, myrobot.y/1000,myrobot.orientation]
-			print old
-			sharedcor.value = 0
+			correction_performed.value = 0
 		new = recievedPacket.reply	
 		return [(new[0]-old[0])*1000, (new[1]-old[1])*1000, new[2]-old[2]], new
 
@@ -202,7 +200,7 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 		time.sleep(0.1)
 	return s
 
-def stm_driver(command, parameters = '', input_command_queue):
+def stm_driver(input_command_queue, reply_to_localization_queue, command, parameters = ''):
     command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
     input_command_queue.put(command)
     return reply_to_localization_queue.get()
@@ -222,7 +220,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinate,cor
 	try:
 		while 1:
 			start = time.time()
-			rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, sharedcor, myrobot)	
+			rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot)	
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
 			old = old2
