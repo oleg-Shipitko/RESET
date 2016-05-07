@@ -30,6 +30,13 @@ WORLD_Y = 2000
 BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # left starting possition (0,0 in corner near beach huts)
 # BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # right starting possition (0,0 in corner near beach huts)
 
+# Lidar displacement from robo center
+DELTA_X = 60.0
+DELTA_Y = 7.0
+BETA = math.atan(DELTA_Y/DELTA_X)
+R = math.sqrt(60.0**2 + 7.0**2) 
+
+
 class Robot(object):
 	"""Robot class. Represent particles in monte carlo localisation"""
 	def __init__(self, first):
@@ -106,7 +113,7 @@ class Robot(object):
 ###############################################################################
 
 def mean_angl(p, w):
-	"""Calculate robot orientation base on particles/weights"""
+	"""Calculate robot orientation based on particles/weights"""
 	x = 0 
 	y = 0
 	for i in xrange(N):
@@ -147,10 +154,11 @@ def p_trans(agl, pit):
 
 def angle5(angle):
 	"""Transform lidar points from lidar coord sys to robot cord sys""" 
-	if angle >= math.pi/4:
-		return angle - math.pi/4
-	else:
-		return angle + 7*math.pi/4
+	#if angle >= math.pi/4:
+	#	return angle - math.pi/4
+	#else:
+	#	return angle + 7*math.pi/4
+	return (angle + math.pi/4)%(2*math.pi)
 
 def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot):
 		"""Calculate robot's relative motion"""	
@@ -218,8 +226,8 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
 	"""Main function for localisation"""
 	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
 	myrobot = Robot(True)
-	myrobot.set(200.0, 720.0, 0.0)
-	print myrobot
+	myrobot.set(210.0, 720.0, 0.0)
+	print myrobot, R, BETA
 	p = [Robot(True) for i in xrange(N)]
 	old = [0.1525,0.72,0.0]
 	w_re = [1.0/N for i in xrange(N)]
@@ -258,7 +266,9 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
 			mean_val = [(p[i].x*w_norm[i], p[i].y*w_norm[i]) for i in xrange(N)]
 			mean_orientation = mean_angl(p, w_norm)
 			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
-			myrobot.set(center[0], center[1], mean_orientation)
+			myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
+						center[1]-R*math.sin(mean_orientation+BETA), 
+						mean_orientation)
 			#print myrobot
 			current_coordinatess[0] = myrobot.x/1000
 			current_coordinatess[1] = myrobot.y/1000

@@ -11,7 +11,7 @@ class ParsePacket(object):
 	crcCalculator = crc.CrcCalculator()
 	listOfComands =  packetBuilder.CommandsList()
 
-	def __init__(self, byteString):
+	def __init__(self, byteString):		
 		self.string = byteString
 		self.byteArray = self.GetByteArrayFromRecievedString()
 		self.recievedSynchronizationByte = self.byteArray[0]
@@ -34,6 +34,12 @@ class ParsePacket(object):
 			return coordinatesList
 			
 		if self.listOfComands.closeCubeCollector == self.command or self.listOfComands.getADCPinState == self.command:
+			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
+			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
+			# check int 16 or int 8
+			return int(invertedParametersString, 16)
+
+		if self.listOfComands.getNumberOfReachedPoints == self.command:
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
 			return int(invertedParametersString, 16)

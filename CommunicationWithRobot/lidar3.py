@@ -265,7 +265,7 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 				except:
 					print 'error with choice'
 			end = time.time()
-			print end - start
+			#print end - start
 	except:			
 		s.shutdown(2)
 		s.close()

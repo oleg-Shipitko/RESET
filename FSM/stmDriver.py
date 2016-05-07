@@ -119,6 +119,10 @@ def get_playing_field_side():
     # todo: finish method
     return 1
 
+def get_number_of_reached_points():
+    packet = packetBuilder.BuildPacket(commands_to_stm.getNumberOfReachedPoints)
+    reply_on_request = send_request(packet)
+    return reply_on_request
 
 def stmMainLoop(input_command_queue, reply_to_fsm_queue, reply_to_localization_queue):
     global com_port

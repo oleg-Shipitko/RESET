@@ -148,8 +148,8 @@ class CommandsList(object):
 	raiseCubeMoovers = 0x2E
 	switchOnVibrationTable = 0x2F
 	switchOffVibrationTable = 0x30
-	switchOnBelts = 0x32
 	switchOffBelts = 0x33
 	startGame = 0x34
 	openCubeBorder = 0x2D
-	closeCubeBorder = 0x2E	
+	closeCubeBorder = 0x2E
+	getNumberOfReachedPoints = 0x32	
