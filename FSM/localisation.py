@@ -24,8 +24,8 @@ N = 200
 #Resampling trashold
 n_trash = N/3
 # Dimensions of the playing field  
-WORLD_X = 3000
-WORLD_Y = 2000
+WORLD_X = 3100
+WORLD_Y = 2100
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # left starting possition (0,0 in corner near beach huts)
 # BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # right starting possition (0,0 in corner near beach huts)
@@ -48,11 +48,11 @@ class Robot(object):
 
 	def set(self, x_new, y_new, orientation_new):
 		"""Set particle position on the field"""
-		if 0 <= x_new <= WORLD_X:
+		if -100 <= x_new <= WORLD_X:
 			self.x = x_new
 		else:
 			self.x = random.gauss(151.0, 5) 
-		if 0 <= y_new <= WORLD_Y:
+		if -100 <= y_new <= WORLD_Y:
 			self.y = y_new
 		else:
 			self.y = random.gauss(756.5, 5)
@@ -98,7 +98,7 @@ class Robot(object):
 				continue
 			beacon[num] += lmin
 			num_point[num] += 1
-		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (5000) for i in xrange(3)]
+		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (2000) for i in xrange(3)]
 		try:
 			return 1.0/sum(median)
 		except ZeroDivisionError:
