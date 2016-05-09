@@ -168,6 +168,7 @@ class SetCorrectCoordinatesAction():
         self.theta = current_coordinatess[2]
 
         stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
+        print 'Coordinates ', [self.x, self.y, self.theta], 'were seted'
 
     def check_action(self):
         return True
@@ -570,12 +571,13 @@ class CloseDoorsState(object):
         self.future_tasks = [
             MoveToFinalPointTask(0.35, 0.11, -1.57),
             MoveToIntermediaryPointTask(0.35, 0.18, -1.57),
-            MoveToIntermediaryPointTask(0.55, 0.18, -1.57),
-            MoveToFinalPointTask(0.55, 0.11, -1.57)]
+            MoveToIntermediaryPointTask(0.6, 0.18, -1.57),
+            MoveToFinalPointTask(0.6, 0.11, -1.57)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
     def run_state(self):
+        print 'Starting close door state'
         self.current_task.run_task()
 
     def check_state(self):
@@ -658,7 +660,7 @@ localisation = multiprocessing.Process(target=localisation.main, args=(input_com
 stm.start()
 time.sleep(2)
 localisation.start()
-states_list = [InitializeRobotState(), TestState()]
+states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates()]
 number_of_reached_points = stm_driver('get_number_of_reached_points')
 print 'Number of reached points at the beginning:', number_of_reached_points
 #states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
