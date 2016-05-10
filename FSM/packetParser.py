@@ -39,7 +39,7 @@ class ParsePacket(object):
 			# check int 16 or int 8
 			return int(invertedParametersString, 16)
 
-		if self.listOfComands.getNumberOfReachedPoints == self.command:
+		if self.listOfComands.isPointWasReached == self.command:
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
 			return int(invertedParametersString, 16)

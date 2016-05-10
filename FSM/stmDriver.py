@@ -119,8 +119,8 @@ def get_playing_field_side():
     # todo: finish method
     return 1
 
-def get_number_of_reached_points():
-    packet = packetBuilder.BuildPacket(commands_to_stm.getNumberOfReachedPoints)
+def is_point_was_reached():
+    packet = packetBuilder.BuildPacket(commands_to_stm.isPointWasReached)
     reply_on_request = send_request(packet)
     return reply_on_request
 

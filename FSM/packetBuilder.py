@@ -152,4 +152,4 @@ class CommandsList(object):
 	startGame = 0x34
 	openCubeBorder = 0x2D
 	closeCubeBorder = 0x2E
-	getNumberOfReachedPoints = 0x32	
+	isPointWasReached = 0x32	
