@@ -78,23 +78,39 @@ extern Path curPath;
 //extern float Coord_local_track[3];
 extern pathPointStr points[POINT_STACK_SIZE];
 extern char lastPoint;
-extern float normalVelFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм
-extern float stopVelFast[5]; //{0.2,0.1,-0.05,0.2,0.7};
-extern float standVelFast[5];
 
-extern float normalRotFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм
-extern float stopRotFast[5]; //{0.2,0.1,-0.1,0.3,0.6};
-extern float standRotFast[5];
-extern float * speedType[3];
-extern float * rotType[3];
+extern float normalVelFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+extern float stopVelFast[5] ; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+extern float standVelFast[5] ;                                       //удержание заданного положения
+
+extern float normalVelSlow[5] ;//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+extern float stopVelSlow[5];//{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+extern float standVelSlow[5] ;                                       //удержание заданного положения
+
+
+extern float normalRotFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+extern float stopRotFast[5] ; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+extern float standRotFast[5] ;                                       //удержание заданного положения
+
+extern float normalRotSlow[5] ;;//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+extern float stopRotSlow[5] ; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+extern float standRotSlow[5] ;
+
+
+
+
+extern float * speedType[6];
+extern float * rotType[6];
 extern PidStruct wheelsPidStruct[4];
 extern float vTargetGlob[3];
 extern float vTargetGlobF[3];
+extern float vTargetGlobCA[3];
 extern float regulatorOut[4];
 extern uint16_t totalPointComplite;
 extern float MLineSpeed[4][3];          //
 extern float MRotSpeed[4][3];           // Матрицы должны быть определены из вне
 extern float InverseKinematics[4][4];   //
+extern float distanceFromSonars[5][3];
 
 
 void pidCalc(PidStruct *pid_control); //Расчитать ПИД, в качестве параметра - указатель на структуру
@@ -118,7 +134,6 @@ signed char digitalize(char data, char lowerLevel, char upperLevel);
 void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out);
 void removePoint(pathPointStr * points,char *lastPoint);
 void SpeedFiltration(float *V,float *vF);
-
-
+void collisionAvoidance(float *V,float *vCA);
 
 #endif

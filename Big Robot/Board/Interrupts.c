@@ -26,9 +26,9 @@ void TIM2_IRQHandler(void)
 }
 ////////////////////////////////////////////////////////////////////////////////
 
-void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регуляторов колес
+void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регуляторов колес, манипулятора и считывание данных сонаров
 {
-//static char i=0; // Divider by 2 to get 10Hz frequency
+   //static char i=0; // Divider by 2 to get 10Hz frequency
    //   set_pin(PWM_DIR[8]);
 
 
@@ -36,9 +36,28 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регулятор
   NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
   GetDataForRegulators(); // обновление входных данных для ПИД
   NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
+
+  if (curState.filtering) SpeedFiltration(&vTargetGlobCA[0],&vTargetGlobF[0]);
+  else
+    {
+      vTargetGlobF[0] = vTargetGlobCA[0];
+      vTargetGlobF[1] = vTargetGlobCA[1];
+      vTargetGlobF[2] = vTargetGlobCA[2];
+}
+
+if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
+
+  /////
+
   pidLowLevel();       // рассчет ПИД
   pidLowLevelManipulator();
 
+  // Sonars
+  getSonarData((char)ADC_SONAR_RIGHT, (char)SONAR_RIGHT);
+  getSonarData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
+  getSonarData((char)ADC_SONAR_FRONT_1, (char)SONAR_FRONT_1);
+  getSonarData((char)ADC_SONAR_FRONT_2, (char)SONAR_FRONT_2);
+  getSonarData((char)ADC_SONAR_BACK, (char)SONAR_BACK);
    //   reset_pin(PWM_DIR[8]);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,27 +84,31 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
 
 
 
-  if ((fabs(fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0])) < 0.02) && // достигнута заданная точка по положению и углу
+//  if ((fabs(curPath.lengthTrace) <= fabs(curPath.Coord_local_track[0])) && // достигнута заданная точка по положению и углу
+//     (fabs((curPath.phiZad)-(robotCoord[2])) < 0.02))
+  if (((fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0])) < 0.005) && ((fabs(curPath.Coord_local_track[1])) < 0.05)&& // достигнута заданная точка по положению и углу
      (fabs((curPath.phiZad)-(robotCoord[2])) < 0.02))
         {
+
           traceFlag = 1;  // точка достигнута
         }
-  else traceFlag = 0;
+ else traceFlag = 0;
  if (!movFlag)
-    if (points[0].movTask) movFlag=(points[0].movTask)(); else movFlag =1; // действие в процессе движения
+    if (points[0].movTask) movFlag = (points[0].movTask)(); else movFlag =1; // действие в процессе движения
  if (traceFlag&&movFlag&&(!endFlag))
-    if (points[0].endTask) endFlag = ((char (*)(float))(points[0].endTask))(points[0].endTaskP1); else endFlag =1; // действие в конечной точке
+    if (points[0].endTask) endFlag = ((char (*)(float))(points[0].endTask))(points[0].endTaskP1); else endFlag = 1; // действие в конечной точке
     if (traceFlag && movFlag && endFlag)
         {
           if (lastPoint > 0) //Остались ли точки в стеке
           {
-            totalPointComplite++;
             CreatePath(&points[1], &points[0], &curPath); // задать новый участок
-          }
+           totalPointComplite++;
+
           removePoint(&points[0],&lastPoint); //удалить ткущую точку
           endFlag=0;
           movFlag=0;
           traceFlag=0;
+          }
         }
 
 
@@ -93,17 +116,18 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
 
  if (curState.trackEn)
 {
-   TrackRegulator(&robotCoord[0],&robotSpeed[0], (&curPath),&vTargetGlob[0]); // расчет глобальных скоростей
+   TrackRegulator(&robotCoord[0], &robotSpeed[0], (&curPath), &vTargetGlob[0]); // расчет глобальных скоростей
 }
-   if (curState.filtering) SpeedFiltration(&vTargetGlob[0],&vTargetGlobF[0]); else
-   {
-      vTargetGlobF[0] =vTargetGlob[0];
-      vTargetGlobF[1] =vTargetGlob[1];
-      vTargetGlobF[2] =vTargetGlob[2];
-   }
-   if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
 
-  ////////////////////////////////////////////////////////////////////////////////
+if (curState.collisionAvoidance) collisionAvoidance(&vTargetGlob[0],&vTargetGlobCA[0]);
+else
+{
+      vTargetGlobCA[0] = vTargetGlob[0];
+      vTargetGlobCA[1] = vTargetGlob[1];
+      vTargetGlobCA[2] = vTargetGlob[2];
+}
+
+///////////////////////////////////////////////////////////////////////////
   NVIC_EnableIRQ(TIM6_DAC_IRQn); //включение ПИД
     // reset_pin(PWM_DIR[8]);
 }

@@ -13,4 +13,5 @@ obj\release\robot\dynamixel_control.o: Robot\Dynamixel_control.c \
  SPL\inc/stm32f4xx_sdio.h SPL\inc/stm32f4xx_spi.h \
  SPL\inc/stm32f4xx_syscfg.h SPL\inc/stm32f4xx_tim.h \
  SPL\inc/stm32f4xx_usart.h SPL\inc/stm32f4xx_wwdg.h SPL\inc/misc.h \
- Robot\Dynamixel_control.h Board/Pins.h Board/gpio.h
+ Robot\Dynamixel_control.h Board/Pins.h Board/gpio.h Robot\Manipulators.h \
+ Robot\Regulator.h Robot\Path.h

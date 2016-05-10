@@ -18,14 +18,13 @@
 #define PHI_RAD             0.5236
 #define distA	 	    0.31819
 #define distB		    0.2625
-//#define RO                  (0.023)
-#define RO                  (0.013)          // Радиус колес
-#define L1                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
-#define L2                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
+#define RO                  (0.023)
+//#define RO                  (0.013)          // Радиус колес
+//#define L1                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
+//#define L2                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
 #define JOYST_RAD_VEL_KOFF  MAX_RAD_SPEED/128.0 //(MAX_WHEEL_SPEED/distA/128.0/5.0)
-#define DISKR_TO_REAL       (1)
-//#define DISKR_TO_REAL       (2.0*PI*RO/26624.0)
-//#define DISKR_TO_REAL       (2.0*PI*RO/2800.0)
+#define DISKR_TO_REAL       (2.0*PI*RO/2800)
+//#define DISKR_TO_REAL       (2.0*PI*RO / 4096.0/26)
 #define ONE_RO_COS_PHI      1.0                   // 23.0947
 //#define COFF_TO_RAD         (2.0*PI/(4658.346666667))
 #define MAX_CAPACITANCE     0.6 //(120.0*DISKR_TO_REAL/PID_PERIOD)*1.5   // Максимальный вектор задания на ПИДЫ
@@ -91,6 +90,7 @@ extern float * rotType[3];
 extern PidStruct wheelsPidStruct[4];
 extern float vTargetGlob[3];
 extern float vTargetGlobF[3];
+extern float vTargetGlobCA[3];
 extern float regulatorOut[4];
 extern uint16_t totalPointComplite;
 extern float MLineSpeed[4][3];          //
@@ -118,6 +118,7 @@ void moving2(float Coord_x_cur, float Coord_x_targ, float* parameters, float* v_
 signed char digitalize(char data, char lowerLevel, char upperLevel);
 void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out);
 void removePoint(pathPointStr * points,char *lastPoint);
+void SpeedFiltration(float *V,float *vF);
 void SpeedFiltration(float *V,float *vF);
 
 

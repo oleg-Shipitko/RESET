@@ -8,6 +8,21 @@
 #define MAX_MAXON_PWM 0.9
 #define MIN_MAXON_PWM 0.1
 
+////////////////////ADC SONAR CHANNELS/////////////////////////////////
+#define ADC_SONAR_RIGHT 3
+#define ADC_SONAR_LEFT 4
+#define ADC_SONAR_FRONT_1 5
+#define ADC_SONAR_FRONT_2 6
+#define ADC_SONAR_BACK 7
+
+////////////////////SONAR INDEXES IN ARRAY////////////////////////////
+#define SONAR_RIGHT 0
+#define SONAR_LEFT 1
+#define SONAR_FRONT_1 2
+#define SONAR_FRONT_2 3
+#define SONAR_BACK 4
+
+
 extern uint32_t * PWM_CCR[10];  //регистры сравнения каналов ШИМ
 extern uint32_t  PWM_DIR[10];
 extern uint32_t  GENERAL_PIN[10];

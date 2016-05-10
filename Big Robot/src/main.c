@@ -45,9 +45,10 @@ char command = 0;
 
 char mode;
 
-char pwm_ch = 5;
-float dir = 1;
-float speed= 0.7;
+//char pwm_ch = 5;
+//float dir = 1;
+//float speed= 0.7;
+uint8_t number;
 
 int main(void)
 {
@@ -65,100 +66,32 @@ int main(void)
             &USBD_CDC_cb,
             &USR_cb);
 
+openCubesCatcher();
+
   while(1)
    {
-//      char temp = pin_val (EXTI1_PIN);
-//      if (temp)
-//      {
-//        curState.trackEn = 1;
-//      }
-//      else
-//      {
-//        curState.trackEn = 0;
-//        vTargetGlob[0] = 0;
-//        vTargetGlob[1] = 0;
-//        vTargetGlob[2] = 0;
-//      }
+//      openCubesCatcher();
+//      closeCubesCatcher(&number);
+
+      char temp = pin_val (EXTI1_PIN);
+      if (temp)
+      {
+        curState.trackEn = 1;
+      }
+      else
+      {
+        curState.trackEn = 0;
+        vTargetGlob[0] = 0;
+        vTargetGlob[1] = 0;
+        vTargetGlob[2] = 0;
+      }
 
 //switchOnVibration();
 //openWall();
 
 //setSpeedMaxon(pwm_ch - 1, speed); // Maxons
 //set_pin(PIN6_12V);
-          getSonarData((char)3, (char)0); //3 right
-          getSonarData((char)4, (char)1); //4 left
-          getSonarData((char)5, (char)2); //5 front
-          // getSonarData((char)6, (char)3); //6 back
 
-          if ( (distance[2][0] < 20)  && (robotSpeed[0] >= 0) )
-          {
-              stopTheRobot();
-          }
-//          else if ( (distance[3][0] < 20)  && (robotSpeed[0] <= 0) )
-////          {
-////              stopTheRobot();
-////          }
-//          else if ( (distance[1][0] < 32)  && (robotSpeed[1] >= 0) )
-//          {
-//              stopTheRobot();
-//          }
-//          else if ( (distance[0][0] < 32)  && (robotSpeed[1] <= 0) )
-//          {
-//              stopTheRobot();
-//          }
-//          else if ( (distance[0][0] < 32 || distance[1][0] < 32 || distance[2][0] < 32 || (robotSpeed[2] > 1.0) )//distance[3][0] < 32)  && (robotSpeed[2] > 1.0) )
-//          {
-//              stopTheRobot();
-//          }
-          else
-          {
-              curState.trackEn = 1;
-          }
-////      if (robotSpeed[0] >= robotSpeed[1])
-////      {
-////          if (robotSpeed[0] >= 0)
-////          {
-////              getSonarData((char)5, (char)2);
-//          }
-//          else
-//          {
-//              //getSonarData((char)6, (char)3);
-//          }
-//      }
-//      else
-//      {
-//          if (robotSpeed[1] >= 0)
-//          {
-//              getSonarData((char)4, (char)1);
-//          }
-//          else
-//          {
-//              getSonarData((char)3, (char)0);
-//          }
-//      }
-//
-//      if (fabs(robotSpeed[2]) > 1.0)
-//      {
-//          getSonarData((char)3, (char)0);
-//          getSonarData((char)4, (char)1);
-//          getSonarData((char)5, (char)2);
-//          getSonarData((char)6, (char)3);
-//      }
-//      if (distance[0][0] < 32 ||  distance[1][0] < 32 || distance[2][0] < 32 || distance[3][0] < 32)
-//      {
-//           curState.trackEn = 0;
-//           vTargetGlob[0] = 0;
-//           vTargetGlob[1] = 0;
-//           vTargetGlob[2] = 0;
-//      }
-//      else
-//      {
-//           curState.trackEn = 1;
-//      }
   }
 }
-//ADC:
-//3 right
-//4 left
-//5 front
-//6 back
+

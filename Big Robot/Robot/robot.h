@@ -68,6 +68,7 @@ typedef struct {
   char pidEnabled;
   char trackEn;
   char kinemEn;
+  char collisionAvoidance;
   char filtering;
 } robStateStruct;
 
@@ -79,6 +80,7 @@ extern float robotCoord[3] ;
 extern float robotSpeed[3] ;
 extern robStateStruct curState;
 extern encOutPackStruct outEnc;
+extern uint16_t totalPointComplite;
 
 
 extern uint32_t  PWM_DIR[10];
@@ -92,11 +94,7 @@ extern char inData[64];
 extern char dataIndex;
 extern struct InPackStruct;
 
-extern float distance[4][3];
-extern float distance_front;
-
 char execCommand(InPackStruct* cmd);
 void getSonarData(char ADC_ch, char side);
-void stopTheRobot(void);
 
 #endif

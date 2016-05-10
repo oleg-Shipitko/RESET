@@ -21,35 +21,13 @@ float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
-float distance[4][3] = {{100, 100, 100}, {100, 100, 100}, {100, 100, 100}, {100, 100, 100}};                      // расстояния по показаниям дальномеров
-float distance_front = 100;
+robStateStruct curState = {1, 1, 1, 0, 0};    // состояние регуляторов активен-1/неактвен -0
 
 uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
 
 //extern CDC_IF_Prop_TypeDef  APP_FOPS;
 
-void getSonarData(char ADC_ch, char side) // Reads data from ADC, filter with running mean (window = 3) it and transfers to cm
-{
-    // side:
-    // 0 - right
-    // 1 - left
-    // 2 - front
-    // 3 - back
-
-    distance[side][2] = distance[side][1];
-    distance[side][1] = distance[side][0];
-    distance[side][0] = (adcData[ADC_ch - 1] * 0.0822 * 2.54 + distance[side][1] + distance[side][2]) / 3.0;
-}
-
-void stopTheRobot(void)
-{
-    curState.trackEn = 0;
-    vTargetGlob[0] = 0;
-    vTargetGlob[1] = 0;
-    vTargetGlob[2] = 0;
-}
 
 char execCommand(InPackStruct* cmd) //обработать входящую команду
 {
@@ -222,7 +200,7 @@ switch(cmd->command)
       points[lastPoint].center[1] = temp[1];
       points[lastPoint].center[2] = temp[2];
       points[lastPoint].speedVelTipe = speedType[*ch];
-      points[lastPoint].speedRotTipe = rotType[*(ch)];
+      points[lastPoint].speedRotTipe = rotType[*ch];
       points[lastPoint].endTask = NULL;
       points[lastPoint].movTask = NULL;
       char * str ="Ok";
@@ -547,7 +525,7 @@ switch(cmd->command)
       uint8_t numberOfCubesCatched;
       closeCubesCatcher(&numberOfCubesCatched);
 
-      sendAnswer(cmd->command, numberOfCubesCatched, sizeof(uint8_t));
+      sendAnswer(cmd->command, (char *)&numberOfCubesCatched, sizeof(uint8_t));
   }
   break;
 
@@ -594,6 +572,12 @@ switch(cmd->command)
 
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x32:  // Flag of reached point
+  {
+      sendAnswer(cmd->command, (char *)&traceFlag, sizeof(traceFlag));
   }
   break;
 

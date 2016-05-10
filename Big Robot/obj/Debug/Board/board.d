@@ -15,4 +15,4 @@ obj\debug\board\board.o: Board\Board.c Board\Board.h Library/stm32f4xx.h \
  Board\Pins.h Board\gpio.h Library/stm32f4xx_conf.h Board\i2c.h \
  Board\Interrupts.h Board\usart.h Board\tim.h Board\adc.h \
  Robot/Regulator.h Robot/Path.h Robot/Manipulators.h Robot/Regulator.h \
- Board/Pins.h
+ Board/Pins.h Robot/Dynamixel_control.h

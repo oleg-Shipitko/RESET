@@ -42,10 +42,6 @@ bool openCubesCatcher()
 
 bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 {
-    setServoReturnDelayMicros((uint8_t)ID_RIGHT, (uint16_t) 0);
-    setServoReturnDelayMicros((uint8_t)ID_LEFT, (uint16_t) 0);
-    setServoTorque((uint8_t)ID_RIGHT, 500);
-    setServoTorque((uint8_t)ID_LEFT, 500);
     setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT);
     setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT);
     softDelay(20000000);
@@ -79,7 +75,7 @@ bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 
 bool initCubeCatcherPID(void)
 {
-    cubesCatcherPID.target = 260.0;
+    cubesCatcherPID.target = 275.0;
   	cubesCatcherPID.p_k = 0.014;
   	cubesCatcherPID.i_k = 0.004;
   	cubesCatcherPID.d_k = 0.004;

@@ -6,11 +6,20 @@
 			<break type="0" file="src/main.c" line="184" />
 		</breakpoints>
 		<watches>
+			<watch key="adcData" format="0" array="1" start="0" count="0" />
+			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
+			<watch key="curState" format="0" array="0" start="0" count="0" />
+			<watch key="distanceFromSonars" format="0" array="0" start="0" count="0" />
+			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
+			<watch key="robotSpeed" format="0" array="0" start="0" count="0" />
+			<watch key="totalPointComplite" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlobF" format="0" array="0" start="0" count="0" />
+			<watch key="distance" format="0" array="0" start="0" count="0" />
 			<watch key="left_servo_angle" format="0" array="0" start="0" count="0" />
 			<watch key="num" format="0" array="0" start="0" count="0" />
 			<watch key="right_servo_angle" format="0" array="0" start="0" count="0" />
 			<watch key="*test" format="3" array="0" start="0" count="0" />
-			<watch key="adcData" format="0" array="0" start="0" count="0" />
 			<watch key="checkSum" format="3" array="0" start="0" count="0" />
 			<watch key="curAngle" format="0" array="0" start="0" count="0" />
 			<watch key="curLoad" format="0" array="0" start="0" count="0" />
@@ -24,9 +33,7 @@
 			<watch key="params" format="3" array="0" start="0" count="0" />
 			<watch key="points" format="0" array="1" start="0" count="0" />
 			<watch key="right_servo_angle" format="1" array="0" start="0" count="0" />
-			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
 			<watch key="robotCoord" format="1" array="0" start="0" count="0" />
-			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
 		</watches>
 	</debuggerLastSession>
 </EmBlocks_debug_session>

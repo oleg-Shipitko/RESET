@@ -8,6 +8,7 @@
 #include "adc.h"
 #include "Regulator.h"
 #include "Manipulators.h"
+#include "Dynamixel_control.h"
 
 uint16_t adcData[10];
 uint8_t pinType[10];
@@ -343,7 +344,8 @@ initCubeCatcherPID();
 //  NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 //___Dynamixel IO control____________________________________________________________________
-// conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, PULL_DOWN);
+  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
+  set_pin(DYNAMIXEL_IO_CONTROL); // Transmit mode
 
 //___I2C_____________________________________________________________________
 //conf_af(I2C_SDA_PIN, AF4);
@@ -355,8 +357,10 @@ initCubeCatcherPID();
 //NVIC_EnableIRQ(I2C2_ER_IRQn);
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
 
-//CloseCubesMovers();
 closeWall();
+initDynamixels();
+openCubesCatcher();
+
 __enable_irq();
 
 }

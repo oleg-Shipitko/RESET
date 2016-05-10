@@ -10,6 +10,7 @@ on an STM32F4 chip.
 #include "stm32f4xx_usart.h"
 #include "Dynamixel_control.h"
 #include "Pins.h"
+#include "Manipulators.h"
 
 __asm__(".global _printf_float");
 __asm__(".global _scanf_float");
@@ -27,6 +28,8 @@ void sendServoCommand (const uint8_t servoId,
                        const uint8_t numParams,
                        const uint8_t *params)
 {
+    //reset_pin(DYNAMIXEL_IO_CONTROL);
+//    softDelay(100);
     sendServoByte (0xff);
     sendServoByte (0xff);  // command header
 
@@ -46,10 +49,14 @@ void sendServoCommand (const uint8_t servoId,
     }
 
     sendServoByte (~checksum);  // checksum
+//    softDelay(100);
+    //set_pin(DYNAMIXEL_IO_CONTROL);
 }
 
 bool getServoResponse (void)
 {
+    reset_pin(DYNAMIXEL_IO_CONTROL);
+//    softDelay(100);
     uint16_t retries = 0;
 
     clearServoReceiveBuffer();
@@ -62,6 +69,7 @@ bool getServoResponse (void)
             #ifdef SERVO_DEBUG
             printf ("Too many retries at start\n");
             #endif
+            set_pin(DYNAMIXEL_IO_CONTROL);
             return false;
         }
     }
@@ -78,6 +86,7 @@ bool getServoResponse (void)
         #ifdef SERVO_DEBUG
         printf ("Response length too big: %d\n", (int)response.length);
         #endif
+        set_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
 
@@ -89,6 +98,7 @@ bool getServoResponse (void)
             #ifdef SERVO_DEBUG
             printf ("Too many retries waiting for params, got %d of %d params\n", getServoBytesAvailable(), response.length);
             #endif
+            set_pin(DYNAMIXEL_IO_CONTROL);
             return false;
         }
     }
@@ -113,21 +123,21 @@ bool getServoResponse (void)
         #ifdef SERVO_DEBUG
         printf ("Checksum mismatch: %x calculated, %x received\n", calcChecksum, recChecksum);
         #endif
+        set_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
-
+//    softDelay(100);
+    set_pin(DYNAMIXEL_IO_CONTROL);
     return true;
 }
 
 inline bool getAndCheckResponse (const uint8_t servoId)
 {
-//    set_pin(DYNAMIXEL_IO_CONTROL);
     if (!getServoResponse())
     {
         #ifdef SERVO_DEBUG
         printf ("Servo error: Servo %d did not respond correctly or at all\n", (int)servoId);
         #endif
-//        reset_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
 
@@ -136,7 +146,6 @@ inline bool getAndCheckResponse (const uint8_t servoId)
         #ifdef SERVO_DEBUG
         printf ("Servo error: Response ID %d does not match command ID %d\n", (int)response.id);
         #endif
-//        reset_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
 
@@ -145,10 +154,8 @@ inline bool getAndCheckResponse (const uint8_t servoId)
         #ifdef SERVO_DEBUG
         printf ("Servo error: Response error code was nonzero (%d)\n", (int)response.error);
         #endif
-//        reset_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
-//    reset_pin(DYNAMIXEL_IO_CONTROL);
     return true;
 }
 
@@ -432,55 +439,12 @@ bool setServoCCWAngleLimit (const uint8_t servoId,
     return true;
 }
 
-void initServoUSART (void)
+void initDynamixels(void)
 {
-    // enable the USART3 clock
-    RCC_APB1PeriphClockCmd (RCC_AHB1Periph_GPIOB, ENABLE);
-    RCC_APB1PeriphClockCmd (RCC_APB1Periph_USART3, ENABLE);
-
-    GPIO_InitTypeDef GPIO_InitStruct;
-    USART_InitTypeDef USART_InitStructure;
-    USART_ClockInitTypeDef USART_ClockInitStructure;
-    NVIC_InitTypeDef NVIC_InitStructure;
-    EXTI_InitTypeDef EXTI_InitStruct;
-
-    clearServoReceiveBuffer();
-
-    // set USART3 Tx (PB8) as alternate function open-drain
-    GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_8 | GPIO_Pin_9;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-    GPIO_InitStruct.GPIO_OType = GPIO_OType_OD;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_25MHz;
-    GPIO_Init (GPIOB, &GPIO_InitStruct);
-
-	// connect the output pin to the peripheral's alt function
-    GPIO_PinAFConfig (GPIOB, GPIO_PinSource8, GPIO_AF_USART3);
-    GPIO_PinAFConfig (GPIOB, GPIO_PinSource9, GPIO_AF_USART3);
-
-
-    // set up USART3
-    USART_InitStructure.USART_BaudRate = 1000000;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    USART_InitStructure.USART_Parity = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-
-    USART_Init (USART3, &USART_InitStructure);
-
-    // configure the USART3 interrupt
-    NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init (&NVIC_InitStructure);
-
-	// enable the USART3 receive interrupt
-	USART_ITConfig (USART3, USART_IT_RXNE, ENABLE);
-
-    // enable USART3
-    USART_Cmd (USART3, ENABLE);
+    setServoReturnDelayMicros((uint8_t)ID_RIGHT, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)ID_LEFT, (uint16_t) 0);
+    setServoTorque((uint8_t)ID_RIGHT, 500);
+    setServoTorque((uint8_t)ID_LEFT, 500);
 }
 
 void sendServoByte (const uint8_t byte)

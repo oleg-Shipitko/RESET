@@ -107,7 +107,7 @@ void soft_delay(long int ticks)
     uint16_t right_open = 300; // right open
 
     int8_t num = 0;
-    uint16_t delay = 0;
+    uint16_t delay = 10;
 
     float right_servo_angle = 0;
     float left_servo_angle = 0;
