@@ -42,6 +42,10 @@ void initServoUSART (void);
 // ping a servo, returns true if we get back the expected values
 bool pingServo (const uint8_t servoId);
 
+bool setID (const uint8_t servoId, uint8_t newID);
+
+bool setBaudRate (const uint8_t servoId, uint8_t baudRate);
+
 // set the number of microseconds the servo waits before returning a response
 // servo factory default value is 500, but we probably want it to be 0
 // max value: 510

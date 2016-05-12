@@ -1,39 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <EmBlocks_debug_session>
 	<debuggerLastSession>
-		<breakpoints>
-			<break type="0" file="src/main.c" line="176" />
-			<break type="0" file="src/main.c" line="184" />
-		</breakpoints>
 		<watches>
-			<watch key="adcData" format="0" array="1" start="0" count="0" />
-			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
-			<watch key="curState" format="0" array="0" start="0" count="0" />
-			<watch key="distanceFromSonars" format="0" array="0" start="0" count="0" />
-			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
-			<watch key="robotSpeed" format="0" array="0" start="0" count="0" />
-			<watch key="totalPointComplite" format="0" array="0" start="0" count="0" />
-			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
-			<watch key="vTargetGlobF" format="0" array="0" start="0" count="0" />
-			<watch key="distance" format="0" array="0" start="0" count="0" />
-			<watch key="left_servo_angle" format="0" array="0" start="0" count="0" />
-			<watch key="num" format="0" array="0" start="0" count="0" />
-			<watch key="right_servo_angle" format="0" array="0" start="0" count="0" />
+			<watch key="*ch" format="0" array="0" start="0" count="0" />
 			<watch key="*test" format="3" array="0" start="0" count="0" />
+			<watch key="MAX_ACCEL" format="0" array="0" start="0" count="0" />
+			<watch key="MAX_ACCEL_INC" format="0" array="0" start="0" count="0" />
+			<watch key="adcData" format="0" array="1" start="0" count="0" />
 			<watch key="checkSum" format="3" array="0" start="0" count="0" />
+			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
 			<watch key="curAngle" format="0" array="0" start="0" count="0" />
 			<watch key="curLoad" format="0" array="0" start="0" count="0" />
 			<watch key="curPath" format="0" array="0" start="0" count="0" />
+			<watch key="curPath.Coord_local_track" format="0" array="0" start="0" count="0" />
+			<watch key="curPath.lengthTrace" format="0" array="0" start="0" count="0" />
+			<watch key="curPath.phiZad" format="0" array="0" start="0" count="0" />
 			<watch key="curSpeed" format="0" array="0" start="0" count="0" />
+			<watch key="curState" format="0" array="0" start="0" count="0" />
 			<watch key="dataIndex" format="0" array="0" start="0" count="0" />
+			<watch key="distance" format="0" array="0" start="0" count="0" />
+			<watch key="distanceFromSonars" format="0" array="0" start="0" count="0" />
+			<watch key="frequency" format="0" array="0" start="0" count="0" />
+			<watch key="i" format="0" array="0" start="0" count="0" />
 			<watch key="inData" format="3" array="1" start="0" count="0" />
+			<watch key="lastPoint" format="0" array="0" start="0" count="0" />
 			<watch key="lastPoint" format="1" array="0" start="0" count="0" />
+			<watch key="left_servo_angle" format="0" array="0" start="0" count="0" />
+			<watch key="num" format="0" array="0" start="0" count="0" />
 			<watch key="num" format="1" array="0" start="0" count="0" />
 			<watch key="outData" format="3" array="1" start="0" count="0" />
 			<watch key="params" format="3" array="0" start="0" count="0" />
-			<watch key="points" format="0" array="1" start="0" count="0" />
+			<watch key="pathPointStr" format="0" array="0" start="0" count="0" />
+			<watch key="points" format="0" array="0" start="0" count="0" />
+			<watch key="right_servo_angle" format="0" array="0" start="0" count="0" />
 			<watch key="right_servo_angle" format="1" array="0" start="0" count="0" />
 			<watch key="robotCoord" format="1" array="0" start="0" count="0" />
+			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
+			<watch key="robotSpeed" format="0" array="0" start="0" count="0" />
+			<watch key="rotType" format="0" array="0" start="0" count="0" />
+			<watch key="totalPointComplite" format="0" array="0" start="0" count="0" />
+			<watch key="traceFlag" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlobCA" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlobF" format="0" array="0" start="0" count="0" />
 		</watches>
 	</debuggerLastSession>
 </EmBlocks_debug_session>

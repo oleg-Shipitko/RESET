@@ -97,10 +97,8 @@ extern float stopRotSlow[5] ; //{0.2,0.1,-0.1,0.3,0.6};             //движе
 extern float standRotSlow[5] ;
 
 
-
-
-extern float * speedType[6];
-extern float * rotType[6];
+extern float * speedType[9];
+extern float * rotType[9];
 extern PidStruct wheelsPidStruct[4];
 extern float vTargetGlob[3];
 extern float vTargetGlobF[3];
@@ -135,5 +133,8 @@ void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out)
 void removePoint(pathPointStr * points,char *lastPoint);
 void SpeedFiltration(float *V,float *vF);
 void collisionAvoidance(float *V,float *vCA);
+
+void getSonarData(char ADC_ch, char side);
+void getIRData(char ADC_ch, char side);
 
 #endif

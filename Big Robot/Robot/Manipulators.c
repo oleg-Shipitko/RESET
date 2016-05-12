@@ -181,3 +181,23 @@ bool closeWall(void)
     return 0;
 }
 ///////////////////////////////////////////////////////////////
+
+
+///////////////////////////CUBES CATCHER 2///////////////////////
+
+//bool openCubesCatcher_2(void)
+//{
+//    setServoAngle((uint8_t)ID_RIGHT_2, (uint16_t)OPEN_ANG_RIGHT_2);
+//    setServoAngle((uint8_t)ID_LEFT_2, (uint16_t)OPEN_ANG_LEFT_2);
+//
+//    return 0;
+//}
+//
+//bool closeCubesCatcher_2(void)
+//{
+//    setServoAngle((uint8_t)ID_RIGHT_2, (uint16_t)CLOSED_ANG_RIGHT_2);
+//    setServoAngle((uint8_t)ID_LEFT_2, (uint16_t)CLOSED_ANG_LEFT_2);
+//
+//    return 0;
+//}
+///////////////////////////////////////////////////////////////
