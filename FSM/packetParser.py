@@ -24,7 +24,7 @@ class ParsePacket(object):
 		self.CheckCrc()
 
 	def GetReply(self):
-		if self.listOfComands.getCurentCoordinates == self.command:
+		if self.listOfComands.getCurentCoordinates == self.command or self.listOfComands.getCurrentSpeed == self.command:
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
 			coordinatesList = []

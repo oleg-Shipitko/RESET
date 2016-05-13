@@ -45,6 +45,11 @@ def switch_on_tajectory_regulator():
     reply_on_request = send_request(packet)
     return reply_on_request
 
+def switch_off_tajectory_regulator():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffTrajectoryRegulator)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
 def switch_on_kinematic_calculator():
     packet = packetBuilder.BuildPacket(commands_to_stm.switchOnKinematicCalculation)
     reply_on_request = send_request(packet)
@@ -131,6 +136,11 @@ def switch_on_collision_avoidance():
 
 def switch_off_collision_avoidance():
     packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def get_robot_speeds():
+    packet = packetBuilder.BuildPacket(commands_to_stm.getCurrentSpeed)
     reply_on_request = send_request(packet)
     return reply_on_request
 
