@@ -28,6 +28,8 @@ typedef enum ServoCommand
     WRITE = 3
 } ServoCommand;
 
+#define ID                  0x03
+#define BAUD_RATE           0x04
 #define RETURN_DELAY        0x05
 #define BLINK_CONDITIONS    0x11
 #define SHUTDOWN_CONDITIONS 0x12
@@ -177,6 +179,39 @@ bool pingServo (const uint8_t servoId)
 
     return true;
 }
+
+// set an ID to a servo, returns true if we get back the expected values
+bool setID (const uint8_t servoId, uint8_t newID)
+{
+    if (newID > 253)
+        return false;
+
+    const uint8_t params[2] = {ID, newID & 0xff};
+
+    sendServoCommand (servoId, WRITE, 2, params);
+
+    if (!getAndCheckResponse (newID))
+        return false;
+
+    return true;
+}
+
+// set a baud rate to a servo, returns true if we get back the expected values
+bool setBaudRate (const uint8_t servoId, uint8_t baudRate)
+{
+    if (BAUD_RATE > 253)
+        return false;
+
+    const uint8_t params[2] = {BAUD_RATE, baudRate & 0xff};
+
+    sendServoCommand (servoId, WRITE, 2, params);
+
+    if (!getAndCheckResponse (servoId))
+        return false;
+
+    return true;
+}
+
 
 // set the number of microseconds the servo waits before returning a response
 // servo factory default value is 500, but we probably want it to be 0

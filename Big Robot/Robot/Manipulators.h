@@ -38,6 +38,18 @@ bool initCubeCatcherPID(void);
 bool pidLowLevelManipulator(void);
 ///////////////////////////////////////////////////////////////
 
+///////////////////////////CUBES CATCHER 2///////////////////////
+#define ID_RIGHT_2 5                     // If to look on robot from the front
+#define ID_LEFT_2 1
+#define OPEN_ANG_RIGHT_2 290//300
+#define OPEN_ANG_LEFT_2 10 //0
+#define CLOSED_ANG_RIGHT_2 150
+#define CLOSED_ANG_LEFT_2 150
+
+bool openCubesCatcher_2(void);
+bool closeCubesCatcher_2(void);
+///////////////////////////////////////////////////////////////
+
 ///////////////////////////PNEUMO//////////////////////////////
 
 bool pneumoIn();

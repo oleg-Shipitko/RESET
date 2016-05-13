@@ -32,9 +32,9 @@ float ACCEL_INC = 0.2;
  TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },  //Стек точек траектории
-                                        {0.0, 0.0, -1.570, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },
-                                        {0.0, 0.0, 1.570, NULL,NULL,0,stopVelFast,stopRotSlow,0,1 },
+                                        {1.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },
+                                        {1.0, 1.0, 0.0, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },
+                                        {0.0, 1.0, 0.0, NULL,NULL,0,stopVelFast,stopRotSlow,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotSlow,0,1 },
                                         {0.0, 0.0, 2.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
@@ -46,26 +46,33 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFas
 char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
+float normalVelSuperFast[5] = {0.6, 0.3, 0.3, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVelSuperFast[5] = {0.6, 0.3, -0.3, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVelSuperFast[5] = {0.6, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
+
+float normalRotSuperFast[5] = {4.0, 2.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopRotSuperFast[5] = {4.0, 2.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRotSuperFast[5] = {4.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
+
 float normalVelFast[5] = {0.3, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopVelFast[5] = {0.3, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
 float standVelFast[5] = {0.3, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
 
-float normalVelSlow[5] = {0.1, 0.05, 0.05, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVelSlow[5] = {0.1, 0.05, -0.05, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVelSlow[5] = {0.1, 0.05, -0.05, 2.0, 2.5};                                       //удержание заданного положения
-
-
 float normalRotFast[5] = {3.0, 1.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopRotFast[5] = {3.0, 1.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
 float standRotFast[5] = {4.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
+
+float normalVelSlow[5] = {0.1, 0.05, 0.05, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVelSlow[5] = {0.1, 0.05, -0.05, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVelSlow[5] = {0.1, 0.05, -0.05, 2.0, 2.5};                                       //удержание заданного положения
 
 float normalRotSlow[5] = {1.0, 0.2, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopRotSlow[5] = {1.0, 0.2, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
 float standRotSlow[5] = {1.0 , 1.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
 
 
-float * speedType[6] = {normalVelFast, stopVelFast, standVelFast, normalVelSlow, stopVelSlow, standVelSlow };// типы  линейный скоростей
-float * rotType[6] = {normalRotFast, stopRotFast, standRotFast, normalRotSlow, stopRotSlow, standRotSlow};// типы угловых скоростей
+float * speedType[9] = {normalVelFast, stopVelFast, standVelFast, normalVelSlow, stopVelSlow, standVelSlow, normalVelSuperFast, stopVelSuperFast, standVelSuperFast  };// типы  линейный скоростей
+float * rotType[9] = {normalRotFast, stopRotFast, standRotFast, normalRotSlow, stopRotSlow, standRotSlow, normalRotSuperFast, stopRotSuperFast, standRotSuperFast};// типы угловых скоростей
 
 
 void getSonarData(char ADC_ch, char side) // Reads data from ADC, filter with running mean (window = 3) it and transfers to cm
@@ -81,6 +88,18 @@ void getSonarData(char ADC_ch, char side) // Reads data from ADC, filter with ru
     distanceFromSonars[side][0] = (adcData[ADC_ch - 1] * 0.0822 * 2.54 + distanceFromSonars[side][1] + distanceFromSonars[side][2]) / 3.0;
 }
 
+void getIRData(char ADC_ch, char side) // Reads data from ADC, filter with running mean (window = 3) it and transfers to cm
+{
+    // side:
+    // 0 - right
+    // 1 - left
+    // 2 - front
+    // 3 - back
+
+    distanceFromSonars[side][2] = distanceFromSonars[side][1];
+    distanceFromSonars[side][1] = distanceFromSonars[side][0];
+    distanceFromSonars[side][0] = ((20.0 / ((3.0 * adcData[ADC_ch - 1] / 4096.0) - 0.15)) + distanceFromSonars[side][1] + distanceFromSonars[side][2]) / 3.0;
+}
 //______________________________________________________________________________
 ////////////////////////////////////////////////////////////////////////////////
 void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из очереди
@@ -742,32 +761,32 @@ void SpeedFiltration(float *V,float *vF)
   ////////////////////////////////////////////////////////////////////////////////
 void collisionAvoidance(float *V,float *vCA)
   {
-      if ( ( (distanceFromSonars[SONAR_FRONT_1][0] < 25) || (distanceFromSonars[SONAR_FRONT_2][0] < 25) )  && (V[0] > 0.1) )
+      if ( ( (distanceFromSonars[SONAR_FRONT_1][0] < 30) || (distanceFromSonars[SONAR_FRONT_2][0] < 30) )  && (V[0] > 0.05) )
       {
           vCA[0] = 0;
           vCA[1] = 0;
           vCA[2] = 0;
       }
-      else if ( (distanceFromSonars[SONAR_BACK][0] < 25)  && (V[0] < 0.1) )
+      else if ( (distanceFromSonars[SONAR_BACK][0] < 30)  && (V[0] < -0.05) )
       {
           vCA[0] = 0;
           vCA[1] = 0;
           vCA[2] = 0;
       }
-      else if ( (distanceFromSonars[SONAR_LEFT][0] < 25)  && (V[1] > 0.1) )
+      else if ( (distanceFromSonars[SONAR_LEFT][0] < 30)  && (V[1] > 0.05) )
       {
           vCA[0] = 0;
           vCA[1] = 0;
           vCA[2] = 0;
       }
-      else if ( (distanceFromSonars[SONAR_RIGHT][0] < 25)  && (V[1] < 0.1) )
-      {
-          vCA[0] = 0;
-          vCA[1] = 0;
-          vCA[2] = 0;
-      }
-      else if ((distanceFromSonars[SONAR_LEFT][0] < 25 || distanceFromSonars[SONAR_RIGHT][0] < 25 || distanceFromSonars[SONAR_FRONT_1][0] < 20 ||
-                distanceFromSonars[SONAR_FRONT_2][0] < 25 || distanceFromSonars[SONAR_BACK][0] < 25) && (V[2] > 1.0))
+//      else if ( (distanceFromSonars[SONAR_RIGHT][0] < 30)  && (V[1] < -0.1) )
+//      {
+//          vCA[0] = 0;
+//          vCA[1] = 0;
+//          vCA[2] = 0;
+//      }
+      else if ((distanceFromSonars[SONAR_LEFT][0] < 30 || distanceFromSonars[SONAR_RIGHT][0] < 30 || distanceFromSonars[SONAR_FRONT_1][0] < 30 ||
+                distanceFromSonars[SONAR_FRONT_2][0] < 30 || distanceFromSonars[SONAR_BACK][0] < 30) && (V[2] > 1.0))
       {
           vCA[0] = 0;
           vCA[1] = 0;

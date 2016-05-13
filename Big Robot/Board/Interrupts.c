@@ -54,10 +54,11 @@ if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0]
 
   // Sonars
   getSonarData((char)ADC_SONAR_RIGHT, (char)SONAR_RIGHT);
-  getSonarData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
+//  getSonarData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
   getSonarData((char)ADC_SONAR_FRONT_1, (char)SONAR_FRONT_1);
   getSonarData((char)ADC_SONAR_FRONT_2, (char)SONAR_FRONT_2);
   getSonarData((char)ADC_SONAR_BACK, (char)SONAR_BACK);
+  getIRData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
    //   reset_pin(PWM_DIR[8]);
 }
 ////////////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@ float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 0, 0};    // состояние регуляторов активен-1/неактвен -0
+robStateStruct curState = {1, 1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
 
 uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
@@ -578,6 +578,22 @@ switch(cmd->command)
   case 0x32:  // Flag of reached point
   {
       sendAnswer(cmd->command, (char *)&traceFlag, sizeof(traceFlag));
+  }
+  break;
+
+  case 0x33:  // Switch on collision avoidance
+  {
+      curState.collisionAvoidance = 1;
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x34:  // Switch off collision avoidance
+  {
+      curState.collisionAvoidance = 0;
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
   }
   break;
 

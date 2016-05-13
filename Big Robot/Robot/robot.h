@@ -95,6 +95,6 @@ extern char dataIndex;
 extern struct InPackStruct;
 
 char execCommand(InPackStruct* cmd);
-void getSonarData(char ADC_ch, char side);
+
 
 #endif

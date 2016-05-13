@@ -70,8 +70,8 @@ openCubesCatcher();
 
   while(1)
    {
-//      openCubesCatcher();
-//      closeCubesCatcher(&number);
+//      openCubesCatcher_2();
+//      closeCubesCatcher_2();
 
       char temp = pin_val (EXTI1_PIN);
       if (temp)
