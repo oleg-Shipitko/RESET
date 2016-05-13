@@ -14,6 +14,10 @@ TCP_IP = '192.168.0.10'
 TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 
+# PC server address and  port
+HOST = '192.168.1.251'
+PORT = 9999
+
 #STM 32 board parameters
 VID = 1155
 PID = 22336
@@ -24,7 +28,7 @@ N = 200
 #Resampling trashold
 n_trash = N/3
 # Dimensions of the playing field  
-WORLD_X = 3100
+WORLD_X = 3500
 WORLD_Y = 2100
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # left starting possition (0,0 in corner near beach huts)
@@ -39,19 +43,19 @@ R = math.sqrt(60.0**2 + 7.0**2)
 
 class Robot(object):
 	"""Robot class. Represent particles in monte carlo localisation"""
-	def __init__(self, first):
+	def __init__(self, first, start_position = None):
 		"""Initialize robot/particle with random position"""
 		if first:
-			self.x = random.gauss(200.0, 50) 
-			self.y = random.gauss(720.0, 50)  
-			self.orientation = random.gauss(0.0, 0.1)
+			self.x = random.gauss(start_position[0]*1000, 50)#(200.0, 50) 2.847, 0.72, -3.14
+			self.y = random.gauss(start_position[1]*1000, 50)
+			self.orientation = random.gauss(start_position[2], 0.1)
 
 	def set(self, x_new, y_new, orientation_new):
 		"""Set particle position on the field"""
 		if -100 <= x_new <= WORLD_X:
 			self.x = x_new
 		else:
-			self.x = random.gauss(151.0, 5) 
+			self.x = random.gauss(2800.0, 5) 
 		if -100 <= y_new <= WORLD_Y:
 			self.y = y_new
 		else:
@@ -60,8 +64,8 @@ class Robot(object):
 		
 	def move(self, delta):
 		"""Move particle by creating new one and setting position"""
-		x_new = self.x + delta[0] + random.gauss(0, 1)
-		y_new = self.y + delta[1] + random.gauss(0, 1)
+		x_new = self.x + delta[0] + random.gauss(0, 10)
+		y_new = self.y + delta[1] + random.gauss(0, 10)
 		orientation_new = self.orientation + delta[2] + random.gauss(0, 0.03)	
 		new_robot = Robot(False)
 		new_robot.set(x_new, y_new, orientation_new)
@@ -160,11 +164,14 @@ def angle5(angle):
 	#	return angle + 7*math.pi/4
 	return (angle + math.pi/4)%(2*math.pi)
 
-def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot):
+def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot, cc_robot):
 		"""Calculate robot's relative motion"""	
 		#print 'in relative motion'
 		new = stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
 		#print 'after stm ===========', new
+		cc_robot[0] = new[0]
+		cc_robot[1] = new[1]
+		cc_robot[2] = new[2]
 		if correction_performed.value == 1:
 			old = [myrobot.x/1000, myrobot.y/1000,myrobot.orientation]
 			correction_performed.value = 0	
@@ -210,6 +217,15 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 	print 'lidar initialized'
 	return s
 
+def connect_pc(HOST, PORT):
+    try:    
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((HOST, PORT))
+        return sock
+    except Exception as err:
+        print 'Error in connecting to pc server: ', err
+        sock.close()
+
 def stm_driver(input_command_queue, reply_to_localization_queue, command, parameters = ''):
     #print 'in stm'
     command = {'request_source': 'localisation', 'command': command, 'parameters': parameters}
@@ -222,70 +238,79 @@ def stm_driver(input_command_queue, reply_to_localization_queue, command, parame
 
 ###############################################################################
 
-def main(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed):
-	"""Main function for localisation"""
-	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-	myrobot = Robot(True)
-	myrobot.set(210.0, 720.0, 0.0)
-	print myrobot, R, BETA
-	p = [Robot(True) for i in xrange(N)]
-	old = [0.1525,0.72,0.0]
-	w_re = [1.0/N for i in xrange(N)]
-	w_prev = [1.0 for i in xrange(N)]
-	try:
-		while 1:
-			#print 'maki'
-			start = time.time()
-			rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot)	
-			#print '=========================after lidar'
-			p2 = [p[i].move(rel_motion) for i in xrange(N)]
-			p = p2
-			old = old2
-			s.send('GE0000108000\r')
-			data_lidar = s.recv(BUFFER_SIZE)
-			angle, distance = lidar_scan(data_lidar) 
-			x_rob, y_rob = p_trans(angle, distance)			
-			#print 'kkk'
-			w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
-			w_n_sum = sum(w_next)
-			try:
-				w_n_norm = [i/w_n_sum for i in w_next]
-			except ZeroDivisionError:
-				print 'zero weights in lidar'
-				w_n_norm = [0.0 for i in xrange(N)]
-			
-			w = [w_prev[i]*w_n_norm[i] for i in xrange(N)]
-			w_sum = sum(w)
-
-			try:
-				w_norm = [i/w_sum for i in w]
-			except ZeroDivisionError:
-				print 'zero weights in lidar'
-				w_norm = [0.0 for i in xrange(N)]
-				
-			mean_val = [(p[i].x*w_norm[i], p[i].y*w_norm[i]) for i in xrange(N)]
-			mean_orientation = mean_angl(p, w_norm)
-			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
-			myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
-						center[1]-R*math.sin(mean_orientation+BETA), 
-						mean_orientation)
-			#print myrobot
-			current_coordinatess[0] = myrobot.x/1000
-			current_coordinatess[1] = myrobot.y/1000
-			current_coordinatess[2] = myrobot.orientation
-			#print '==================', current_coordinatess[:]
-			w_prev = w_norm
-
-			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
-			if n_eff < n_trash:# and sum(rel_motion) > 0.1:
-				try:
-					p3 = resample(p, w_norm, N)
-					p = p3
-					w_prev = w_re
-				except:
-					print 'error with choice'
-			end = time.time()
-			#print end - start
-	except:			
-		s.shutdown(2)
-		s.close()
+def main(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, cc_robot):	
+    """Main function for localisation"""
+    try: 
+        s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
+        #pc = connect_pc(HOST,PORT)
+        myrobot = Robot(True,start_position)
+        #myrobot.set(start_position[0]*1000,start_position[1]*1000,start_position[2])
+        #print myrobot
+        p = [Robot(True, start_position) for i in xrange(N)]
+        #print p[0], p[30], p[170]
+        old = start_position
+        w_re = [1.0/N for i in xrange(N)]
+        w_prev = [1.0 for i in xrange(N)]
+        time.sleep(1)
+        try:
+            while 1:
+                #print 'maki'
+                #start = time.time()
+                rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot, cc_robot)	
+                #print '=========================after lidar'
+                p2 = [p[i].move(rel_motion) for i in xrange(N)]
+                p = p2
+                old = old2
+                s.send('GE0000108000\r')
+                data_lidar = s.recv(BUFFER_SIZE)
+                angle, distance = lidar_scan(data_lidar) 
+                x_rob, y_rob = p_trans(angle, distance)			
+                #print 'kkk'
+                w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
+                w_n_sum = sum(w_next)
+                try:
+                    w_n_norm = [i/w_n_sum for i in w_next]
+                except ZeroDivisionError:
+                    print 'zero weights in lidar'
+                    w_n_norm = [0.0 for i in xrange(N)]
+            	
+                w = [w_prev[i]*w_n_norm[i] for i in xrange(N)]
+                w_sum = sum(w)
+    
+                try:
+                    w_norm = [i/w_sum for i in w]
+                except ZeroDivisionError:
+                    print 'zero weights in lidar'
+                    w_norm = [0.0 for i in xrange(N)]
+                	
+                mean_val = [(p[i].x*w_norm[i], p[i].y*w_norm[i]) for i in xrange(N)]
+                mean_orientation = mean_angl(p, w_norm)
+                center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
+                myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
+                            center[1]-R*math.sin(mean_orientation+BETA), 
+                            mean_orientation)
+                #print myrobot
+                current_coordinatess[0] = myrobot.x/1000
+                current_coordinatess[1] = myrobot.y/1000
+                current_coordinatess[2] = myrobot.orientation
+                #print '==================', current_coordinatess[:]
+                w_prev = w_norm
+                pc.sendall(str(mytobot.pose()) + '\n' + str(w_prev) + '\n')
+                n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
+                if n_eff < n_trash:# and sum(rel_motion) > 0.1:
+                    try:
+                        p3 = resample(p, w_norm, N)
+                        p = p3
+                        w_prev = w_re
+                    except:
+                        print 'error with choice'
+                #end = time.time()
+                #print end - start
+        except:			
+            s.shutdown(2)
+            s.close()
+            pc.close()
+    except:			
+        s.shutdown(2)
+        s.close()
+        pc.close()

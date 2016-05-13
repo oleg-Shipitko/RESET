@@ -283,7 +283,7 @@ if __name__ == '__main__':
 					if strength > maxs:
 						maxs = strength
 					#print 'strenght ', strength
-					if strength > 1100 and point < 4000:	
+					if strength > 1200 and point < 4000:	
 						polar_graph.append(point)
 						angle.append(step)
 						stre.append(strength)

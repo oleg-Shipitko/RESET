@@ -11,17 +11,12 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
-current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
 
 cubes_in_trunk = 0
 trunk_capacity = 12
 unloading_cubes_position = 0
-taken_cubes_number = None
-
-start_position = [2.847, 0.77, -3.14]
-#start_position = [0.1525, 0.72, 0.0]
 
 class SwitchOnKinematicsAction(object):
     def run_action(self):
@@ -53,7 +48,7 @@ class OpenCubesManipulatorAction(object):
         self.start_time = time.time()
 
     def check_action(self):
-        if time.time() - self.start_time > 1:
+        if time.time() - self.start_time > 1.5:
             print time.time() - self.start_time
             return True
 
@@ -66,7 +61,7 @@ class SetCubesManipulatorAngleAction(object):
         self.start_time = time.time()
 
     def check_action(self):
-        if time.time() - self.start_time > 1:
+        if time.time() - self.start_time > 2:
             return True
 
 class SwitchOnVibrationTableAction():
@@ -106,8 +101,8 @@ class CloseCubesManipulatorAction(object):
         self.start_time = time.time()
 
     def run_action(self):
-        global taken_cubes_number
-        taken_cubes_number = stm_driver('close_cube_collector')
+        #TODO: return number of taken cubes
+        stm_driver('close_cube_collector')
 
     def check_action(self):
         if time.time() - self.start_time > 1:
@@ -133,31 +128,14 @@ class SlowMoveToFinalPointAction(object):
 
     def run_action(self):
         print 'goto point', self.x, self.y, self.theta
+        is_point_was_reached = stm_driver('is_point_was_reached')
+        print 'check is_point_was_reached:', is_point_was_reached
         parameters = [self.x, self.y, self.theta, 4]
         stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
 
     def check_action(self):
         is_point_was_reached = stm_driver('is_point_was_reached')
-        if is_point_was_reached == 1:
-            #raw_input("Press Enter...")
-            return True
-
-class SuperFastMoveToFinalPointAction(object):
-    def __init__(self, x, y, theta):
-        self.x = x
-        self.y = y
-        self.theta = theta
-
-    def run_action(self):
-        print 'goto point', self.x, self.y, self.theta
-        parameters = [self.x, self.y, self.theta, 7]
-        stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
-
-    def check_action(self):
-        is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
+        print 'check is_point_was_reached:', is_point_was_reached
         if is_point_was_reached == 1:
             #raw_input("Press Enter...")
             return True
@@ -170,13 +148,14 @@ class FastMoveToFinalPointAction(object):
 
     def run_action(self):
         print 'goto point', self.x, self.y, self.theta
+        is_point_was_reached = stm_driver('is_point_was_reached')
+        print 'check is_point_was_reached:', is_point_was_reached
         parameters = [self.x, self.y, self.theta, 1]
         stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
 
     def check_action(self):
         is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
+        print 'check is_point_was_reached:', is_point_was_reached
         if is_point_was_reached == 1:
             #raw_input("Press Enter...")
             return True
@@ -189,13 +168,14 @@ class SlowMoveToIntermediaryPointAction(object):
 
     def run_action(self):
         print 'goto point', self.x, self.y, self.theta
+        is_point_was_reached = stm_driver('is_point_was_reached')
+        print 'check is_point_was_reached:', is_point_was_reached
         parameters = [self.x, self.y, self.theta, 3]
         stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
 
     def check_action(self):
         is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
+        print 'check is_point_was_reached:', is_point_was_reached
         if is_point_was_reached == 1:
             #raw_input("Press Enter...")
             return True
@@ -208,13 +188,14 @@ class FastMoveToIntermediaryPointAction(object):
 
     def run_action(self):
         print 'goto point', self.x, self.y, self.theta
+        is_point_was_reached = stm_driver('is_point_was_reached')
+        print 'check is_point_was_reached:', is_point_was_reached
         parameters = [self.x, self.y, self.theta, 0]
         stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
 
     def check_action(self):
         is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
+        print 'check is_point_was_reached:', is_point_was_reached
         if is_point_was_reached == 1:
             #raw_input("Press Enter...")
             return True
@@ -229,20 +210,6 @@ class SetCorrectCoordinatesAction():
 
         stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
         print 'Coordinates ', [self.x, self.y, self.theta], 'were seted'
-
-    def check_action(self):
-        return True
-
-class SetCorrectCoordinatesWithoutMovementAction():
-    def run_action(self):
-        global current_coordinatess, correction_performed
-        correction_performed.value = 1
-        self.x = current_coordinatess[0]
-        self.y = current_coordinatess[1]
-        self.theta = current_coordinatess[2]
-
-        stm_driver('set_coordinates_without_movement', [self.x, self.y, self.theta])
-        print 'Coordinates ', [self.x, self.y, self.theta], 'were seted without movement'
 
     def check_action(self):
         return True
@@ -264,20 +231,12 @@ class ThrowCubesTask(object):
 
     def __init__(self, initial_coordinates):
         self.future_actions= [
-            SuperFastMoveToFinalPointAction(initial_coordinates[0], initial_coordinates[1]-0.01, initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0], initial_coordinates[1], initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0], initial_coordinates[1]-0.01, initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0], initial_coordinates[1], initial_coordinates[2]),
-            FastMoveToFinalPointAction(initial_coordinates[0]-0.1, initial_coordinates[1], initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.1, initial_coordinates[1]-0.01, initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.1, initial_coordinates[1], initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.1, initial_coordinates[1]-0.01, initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.1, initial_coordinates[1], initial_coordinates[2]),
-            FastMoveToFinalPointAction(initial_coordinates[0]-0.2, initial_coordinates[1], initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.2, initial_coordinates[1]-0.01, initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.2, initial_coordinates[1], initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.2, initial_coordinates[1]-0.01, initial_coordinates[2]),
-            SuperFastMoveToFinalPointAction(initial_coordinates[0]-0.2, initial_coordinates[1], initial_coordinates[2]),]
+            WaitTimeAction(3),
+            MoveToPointAction(initial_coordinates[0]-0.1, initial_coordinates[1], initial_coordinates[2]),
+            WaitTimeAction(3),
+            MoveToPointAction(initial_coordinates[0]-0.2, initial_coordinates[1], initial_coordinates[2]),
+            WaitTimeAction(3),
+            SetCorrectCoordinatesAction()]
         self.future_actions.reverse()
         self.current_action = self.future_actions.pop()
 
@@ -305,13 +264,14 @@ class FastMoveToIntermediaryPointTask(object):
 
     def run_task(self):
         print 'goto point', self.x, self.y, self.theta
+        is_point_was_reached = stm_driver('is_point_was_reached')
+        print 'check is_point_was_reached:', is_point_was_reached
         parameters = [self.x, self.y, self.theta, 0]
         stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
 
     def check_task(self):
         is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
+        print 'check is_point_was_reached:', is_point_was_reached
         if is_point_was_reached == 1:
             #raw_input("Press Enter...")
             return True
@@ -324,32 +284,14 @@ class SlowMoveToIntermediaryPointTask(object):
 
     def run_task(self):
         print 'goto point', self.x, self.y, self.theta
+        is_point_was_reached = stm_driver('is_point_was_reached')
+        print 'check is_point_was_reached:', is_point_was_reached
         parameters = [self.x, self.y, self.theta, 3]
         stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
 
     def check_task(self):
         is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
-        if is_point_was_reached == 1:
-            #raw_input("Press Enter...")
-            return True
-
-class SuperFastMoveToIntermediaryPointTask(object):
-    def __init__(self, x, y, theta):
-        self.x = x
-        self.y = y
-        self.theta = theta
-
-    def run_task(self):
-        print 'goto point', self.x, self.y, self.theta
-        parameters = [self.x, self.y, self.theta, 6]
-        stm_driver('go_to_global_point', parameters)
-        time.sleep(0.2)
-
-    def check_task(self):
-        is_point_was_reached = stm_driver('is_point_was_reached')
-        #print 'check is_point_was_reached:', is_point_was_reached
+        print 'check is_point_was_reached:', is_point_was_reached
         if is_point_was_reached == 1:
             #raw_input("Press Enter...")
             return True
@@ -369,35 +311,7 @@ class FastMoveToFinalPointTask(object):
 
     def run_task(self):
         self.current_action.run_action()
-
-    def check_task(self):
-        self.check_actions_in_task()
-        if self.all_actions_were_completed is True:
-            return True
-
-    def check_actions_in_task(self):
-        if self.current_action.check_action() is True:
-            if len(self.future_actions) is not 0:
-                self.current_action = self.future_actions.pop()
-                self.current_action.run_action()
-            else:
-                self.all_actions_were_completed = True
-
-class SuperFastMoveToFinalPointTask(object):
-    all_actions_were_completed = False
-
-    def __init__(self, x, y, theta):
-        self.x = x
-        self.y = y
-        self.theta = theta
-        self.future_actions= [
-            SuperFastMoveToFinalPointAction(self.x, self.y, self.theta),
-            SetCorrectCoordinatesAction()]
-        self.future_actions.reverse()
-        self.current_action = self.future_actions.pop()
-
-    def run_task(self):
-        self.current_action.run_action()
+        #time.sleep(2)
 
     def check_task(self):
         self.check_actions_in_task()
@@ -442,41 +356,10 @@ class SlowMoveToFinalPointTask(object):
             else:
                 self.all_actions_were_completed = True
 
-class FastMoveToFinalPointWithCorrectionTask(object):
-    all_actions_were_completed = False
-
-    def __init__(self, x, y, theta):
-        self.x = x
-        self.y = y
-        self.theta = theta
-        self.future_actions= [
-            FastMoveToFinalPointAction(self.x, self.y, self.theta),
-            SetCorrectCoordinatesWithoutMovementAction()]
-        self.future_actions.reverse()
-        self.current_action = self.future_actions.pop()
-
-    def run_task(self):
-        self.current_action.run_action()
-        #time.sleep(2)
-
-    def check_task(self):
-        self.check_actions_in_task()
-        if self.all_actions_were_completed is True:
-            return True
-
-    def check_actions_in_task(self):
-        if self.current_action.check_action() is True:
-            if len(self.future_actions) is not 0:
-                self.current_action = self.future_actions.pop()
-                self.current_action.run_action()
-            else:
-                self.all_actions_were_completed = True
-
 class TakeCubesTask(object):
     all_actions_were_completed = False
     angle_for_closed_manipulator = 275
     default_angle = 275
-    task_was_completed_succesfully = None
 
     def __init__(self, layer, expected_number_of_cubes = 1):
         self.layer = layer
@@ -509,17 +392,10 @@ class TakeCubesTask(object):
     def check_task(self):
         self.check_actions_in_task()
         if self.all_actions_were_completed is True:
-            print 'All cubes were taken: ', self.task_was_completed_succesfully
             return True
 
     def check_actions_in_task(self):
         if self.current_action.check_action() is True:
-            if self.current_action.__class__.__name__ is 'CloseCubesManipulatorAction':
-                if taken_cubes_number == self.expected_number_of_cubes:
-                    self.task_was_completed_succesfully = True
-                else:
-                    self.task_was_completed_succesfully = False
-
             if len(self.future_actions) is not 0:
                 self.current_action = self.future_actions.pop()
                 self.current_action.run_action()
@@ -567,7 +443,7 @@ class SetInitialCoordinateTask(object):
         time.sleep(3)
 
     def check_task(self):
-            #print 'coordinates', self.initial_coordinates, 'were setted as initial coordinates'
+            print 'coordinates', self.initial_coordinates, 'were setted as initial coordinates'
             return True
 
 class ActivateCubesUnloadingTask(object):
@@ -639,12 +515,9 @@ class MainState(object):
         self.current_state = states_list.pop()
         self.future_states = states_list
         self.interrupted_state = None
-        self.robot_state = RobotState()
-        self.start_game_time = None
     
     def run_game(self):
         self.current_state.run_state()
-        self.start_game_time = time.time()
         while True:
             current_state_status = self.current_state.check_state()
             if current_state_status is True:
@@ -665,7 +538,6 @@ class MainState(object):
                 self.current_state.run_state()
 
     def check_states(self):
-        self.robot_state.send_data_to_socket()
         for method in dir(self):
             if not method.startswith('check_') or method == 'check_states':
                 continue
@@ -678,13 +550,11 @@ class MainState(object):
         if (current_time - start_time >= 87 and check_time):
             a = 1
 
-    def send_data_to_socket(self):
-        if time.time() - self.start_game_time > 2:
-            try:
-                self.robot_state.update_robot_state()
-                self.send_data_to_socket()
-            except:
-                pass
+    def check_enemy(self):
+        a = 1
+
+    def check_trunk(self):
+        a = 1
 
 class InitializeRobotState(MainState):
     all_tasks_were_completed = False
@@ -692,7 +562,7 @@ class InitializeRobotState(MainState):
     def __init__(self):
         self.future_tasks = [
             ActivateRobotRegulatorsTask(),
-            SetInitialCoordinateTask(start_position)]
+            SetInitialCoordinateTask([0.1525, 0.72, 0])]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -710,38 +580,6 @@ class InitializeRobotState(MainState):
                 self.current_task = self.future_tasks.pop()
                 self.current_task.run_task()
             else:
-                self.all_tasks_were_completed = True
-
-class BrokeMiddleWallState(MainState):
-    all_tasks_were_completed = False
-
-    def __init__(self): 
-        self.future_tasks = [
-            SuperFastMoveToFinalPointTask(1.95, 0.4, -3.14),
-            SuperFastMoveToFinalPointTask(1.88, 0.36, -2.6),
-            SuperFastMoveToFinalPointTask(1.88, 0.23, -2.6),
-            SlowMoveToIntermediaryPointTask(1.7, 0.23, -2.6),
-            FastMoveToFinalPointWithCorrectionTask(1.32, 0.22, -3.34),
-            FastMoveToIntermediaryPointTask(1.5, 0.47, -1.57)]
-        self.future_tasks.reverse()
-        self.current_task = self.future_tasks.pop()
-
-    def run_state(self):
-        print 'Move wall state'
-        self.current_task.run_task()
-
-    def check_state(self):
-        self.check_tasks_in_state()
-        if self.all_tasks_were_completed is True:
-            return True
-
-    def check_tasks_in_state(self):
-        if self.current_task.check_task() is True:
-            if len(self.future_tasks) is not 0:
-                self.current_task = self.future_tasks.pop()
-                self.current_task.run_task()
-            else:
-                print 'Wall was moved'
                 self.all_tasks_were_completed = True
 
 class CollectCubesStates(MainState):
@@ -803,11 +641,11 @@ class UnloadCubesState(MainState):
     def __init__(self):
         global unloading_cubes_position
         self.coordinates_for_unloading_cubes =  [
-            [1.95, 0.617, -1.57],
+            [0.9655, 0.915, -3.14],
             [0.9655, 1.015, -3.14],
             [0.9655, 1.115, -3.14]]
         self.future_tasks = [
-            FastMoveToFinalPointTask(self.coordinates_for_unloading_cubes[unloading_cubes_position][0], self.coordinates_for_unloading_cubes[unloading_cubes_position][1], self.coordinates_for_unloading_cubes[unloading_cubes_position][2]),
+            MoveToFinalPointTask(self.coordinates_for_unloading_cubes[unloading_cubes_position][0], self.coordinates_for_unloading_cubes[unloading_cubes_position][1], self.coordinates_for_unloading_cubes[unloading_cubes_position][2]),
             ActivateCubesUnloadingTask(),
             ThrowCubesTask(self.coordinates_for_unloading_cubes[unloading_cubes_position]),
             DisactivateCubesUnloadingTask()]
@@ -837,11 +675,10 @@ class CloseDoorsState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            SuperFastMoveToIntermediaryPointTask(2.4, 0.47, -1.57),
-            FastMoveToFinalPointTask(2.4, 0.1, -1.57),
-            FastMoveToIntermediaryPointTask(2.4, 0.23, -1.57),
-            FastMoveToIntermediaryPointTask(2.6, 0.23, -1.57),
-            FastMoveToFinalPointTask(2.6, 0.1, -1.57)]
+            FastMoveToFinalPointTask(0.35, 0.11, -1.57),
+            FastMoveToIntermediaryPointTask(0.35, 0.18, -1.57),
+            FastMoveToIntermediaryPointTask(0.57, 0.18, -1.57),
+            FastMoveToFinalPointTask(0.57, 0.11, -1.57)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -891,52 +728,6 @@ class TestState(object):
             else:
                 self.all_tasks_were_completed = True
 
-class DragCubesState(object):
-    all_tasks_were_completed = False
-
-    def __init__(self): 
-        self.future_tasks = [
-            SuperFastMoveToFinalPointTask(2.8, 0.88, -3.14),
-            FastMoveToFinalPointTask(2.4, 0.88, -3.14),
-            FastMoveToFinalPointTask(2.0, 0.88, -3.14)]
-        self.future_tasks.reverse()
-        self.current_task = self.future_tasks.pop()
-
-    def run_state(self):
-        self.current_task.run_task()
-
-    def check_state(self):
-        self.check_tasks_in_state()
-        if self.all_tasks_were_completed is True:
-            return True
-
-    def check_tasks_in_state(self):
-        if self.current_task.check_task() is True:
-            if len(self.future_tasks) is not 0:
-                self.current_task = self.future_tasks.pop()
-                self.current_task.run_task()
-            else:
-                self.all_tasks_were_completed = True
-
-class RobotState(object):
-    def __init__(self):
-        global current_coordinatess_from_robot
-        self.current_coordinates = current_coordinatess_from_robot
-        global current_coordinatess
-        self.current_coordinatess = current_coordinatess
-        self.collisionAvoidance = False
-    
-    def update_robot_state(self):
-        global current_coordinatess_from_robot
-        self.current_coordinates = current_coordinatess_from_robot
-        global current_coordinatess
-        self.current_coordinatess = current_coordinatess
-        #get collision avoidance state
-        self.collisionAvoidance = False
-
-    def send_data_to_socket(self):
-        #send data to socket
-        pass
 
 def stm_driver(command, parameters = ''):
     command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
@@ -951,51 +742,39 @@ def get_angles_diff(a1, a2):
 collect_cubes_options = [{ 
         'priority': 3, 
         'tasks_list': [
+            FastMoveToIntermediaryPointTask(0.60, 0.13, -1.57),
             FastMoveToFinalPointTask(0.60, 0.13, -1.57),
             SlowMoveToFinalPointTask(0.67, 0.13, -1.57),
-            FastMoveToFinalPointTask(0.67, 0.38, -1.57),
-            FastMoveToFinalPointTask(0.95, 0.38, -1.57),
-            SlowMoveToFinalPointTask(0.95, 0.32, -1.57),
+            FastMoveToIntermediaryPointTask(0.67, 0.38, -1.57),
+            SlowMoveToFinalPointTask(0.925, 0.38, -1.57),
             SlowMoveToFinalPointTask(0.925, 0.32, -1.57),
-            TakeCubesTask(2),
-            FastMoveToIntermediaryPointTask(0.925, 0.45, -1.57),
-            FastMoveToIntermediaryPointTask(0.5, 0.45, -1.57),
-            FastMoveToIntermediaryPointTask(0.5, 0.9, -1.57)]},
-        { 
-        'priority': 1, 
-        'tasks_list': [
-            SlowMoveToFinalPointTask(1.37, 0.42, -1.57),
-            TakeCubesTask(1),
-            SlowMoveToFinalPointTask(1.37, 0.37, -1.57),
-            TakeCubesTask(3),
-            FastMoveToIntermediaryPointTask(1.37, 0.46, -1.57)]},
+            TakeCubesTask(2)]},
         { 
         'priority': 2, 
         'tasks_list': [
-            SuperFastMoveToFinalPointTask(2.12, 0.5, -1.57),
-            SlowMoveToFinalPointTask(2.135, 0.48, -1.57),
-            SlowMoveToFinalPointTask(2.135, 0.32, -1.57),
-            SlowMoveToFinalPointTask(2.11, 0.32, -1.57),
+            FastMoveToFinalPointTask(1.38, 0.48, -1.57),
+            SlowMoveToFinalPointTask(1.38, 0.43, -1.57),
             TakeCubesTask(1),
-            TakeCubesTask(3),
-            FastMoveToIntermediaryPointTask(2.11, 0.43, -1.57)]}]
+            SlowMoveToFinalPointTask(1.38, 0.38, -1.57),
+            TakeCubesTask(3)]},
+        { 
+        'priority': 1, 
+        'tasks_list': [
+            FastMoveToIntermediaryPointTask(0.45, 0.46, 0),
+            FastMoveToIntermediaryPointTask(1.38, 0.46, -1.570),
+            FastMoveToIntermediaryPointTask(2.13, 0.46, -1.570),
+            SlowMoveToFinalPointTask(2.19, 0.46, -1.570),
+            SlowMoveToFinalPointTask(2.19, 0.46, -1.57),
+            WaitTimeTask(2),
+            SlowMoveToFinalPointTask(2.19, 0.31, -1.57),
+            TakeCubesTask(1),
+            TakeCubesTask(3)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
-localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot))
+localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed))
 stm.start()
-#time.sleep(2)
+time.sleep(2)
 localisation.start()
-states_list = [
-    InitializeRobotState()]
-    #BrokeMiddleWallState(),
-    #CollectCubesStates(),
-    #CollectCubesStates(),
-    #UnloadCubesState(),
-    #CloseDoorsState(),
-    #DragCubesState()]
-    #UnloadCubesState(),
-    #CloseDoorsState(),
-    #CollectCubesStates(),
-    #UnloadCubesState()]
+states_list = [InitializeRobotState(), CollectCubesStates()]
 #states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()

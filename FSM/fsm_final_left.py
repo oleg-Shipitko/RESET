@@ -11,7 +11,6 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
-current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
 
@@ -639,12 +638,9 @@ class MainState(object):
         self.current_state = states_list.pop()
         self.future_states = states_list
         self.interrupted_state = None
-        self.robot_state = RobotState()
-        self.start_game_time = None
     
     def run_game(self):
         self.current_state.run_state()
-        self.start_game_time = time.time()
         while True:
             current_state_status = self.current_state.check_state()
             if current_state_status is True:
@@ -665,7 +661,6 @@ class MainState(object):
                 self.current_state.run_state()
 
     def check_states(self):
-        self.robot_state.send_data_to_socket()
         for method in dir(self):
             if not method.startswith('check_') or method == 'check_states':
                 continue
@@ -678,13 +673,11 @@ class MainState(object):
         if (current_time - start_time >= 87 and check_time):
             a = 1
 
-    def send_data_to_socket(self):
-        if time.time() - self.start_game_time > 2:
-            try:
-                self.robot_state.update_robot_state()
-                self.send_data_to_socket()
-            except:
-                pass
+    def check_enemy(self):
+        a = 1
+
+    def check_trunk(self):
+        a = 1
 
 class InitializeRobotState(MainState):
     all_tasks_were_completed = False
@@ -918,26 +911,6 @@ class DragCubesState(object):
             else:
                 self.all_tasks_were_completed = True
 
-class RobotState(object):
-    def __init__(self):
-        global current_coordinatess_from_robot
-        self.current_coordinates = current_coordinatess_from_robot
-        global current_coordinatess
-        self.current_coordinatess = current_coordinatess
-        self.collisionAvoidance = False
-    
-    def update_robot_state(self):
-        global current_coordinatess_from_robot
-        self.current_coordinates = current_coordinatess_from_robot
-        global current_coordinatess
-        self.current_coordinatess = current_coordinatess
-        #get collision avoidance state
-        self.collisionAvoidance = False
-
-    def send_data_to_socket(self):
-        #send data to socket
-        pass
-
 def stm_driver(command, parameters = ''):
     command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
     input_command_queue.put(command)
@@ -981,18 +954,18 @@ collect_cubes_options = [{
             FastMoveToIntermediaryPointTask(2.11, 0.43, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
-localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot))
+localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position))
 stm.start()
 #time.sleep(2)
 localisation.start()
 states_list = [
-    InitializeRobotState()]
-    #BrokeMiddleWallState(),
-    #CollectCubesStates(),
-    #CollectCubesStates(),
-    #UnloadCubesState(),
-    #CloseDoorsState(),
-    #DragCubesState()]
+    InitializeRobotState(),
+    BrokeMiddleWallState(),
+    CollectCubesStates(),
+    CollectCubesStates(),
+    UnloadCubesState(),
+    CloseDoorsState(),
+    DragCubesState()]
     #UnloadCubesState(),
     #CloseDoorsState(),
     #CollectCubesStates(),

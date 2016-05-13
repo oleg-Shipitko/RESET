@@ -153,3 +153,5 @@ class CommandsList(object):
 	openCubeBorder = 0x2D
 	closeCubeBorder = 0x2E
 	isPointWasReached = 0x32	
+	switchOnCollisionAvoidance = 0x33
+	switchOffCollisionAvoidance = 0x34

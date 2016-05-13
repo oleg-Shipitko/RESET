@@ -5,6 +5,7 @@ import random
 import serialWrapper
 import packetBuilder
 import packetParser
+import cPickle as pickle
 from collections import deque
 from serial.tools import list_ports
 
@@ -13,6 +14,10 @@ from serial.tools import list_ports
 TCP_IP = '192.168.0.10'
 TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
+
+# PC server address and  port
+HOST = '192.168.1.251'
+PORT = 9999
 
 #STM 32 board parameters
 VID = 1155
@@ -24,8 +29,8 @@ N = 200
 #Resampling trashold
 n_trash = N/3
 # Dimensions of the playing field  
-WORLD_X = 3000
-WORLD_Y = 2000
+WORLD_X = 3100
+WORLD_Y = 2100
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
 BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # left starting possition (0,0 in corner near beach huts)
 # BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # right starting possition (0,0 in corner near beach huts)
@@ -41,11 +46,11 @@ class Robot(object):
 
 	def set(self, x_new, y_new, orientation_new):
 		"""Set particle position on the field"""
-		if 0 <= x_new <= WORLD_X:
+		if -100 <= x_new <= WORLD_X:
 			self.x = x_new
 		else:
 			self.x = random.gauss(151.0, 5) 
-		if 0 <= y_new <= WORLD_Y:
+		if -100 <= y_new <= WORLD_Y:
 			self.y = y_new
 		else:
 			self.y = random.gauss(756.5, 5)
@@ -147,10 +152,11 @@ def p_trans(agl, pit):
 
 def angle5(angle):
 	"""Transform lidar points from lidar coord sys to robot cord sys""" 
-	if angle >= math.pi/4:
-		return angle - math.pi/4
-	else:
-		return angle + 7*math.pi/4
+	#if angle >= math.pi/4:
+	#	return angle - math.pi/4
+	#else:
+	#	return angle + 7*math.pi/4
+	return (angle + math.pi/4)%(2*math.pi)
 
 def relative_motion(old, computerPort, commands, lock, sharedcor, myrobot):
 		"""Calculate robot's relative motion"""	
@@ -204,11 +210,21 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 		time.sleep(0.1)
 	return s
 
+def connect_pc(HOST, PORT):
+    try:    
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((HOST, PORT))
+        return sock
+    except Exception as err:
+        print 'Error in connecting to pc server: ', err
+        sock.close()
+
 ###############################################################################
 
 def localisation(lock, shared, computerPort, commands, sharedcor):
 	"""Main function for localisation"""
 	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
+	pc = connect_pc(HOST,PORT)
 	myrobot = Robot(True)
 	myrobot.set(200.0, 720.0, 0.0)
 	print myrobot
@@ -218,7 +234,7 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 	w_prev = [1.0 for i in xrange(N)]
 	try:
 		while 1:
-			start = time.time()
+			#start = time.time()
 			rel_motion, old2 = relative_motion(old, computerPort, commands, lock, sharedcor, myrobot)	
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
 			p = p2
@@ -249,13 +265,13 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 			mean_orientation = mean_angl(p, w_norm)
 			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
 			myrobot.set(center[0], center[1], mean_orientation)
-			
+
 			shared[0] = myrobot.x
 			shared[1] = myrobot.y
 			shared[2] = myrobot.orientation
 
 			w_prev = w_norm
-
+			pc.sendall(str(myrobot.pose())+'\n'+str(w_prev)+'\n')
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
 			if n_eff < n_trash:# and sum(rel_motion) > 0.1:
 				try:
@@ -264,8 +280,9 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 					w_prev = w_re
 				except:
 					print 'error with choice'
-			end = time.time()
+			#end = time.time()
 			#print end - start
 	except:			
 		s.shutdown(2)
 		s.close()
+		pc.close()

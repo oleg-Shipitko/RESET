@@ -124,6 +124,16 @@ def is_point_was_reached():
     reply_on_request = send_request(packet)
     return reply_on_request
 
+def switch_on_collision_avoidance():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOnCollisionAvoidance)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def switch_off_collision_avoidance():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
 def stmMainLoop(input_command_queue, reply_to_fsm_queue, reply_to_localization_queue):
     global com_port
     com_port = create_connection_to_stm()
