@@ -22,7 +22,7 @@ unloading_cubes_position = 0
 taken_cubes_number = None
 
 start_position = [2.847, 0.77, -3.14]
-server_ip = '10.30.65.226'
+server_ip = '192.168.1.146'
 #start_position = [0.1525, 0.72, 0.0]
 
 class SwitchOnKinematicsAction(object):
@@ -927,12 +927,6 @@ class RobotState(object):
         global current_coordinatess
         self.current_coordinatess = current_coordinatess
         self.collision_avoidance = False
-        self.socket = None
-        try:
-            self.socket = socket.socket()
-            self.socket.connect((server_ip, 9090))
-        except:
-            pass
     
     def update_robot_state(self):
         global current_coordinatess_from_robot
@@ -944,6 +938,8 @@ class RobotState(object):
 
     def send_data_to_socket(self):
         try:
+            self.socket = socket.socket()
+            self.socket.connect((server_ip, 9090))
             string_to_send = str(self.current_coordinates, self.current_coordinatess_from_robot, self.collision_avoidance)
             self.socket.send(string_to_send)
         except:
