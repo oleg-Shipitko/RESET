@@ -11,6 +11,7 @@ reply_to_localization_queue = multiprocessing.Queue()
 request_source = 'fsm'
 start_time = time.time()
 check_time = False
+current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
 
@@ -65,7 +66,7 @@ class SetCubesManipulatorAngleAction(object):
         self.start_time = time.time()
 
     def check_action(self):
-        if time.time() - self.start_time > 1:
+        if time.time() - self.start_time > 1.3:
             return True
 
 class SwitchOnVibrationTableAction():
@@ -449,11 +450,11 @@ class TakeCubesTask(object):
         print 'Start time', self.time
         
         if self.layer is 3:
-            self.manipulator_angle = 195
+            self.manipulator_angle = 193
         elif self.layer is 2:
-            self.manipulator_angle = 165
+            self.manipulator_angle = 160
         elif self.layer is 1:
-            self.manipulator_angle = 125
+            self.manipulator_angle = 130
 
         self.future_actions  = [
             OpenCubesManipulatorAction(),
@@ -622,6 +623,16 @@ class ResetCoordinatesTask(object):
 
     def run_task(self):
         stm_driver('set_coordinates_without_movement', self.coordinates_to_set)
+    
+    def check_task(self):
+        return True
+
+class OpenManipulatorTask(object):
+    def __init__(self, angle):
+        self.angle = angle
+
+    def run_task(self):
+        stm_driver('set_cube_manipulator_angle', self.angle)
     
     def check_task(self):
         return True
@@ -850,6 +861,34 @@ class CloseDoorsState(object):
                 print 'All close doors tasks were completed'
                 self.all_tasks_were_completed = True
 
+class DragCubesState(object):
+    all_tasks_were_completed = False
+
+    def __init__(self): 
+        self.future_tasks = [
+            SuperFastMoveToFinalPointTask(0.2, 0.95, -3.14),
+            FastMoveToFinalPointTask(0.6, 0.95, -3.14),
+            FastMoveToFinalPointWithCorrectionTask(1.1, 0.95, -3.14),
+            FastMoveToFinalPointTask(0.95, 0.95, -3.14)]
+        self.future_tasks.reverse()
+        self.current_task = self.future_tasks.pop()
+
+    def run_state(self):
+        self.current_task.run_task()
+
+    def check_state(self):
+        self.check_tasks_in_state()
+        if self.all_tasks_were_completed is True:
+            return True
+
+    def check_tasks_in_state(self):
+        if self.current_task.check_task() is True:
+            if len(self.future_tasks) is not 0:
+                self.current_task = self.future_tasks.pop()
+                self.current_task.run_task()
+            else:
+                self.all_tasks_were_completed = True
+
 class TestState(object):
     all_tasks_were_completed = False
 
@@ -896,19 +935,23 @@ collect_cubes_options = [{
             SlowMoveToFinalPointTask(0.67, 0.13, -1.57),
             FastMoveToFinalPointTask(0.67, 0.38, -1.57),
             FastMoveToFinalPointTask(0.95, 0.38, -1.57),
-            SlowMoveToFinalPointTask(0.95, 0.32, -1.57),
-            SlowMoveToFinalPointTask(0.925, 0.32, -1.57),
+            OpenManipulatorTask(193),
+            SlowMoveToFinalPointTask(0.95, 0.30, -1.57),
+            SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
+            TakeCubesTask(3),
             TakeCubesTask(2),
-            FastMoveToIntermediaryPointTask(0.925, 0.45, -1.57),
-            FastMoveToIntermediaryPointTask(0.5, 0.45, -1.57),
-            FastMoveToIntermediaryPointTask(0.5, 0.9, -1.57)]},
+            SlowMoveToFinalPointTask(0.925, 0.325, -1.57),
+            OpenManipulatorTask(130),
+            SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
+            TakeCubesTask(1),
+            FastMoveToIntermediaryPointTask(0.925, 0.45, -1.57)]},
         { 
-        'priority': 2, 
+        'priority': 4, 
         'tasks_list': [
             FastMoveToFinalPointTask(1.48, 0.43, -1.57),
-            SlowMoveToFinalPointTask(1.5, 0.41, -1.57),
+            SlowMoveToFinalPointTask(1.5, 0.44, -1.57),
             TakeCubesTask(1),
-            SlowMoveToFinalPointTask(1.48, 0.36, -1.57),
+            SlowMoveToFinalPointTask(1.48, 0.35, -1.57),
             TakeCubesTask(3)]},
         { 
         'priority': 1, 
@@ -916,27 +959,33 @@ collect_cubes_options = [{
             SuperFastMoveToIntermediaryPointTask(0.45, 0.43, 0),
             SuperFastMoveToIntermediaryPointTask(2.0, 0.43, -1.57),
             SlowMoveToFinalPointTask(2.05, 0.43, -1.57),
+            OpenManipulatorTask(193),
             WaitTimeTask(1),
             SlowMoveToFinalPointTask(2.125, 0.43, -1.57),
-            SlowMoveToFinalPointTask(2.125, 0.32, -1.57),
-            SlowMoveToFinalPointTask(2.12, 0.32, -1.57),
-            TakeCubesTask(1),
+            SlowMoveToFinalPointTask(2.125, 0.29, -1.57),
+            SlowMoveToFinalPointTask(2.12, 0.31, -1.57),
             TakeCubesTask(3),
+            TakeCubesTask(2),
+            SlowMoveToFinalPointTask(2.12, 0.325, -1.57),
+            OpenManipulatorTask(130),
+            SlowMoveToFinalPointTask(2.12, 0.31, -1.57),
+            TakeCubesTask(1),
             SuperFastMoveToIntermediaryPointTask(2.125, 0.43, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
-localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position))
+localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot))
 stm.start()
 #time.sleep(2)
 localisation.start()
 states_list = [
     InitializeRobotState(),
-    BrokeMiddleWallState()]
+    #BrokeMiddleWallState()]
+    CollectCubesStates(),
     #CollectCubesStates(),
-    #CollectCubesStates(),
-    #UnloadCubesState(),
-    #CloseDoorsState(),
-    #CollectCubesStates(),
-    #UnloadCubesState()]
+    UnloadCubesState(),
+    CloseDoorsState(),
+    CollectCubesStates(),
+    DragCubesState(),
+    UnloadCubesState()]
 #states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()

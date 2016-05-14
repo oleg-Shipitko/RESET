@@ -43,6 +43,11 @@ class ParsePacket(object):
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
 			return int(invertedParametersString, 16)
+		
+		if self.listOfComands.getManipulatorAngle == self.command:
+			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
+			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
+			return self.typeConvertor.HexToFloat(invertedParametersString)
 
 		return self.byteArray[4:len(self.byteArray) - 2][:-1]
 

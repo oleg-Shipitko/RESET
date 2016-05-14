@@ -71,7 +71,9 @@ class BuildPacket(object):
 		elif comand == CommandsList.set12VState:
 			return self.typeConvertor.IntToHex(parameters)
 		elif comand == CommandsList.stopAllMotors:
-			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.IntToHex(parameters[3])		
+			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.IntToHex(parameters[3])
+		elif comand == CommandsList.switchOnVibrationTable:
+			return self.typeConvertor.IntToHex(parameters)
 		return ""
 
 	def GetByteStringFormString(self, parameters):
@@ -155,3 +157,4 @@ class CommandsList(object):
 	isPointWasReached = 0x32	
 	switchOnCollisionAvoidance = 0x33
 	switchOffCollisionAvoidance = 0x34
+	getManipulatorAngle = 0x35

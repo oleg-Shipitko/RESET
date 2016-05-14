@@ -20,8 +20,47 @@ def get_com_port_number():
         if (port.serial_number == snr) and (port.pid == pid) and (port.vid == vid): 
             return '/dev/' + port.name
 
+
 port_number = get_com_port_number()
 port = serialWrapper.SerialWrapper(port_number)
+
+
+packet = packetBuilder.BuildPacket(commands_to_stm.getManipulatorAngle)
+reply = port.sendRequest(packet.bytearray).reply
+
+print reply
+
+raw_input('switched on. Press to switched off')
+
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 270)
+reply = port.sendRequest(packet.bytearray).reply
+
+print reply
+
+raw_input('setManipulatorAngle. 270')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 193)
+reply = port.sendRequest(packet.bytearray).reply
+
+print reply
+
+raw_input('setManipulatorAngle. 193')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 160)
+reply = port.sendRequest(packet.bytearray).reply
+
+print reply
+
+raw_input('setManipulatorAngle. 160')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 125)
+reply = port.sendRequest(packet.bytearray).reply
+
+print reply
+
+raw_input('setManipulatorAngle. 125')
+
 
 packet = packetBuilder.BuildPacket(commands_to_stm.switchOnCollisionAvoidance)
 reply = port.sendRequest(packet.bytearray).reply

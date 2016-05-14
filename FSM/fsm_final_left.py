@@ -12,6 +12,7 @@ request_source = 'fsm'
 start_time = time.time()
 check_time = False
 current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
+current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
 
 cubes_in_trunk = 0
@@ -65,7 +66,7 @@ class SetCubesManipulatorAngleAction(object):
         self.start_time = time.time()
 
     def check_action(self):
-        if time.time() - self.start_time > 1:
+        if time.time() - self.start_time > 1.3:
             return True
 
 class SwitchOnVibrationTableAction():
@@ -485,11 +486,11 @@ class TakeCubesTask(object):
         print 'Start time', self.time
         
         if self.layer is 3:
-            self.manipulator_angle = 195
+            self.manipulator_angle = 193
         elif self.layer is 2:
-            self.manipulator_angle = 165
+            self.manipulator_angle = 160
         elif self.layer is 1:
-            self.manipulator_angle = 125
+            self.manipulator_angle = 130
 
         self.future_actions  = [
             OpenCubesManipulatorAction(),
@@ -940,21 +941,22 @@ collect_cubes_options = [{
             SlowMoveToFinalPointTask(1.37, 0.42, -1.57),
             TakeCubesTask(1),
             SlowMoveToFinalPointTask(1.37, 0.37, -1.57),
-            TakeCubesTask(3),
+            TakeCubesTask(2),
             FastMoveToIntermediaryPointTask(1.37, 0.46, -1.57)]},
         { 
         'priority': 2, 
         'tasks_list': [
             SuperFastMoveToFinalPointTask(2.12, 0.5, -1.57),
             SlowMoveToFinalPointTask(2.135, 0.48, -1.57),
-            SlowMoveToFinalPointTask(2.135, 0.32, -1.57),
-            SlowMoveToFinalPointTask(2.11, 0.32, -1.57),
-            TakeCubesTask(1),
+            SlowMoveToFinalPointTask(2.135, 0.33, -1.57),
+            SlowMoveToFinalPointTask(2.11, 0.33, -1.57),
             TakeCubesTask(3),
+            TakeCubesTask(2),
+            TakeCubesTask(1),
             FastMoveToIntermediaryPointTask(2.11, 0.43, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
-localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position))
+localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot))
 stm.start()
 #time.sleep(2)
 localisation.start()

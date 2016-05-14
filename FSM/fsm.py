@@ -486,9 +486,9 @@ class TakeCubesTask(object):
         print 'Start time', self.time
         
         if self.layer is 3:
-            self.manipulator_angle = 195
+            self.manipulator_angle = 193
         elif self.layer is 2:
-            self.manipulator_angle = 165
+            self.manipulator_angle = 160
         elif self.layer is 1:
             self.manipulator_angle = 125
 
@@ -868,7 +868,9 @@ class TestState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            MoveToFinalPointTask(0.1525, 0.72, 0)]
+            TakeCubesTask(3),
+            TakeCubesTask(2),
+            TakeCubesTask(1)]
             #MoveToIntermediaryPointTask(0.1625, 0.72, 0),
             #MoveToFinalPointTask(0.3, 0.72, 0)] 
             #SetInitialCoordinateTask([0.3, 0.72, 0])]
@@ -985,17 +987,17 @@ localisation = multiprocessing.Process(target=localisation.main, args=(input_com
 stm.start()
 #time.sleep(2)
 localisation.start()
-states_list = [
-    InitializeRobotState()]
+'''states_list = [
+    InitializeRobotState(),
     #BrokeMiddleWallState(),
-    #CollectCubesStates(),
-    #CollectCubesStates(),
-    #UnloadCubesState(),
-    #CloseDoorsState(),
-    #DragCubesState()]
-    #UnloadCubesState(),
-    #CloseDoorsState(),
-    #CollectCubesStates(),
-    #UnloadCubesState()]
-#states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
+    CollectCubesStates(),
+    CollectCubesStates(),
+    UnloadCubesState(),
+    CloseDoorsState(),
+    DragCubesState(),
+    UnloadCubesState(),
+    CloseDoorsState(),
+    CollectCubesStates(),
+    UnloadCubesState()]'''
+states_list = [TestState()]#, CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
 MainState(states_list).run_game()
