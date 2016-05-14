@@ -3,6 +3,7 @@ import time
 import multiprocessing
 import math
 import localisation
+import socket
 
 input_command_queue = multiprocessing.Queue()
 reply_to_fsm_queue = multiprocessing.Queue()
@@ -10,7 +11,8 @@ reply_to_localization_queue = multiprocessing.Queue()
 
 request_source = 'fsm'
 start_time = time.time()
-check_time = False
+check_start_time = True
+start_game_time = None
 current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
@@ -21,6 +23,7 @@ unloading_cubes_position = 0
 taken_cubes_number = None
 
 start_position = [2.847, 0.77, -3.14]
+server_ip = '192.168.1.146'
 #start_position = [0.1525, 0.72, 0.0]
 
 class SwitchOnKinematicsAction(object):
@@ -639,12 +642,10 @@ class MainState(object):
         self.current_state = states_list.pop()
         self.future_states = states_list
         self.interrupted_state = None
-        self.robot_state = RobotState()
-        self.start_game_time = None
+        self.robot_state = RobotState()        
     
     def run_game(self):
         self.current_state.run_state()
-        self.start_game_time = time.time()
         while True:
             current_state_status = self.current_state.check_state()
             if current_state_status is True:
@@ -673,10 +674,21 @@ class MainState(object):
             if new_state is not None:
                 return new_state
 
+    def check_game_start_time(self):
+        global check_start_time
+        if check_start_time is True:
+            robot_speeds = stm_driver('get_robot_speeds')
+            if robot_speeds[0] > 0.05 or robot_speeds[1] > 0.05 or robot_speeds[2] > 0.05:
+                global start_game_time
+                start_game_time = time.time()
+                check_start_time = False
+
     def check_game_time(self):
+        global start_game_time
         current_time = time.time()
-        if (current_time - start_time >= 87 and check_time):
-            a = 1
+        if (current_time - start_game_time >= 89 and check_start_time is False):
+            stm_driver('switch_off_tajectory_regulator')
+            stm_driver('set_movement_speed', [0.0, 0.0, 0.0])
 
     def send_data_to_socket(self):
         if time.time() - self.start_game_time > 2:
@@ -926,19 +938,24 @@ class RobotState(object):
         self.current_coordinates = current_coordinatess_from_robot
         global current_coordinatess
         self.current_coordinatess = current_coordinatess
-        self.collisionAvoidance = False
+        self.collision_avoidance = False
     
     def update_robot_state(self):
         global current_coordinatess_from_robot
-        self.current_coordinates = current_coordinatess_from_robot
+        self.current_coordinatess_from_robot = current_coordinatess_from_robot
         global current_coordinatess
         self.current_coordinatess = current_coordinatess
         #get collision avoidance state
-        self.collisionAvoidance = False
+        self.collision_avoidance = False
 
     def send_data_to_socket(self):
-        #send data to socket
-        pass
+        try:
+            self.socket = socket.socket()
+            self.socket.connect((server_ip, 9090))
+            string_to_send = str(self.current_coordinates, self.current_coordinatess_from_robot, self.collision_avoidance)
+            self.socket.send(string_to_send)
+        except:
+            pass
 
 def stm_driver(command, parameters = ''):
     command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
