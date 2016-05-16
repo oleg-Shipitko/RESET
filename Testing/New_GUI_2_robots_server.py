@@ -10,7 +10,7 @@ from ttk import Style, Frame, Button, Label, Entry
 #import ttk
 #import server3
 from math import pi, sin, cos, tan, sqrt
-import server5
+import server5, server6
 import sys
 import time
 import re
@@ -165,8 +165,8 @@ class GUI(object):
         INPUTS = Label(frame, text="INPUTS:")
         INPUTS.grid(row=17, column=1)
 
-        INPUTSValue = Text(frame, height=10, width=10)
-        INPUTSValue.grid(row=18, column=1)
+        self.INPUTSValue = Text(frame, height=10, width=10)
+        self.INPUTSValue.grid(row=18, column=1)
 
             ###BUTTONS###
 
@@ -180,38 +180,38 @@ class GUI(object):
 
 def draw_small(X0,Y0,alpha):
     r = 63 #radius of circumscribed circle
-    X = X0*423 #convert from millimeters to pixels
-    Y = -Y0*423 + 846
+    X = X0*0.423 #convert from millimeters to pixels
+    Y = -Y0*0.423 + 846
     Xa = X - r*cos(alpha)
-    Ya = Y + r*sin(alpha)
+    Ya = Y - r*sin(alpha)
     Xb = X + r*cos(alpha-pi/3)
-    Yb = Y - r*sin(alpha-pi/3)
+    Yb = Y + r*sin(alpha-pi/3)
     Xc = X + r*cos(alpha+pi/3)
-    Yc = Y - r*sin(alpha+pi/3)
+    Yc = Y + r*sin(alpha+pi/3)
     a = [Xa, Ya, Xb, Yb, Xc, Yc]
     return a
 
 def draw_big(X0,Y0,alpha):
     r = 90 #radius of circumscribed circle
-    X = X0*423 #convert from millimeters to pixels
-    Y = -Y0*423 + 846
-    Xb1 = X + r*cos(alpha+3*pi/4)   
-    Yb1 = Y - r*sin(alpha+3*pi/4)
+    X = X0*0.423 #convert from millimeters to pixels
+    Y = -Y0*0.423 + 846
+    Xb1 = X + r*cos(alpha+3*pi/4)
+    Yb1 = Y + r*sin(alpha+3*pi/4)
     Xb2 = X + r*cos(alpha+pi/4)
-    Yb2 = Y - r*sin(alpha+pi/4)
+    Yb2 = Y + r*sin(alpha+pi/4)
     Xb3 = X + r*cos(alpha-pi/4)
-    Yb3 = Y - r*sin(alpha-pi/4)
+    Yb3 = Y + r*sin(alpha-pi/4)
     Xb4 = X + r*cos(alpha-3*pi/4)
-    Yb4 = Y - r*sin(alpha-3*pi/4)
+    Yb4 = Y + r*sin(alpha-3*pi/4)
     a = [Xb1, Yb1, Xb2, Yb2, Xb3, Yb3, Xb4, Yb4]
     return a
 
 def draw_lines(X0,Y0,alpha):
     L = 100 # length of the line
-    X = X0*423
-    Y = -Y0*423+846
+    X = X0*0.423
+    Y = -Y0*0.423+846
     Xn = X + L*cos(alpha)
-    Yn = Y - L*sin(alpha)
+    Yn = Y + L*sin(alpha)
     a = [X, Y, Xn, Yn]
     return a
 
@@ -219,14 +219,19 @@ if __name__ == '__main__':
     data_queue = multiprocessing.Queue()
     server = multiprocessing.Process(target=server5.main, args=(data_queue,))
     server.start()
-    #print data_queue.get()
+    data_queue1 = multiprocessing.Queue()
+    server1 = multiprocessing.Process(target=server6.main, args=(data_queue1,))
+    server1.start()
     root = Tk()
     app = GUI(root)
     while True:
-        data = data_queue.get()
-        data1 = str(data)
-        result = re.findall(r'[+-]?\d+(?:\.\d+)?', data1)
-        print data
+        data = data_queue.get() ###SMALL ROBOT
+        data0 = str(data)
+        result = re.findall(r'[+-]?\d+(?:\.\d+)?', data0)
+
+        data1 = data_queue1.get()
+        data2 = str(data1)
+        result1 = re.findall(r'[+-]?\d+(?:\.\d+)?', data2) ###BIG ROBOT
 
         app.curXValue.delete(1.0,2.0)
         app.curXValue.insert(tk.END, result[0])
@@ -238,32 +243,30 @@ if __name__ == '__main__':
         app.curAValue.insert(tk.END, result[2])
 
         app.curXLValue.delete(1.0,2.0)
-        app.curXLValue.insert(tk.END, result[3])
+        app.curXLValue.insert(tk.END, result1[0])
 
         app.curYLValue.delete(1.0,2.0)
-        app.curYLValue.insert(tk.END, result[4])
+        app.curYLValue.insert(tk.END, result1[1])
 
         app.curALValue.delete(1.0,2.0)
-        app.curALValue.insert(tk.END, result[5])
+        app.curALValue.insert(tk.END, result1[2])
 
-        app.collValue.delete(1.0,2.0)
-        app.collValue.insert(tk.END, result[6])
+        #app.collValue.delete(1.0,2.0)
+        #app.collValue.insert(tk.END, result[6])
 
         app.ADCValue.delete(1.0, 2.0)
         app.ADCValue.insert(tk.END, data)
+
+        app.INPUTSValue.delete(1.0, 2.0)
+        app.INPUTSValue.insert(tk.END, data1)
 
         a=float(result[0])###SMALL
         b=float(result[1])
         c=float(result[2])
 
-        d=float(result[3])###BIG
-        e=float(result[4])
-        f=float(result[5])
-
-        """rectangle = app.canvas.create_rectangle(200,500, 300, 400, outline = "red", fill="white", width=5)
-        app.canvas.move(rectangle,str(a),str(b))
-        oval = app.canvas.create_oval(100, 200, 220, 320, outline="blue", fill="white", width=5)
-        app.canvas.move(oval, str(c), str(d))"""
+        d=float(result1[0])###BIG
+        e=float(result1[1])
+        f=float(result1[2])
 
         small = app.canvas.create_polygon(draw_small(a,b,c), outline = "blue", fill = "white", width = 5)
         small_line = app.canvas.create_line(draw_lines(a,b,c), fill = "blue", width = 5)
@@ -272,7 +275,7 @@ if __name__ == '__main__':
         big_line = app.canvas.create_line(draw_lines(d,e,f), fill = "red", width = 5)
 
 
-        #time.sleep(0.01)
+        time.sleep(0.1)
         app.root.update()
         app.canvas.delete(small)
         app.canvas.delete(small_line)
