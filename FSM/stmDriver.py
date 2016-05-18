@@ -100,8 +100,8 @@ def open_cube_collector():
     reply_on_request = send_request(packet)
     return reply_on_request
 
-def switch_on_vibration_table(): 
-    packet = packetBuilder.BuildPacket(commands_to_stm.switchOnVibrationTable)
+def switch_on_vibration_table(parameter): 
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOnVibrationTable, parameter)
     reply_on_request = send_request(packet)
     return reply_on_request
 

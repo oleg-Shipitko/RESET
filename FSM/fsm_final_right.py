@@ -3,6 +3,11 @@ import time
 import multiprocessing
 import math
 import localisation
+import socket
+
+# PC server address and  port
+HOST = '192.168.1.77'
+PORT = 9090
 
 input_command_queue = multiprocessing.Queue()
 reply_to_fsm_queue = multiprocessing.Queue()
@@ -10,7 +15,9 @@ reply_to_localization_queue = multiprocessing.Queue()
 
 request_source = 'fsm'
 start_time = time.time()
-check_time = False
+last_update_for_robot = time.time()
+check_start_time = True
+start_game_time = None
 current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 current_coordinatess = multiprocessing.Array('d', [0.0, 0.0, 0.0])
 correction_performed = multiprocessing.Value('i', 0)
@@ -21,7 +28,7 @@ unloading_cubes_position = 0
 taken_cubes_number = None
 
 start_position = [0.1525, 0.72, 0.0]
-#start_position = [0.1525, 0.72, 0.0]
+#start_position = [2.847, 0.77, -3.14]
 
 class SwitchOnKinematicsAction(object):
     def run_action(self):
@@ -70,8 +77,11 @@ class SetCubesManipulatorAngleAction(object):
             return True
 
 class SwitchOnVibrationTableAction():
+    def __init__(self, time):
+        self.time = time
+
     def run_action(self):
-        stm_driver('switch_on_vibration_table')
+        stm_driver('switch_on_vibration_table', self.time)
 
     def check_action(self):
             print 'Vibration table was activated'
@@ -228,7 +238,7 @@ class SetCorrectCoordinatesAction():
         self.theta = current_coordinatess[2]
 
         stm_driver('set_coordinates_with_movement', [self.x, self.y, self.theta])
-        print 'Coordinates ', [self.x, self.y, self.theta], 'were seted'
+        print 'Coordinates ', [self.x, self.y, self.theta], 'were set'
 
     def check_action(self):
         return True
@@ -242,7 +252,7 @@ class SetCorrectCoordinatesWithoutMovementAction():
         self.theta = current_coordinatess[2]
 
         stm_driver('set_coordinates_without_movement', [self.x, self.y, self.theta])
-        print 'Coordinates ', [self.x, self.y, self.theta], 'were seted without movement'
+        print 'Coordinates ', [self.x, self.y, self.theta], 'were set without movement'
 
     def check_action(self):
         return True
@@ -438,23 +448,23 @@ class SlowMoveToFinalPointTask(object):
 
 class TakeCubesTask(object):
     all_actions_were_completed = False
-    angle_for_closed_manipulator = 275
-    default_angle = 275
+    angle_for_closed_manipulator = 295
+    default_angle = 295
     task_was_completed_succesfully = None
 
     def __init__(self, layer, expected_number_of_cubes = 1):
         self.layer = layer
         self.expected_number_of_cubes = expected_number_of_cubes
-        self.manipulator_angle = 270
+        self.manipulator_angle = 295
         self.time = time.time()
         print 'Start time', self.time
         
         if self.layer is 3:
-            self.manipulator_angle = 193
+            self.manipulator_angle = 213
         elif self.layer is 2:
-            self.manipulator_angle = 160
+            self.manipulator_angle = 178
         elif self.layer is 1:
-            self.manipulator_angle = 130
+            self.manipulator_angle = 160
 
         self.future_actions  = [
             OpenCubesManipulatorAction(),
@@ -462,6 +472,7 @@ class TakeCubesTask(object):
             CloseCubesManipulatorAction(),
             SetCubesManipulatorAngleAction(self.angle_for_closed_manipulator),
             OpenCubesManipulatorAction(),
+            SwitchOnVibrationTableAction(3),
             SetCubesManipulatorAngleAction(self.default_angle)]
         
         self.future_actions.reverse()
@@ -537,9 +548,9 @@ class SetInitialCoordinateTask(object):
 class ActivateCubesUnloadingTask(object):
     all_actions_were_completed = False
 
-    def __init__(self):
+    def __init__(self, time):
         self.future_actions = [
-            SwitchOnVibrationTableAction(),
+            SwitchOnVibrationTableAction(time),
             OpenCubesBorderAction()]
         self.future_actions.reverse()
         self.current_action = self.future_actions.pop()
@@ -643,6 +654,7 @@ class MainState(object):
         self.current_state = states_list.pop()
         self.future_states = states_list
         self.interrupted_state = None
+        #self.robot_state = RobotState()
     
     def run_game(self):
         self.current_state.run_state()
@@ -674,9 +686,21 @@ class MainState(object):
                 return new_state
 
     def check_game_time(self):
+        global start_game_time
         current_time = time.time()
-        if (current_time - start_time >= 87 and check_time):
-            a = 1
+        if start_game_time is not None and (current_time - start_game_time >= 89 and check_start_time is False):
+            stm_driver('switch_off_tajectory_regulator')
+            stm_driver('set_movement_speed', [0.0, 0.0, 0.0])
+
+    '''def check_time_and_send_data_to_socket(self):
+        global last_update_for_robot
+        if time.time() - last_update_for_robot > 1:
+            try:
+                last_update_for_robot = time.time()
+                self.robot_state.update_robot_state()
+                self.robot_state.send_data_to_socket()
+            except:
+                pass'''
 
     def check_enemy(self):
         a = 1
@@ -798,7 +822,7 @@ class CollectCubesStates(MainState):
 class UnloadCubesState(MainState):
     all_tasks_were_completed = False
 
-    def __init__(self):
+    def __init__(self, time):
         global unloading_cubes_position
         self.coordinates_for_unloading_cubes =  [
             [1.28, 0.615, -1.57],
@@ -806,7 +830,7 @@ class UnloadCubesState(MainState):
             [0.9655, 1.115, -3.14]]
         self.future_tasks = [
             FastMoveToFinalPointTask(self.coordinates_for_unloading_cubes[unloading_cubes_position][0], self.coordinates_for_unloading_cubes[unloading_cubes_position][1], self.coordinates_for_unloading_cubes[unloading_cubes_position][2]),
-            ActivateCubesUnloadingTask(),
+            ActivateCubesUnloadingTask(time),
             ThrowCubesTask(self.coordinates_for_unloading_cubes[unloading_cubes_position]),
             DisactivateCubesUnloadingTask()]
         if unloading_cubes_position < len(self.coordinates_for_unloading_cubes):
@@ -836,10 +860,11 @@ class CloseDoorsState(object):
     def __init__(self): 
         self.future_tasks = [
             SuperFastMoveToIntermediaryPointTask(0.5, 0.47, -1.57),
-            FastMoveToFinalPointTask(0.33, 0.1, -1.57),
-            FastMoveToIntermediaryPointTask(0.33, 0.18, -1.57),
+            SuperFastMoveToIntermediaryPointTask(0.35, 0.47, -1.57),
+            FastMoveToFinalPointTask(0.28, 0.1, -1.57),
+            FastMoveToIntermediaryPointTask(0.28, 0.18, -1.57),
             FastMoveToIntermediaryPointTask(0.57, 0.18, -1.57),
-            FastMoveToFinalPointTask(0.57, 0.12, -1.57)]
+            FastMoveToIntermediaryPointTask(0.57, 0.12, -1.57)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -866,10 +891,11 @@ class DragCubesState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            SuperFastMoveToFinalPointTask(0.2, 0.95, -3.14),
-            FastMoveToFinalPointTask(0.6, 0.95, -3.14),
-            FastMoveToFinalPointWithCorrectionTask(1.1, 0.95, -3.14),
-            FastMoveToFinalPointTask(0.95, 0.95, -3.14)]
+            SuperFastMoveToIntermediaryPointTask(0.4, 0.65, -3.14),
+            SuperFastMoveToFinalPointTask(0.4, 0.95, -3.14),
+            SuperFastMoveToIntermediaryPointTask(1.1, 0.95, -3.14),
+            FastMoveToFinalPointWithCorrectionTask(1.3, 1.05, -3.14),
+            SuperFastMoveToIntermediaryPointTask(1.0, 1.05, -3.14)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -894,10 +920,19 @@ class TestState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            MoveToFinalPointTask(0.1525, 0.72, 0)]
-            #MoveToIntermediaryPointTask(0.1625, 0.72, 0),
-            #MoveToFinalPointTask(0.3, 0.72, 0)] 
-            #SetInitialCoordinateTask([0.3, 0.72, 0])]
+            FastMoveToFinalPointTask(0.60, 0.13, -1.57),
+            SlowMoveToFinalPointTask(0.67, 0.13, -1.57),
+            FastMoveToFinalPointTask(0.67, 0.4, -1.57),
+            FastMoveToFinalPointTask(1.02, 0.4, -1.57),
+            OpenManipulatorTask(213),
+            SlowMoveToFinalPointTask(1.02, 0.31, -1.57),
+            SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
+            TakeCubesTask(2),
+            SlowMoveToFinalPointTask(0.925, 0.325, -1.57),
+            OpenManipulatorTask(150),
+            SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
+            TakeCubesTask(1),
+            FastMoveToFinalPointTask(0.925, 0.45, -1.57)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -928,20 +963,60 @@ def get_angles_diff(a1, a2):
     cur = (a2 + 180) % 360 - 180
     return (target - cur + 180) % 360 - 180
 
+class RobotState(object):
+    def __init__(self):
+        global current_coordinatess_from_robot
+        self.current_coordinatess_from_robot = current_coordinatess_from_robot
+        global current_coordinatess
+        self.current_coordinatess = current_coordinatess
+        self.collision_avoidance = 1
+        self.pc = self.connect_pc(HOST, PORT)
+
+    def connect_pc(self, HOST, PORT):
+        try:    
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((HOST, PORT))
+            return sock
+        except Exception as err:
+            print 'Error in connecting to pc server: ', err
+            sock.close()
+    
+    def update_robot_state(self):
+        print 'we are in update_robot_state method'
+        global current_coordinatess_from_robot
+        self.current_coordinatess_from_robot = current_coordinatess_from_robot
+        global current_coordinatess
+        self.current_coordinatess = current_coordinatess
+        self.collision_avoidance = 1
+
+    def send_data_to_socket(self):
+        data_to_send = self.current_coordinatess[0], self.current_coordinatess[1], self.current_coordinatess[2], self.current_coordinatess_from_robot[0], self.current_coordinatess_from_robot[1], self.current_coordinatess_from_robot[2], self.collision_avoidance
+        string_to_send = str(data_to_send)
+        print 'String to send:', string_to_send
+        self.pc.sendall(string_to_send +'\n')
+        '''
+        try:
+            data_to_send = self.current_coordinatess[0], self.current_coordinatess[1], self.current_coordinatess[2], self.current_coordinatess_from_robot[0], self.current_coordinatess_from_robot[1], self.current_coordinatess_from_robot[2], self.collision_avoidance
+            string_to_send = str(data_to_send)
+            print 'String to send:', string_to_send
+            self.pc.sendall(string_to_send +'\n')
+        except:
+            print 'exception occured'
+            pass'''
+
 collect_cubes_options = [{ 
         'priority': 3, 
         'tasks_list': [
             FastMoveToFinalPointTask(0.60, 0.13, -1.57),
             SlowMoveToFinalPointTask(0.67, 0.13, -1.57),
-            FastMoveToFinalPointTask(0.67, 0.38, -1.57),
-            FastMoveToFinalPointTask(0.95, 0.38, -1.57),
-            OpenManipulatorTask(193),
-            SlowMoveToFinalPointTask(0.95, 0.30, -1.57),
+            FastMoveToIntermediaryPointTask(0.67, 0.4, -1.57),
+            FastMoveToIntermediaryPointTask(1.02, 0.4, -1.57),
+            OpenManipulatorTask(213),
+            SlowMoveToFinalPointTask(1.02, 0.31, -1.57),
             SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
-            TakeCubesTask(3),
             TakeCubesTask(2),
             SlowMoveToFinalPointTask(0.925, 0.325, -1.57),
-            OpenManipulatorTask(130),
+            OpenManipulatorTask(150),
             SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
             TakeCubesTask(1),
             FastMoveToIntermediaryPointTask(0.925, 0.45, -1.57)]},
@@ -952,25 +1027,26 @@ collect_cubes_options = [{
             SlowMoveToFinalPointTask(1.5, 0.44, -1.57),
             TakeCubesTask(1),
             SlowMoveToFinalPointTask(1.48, 0.35, -1.57),
-            TakeCubesTask(3)]},
+            TakeCubesTask(3)
+            ]},
         { 
         'priority': 1, 
         'tasks_list': [
             SuperFastMoveToIntermediaryPointTask(0.45, 0.43, 0),
             SuperFastMoveToIntermediaryPointTask(2.0, 0.43, -1.57),
             SlowMoveToFinalPointTask(2.05, 0.43, -1.57),
-            OpenManipulatorTask(193),
-            WaitTimeTask(1),
+            #OpenManipulatorTask(213),
             SlowMoveToFinalPointTask(2.125, 0.43, -1.57),
             SlowMoveToFinalPointTask(2.125, 0.29, -1.57),
             SlowMoveToFinalPointTask(2.12, 0.31, -1.57),
-            TakeCubesTask(3),
-            TakeCubesTask(2),
+            #TakeCubesTask(3),
+            #TakeCubesTask(2),
             SlowMoveToFinalPointTask(2.12, 0.325, -1.57),
-            OpenManipulatorTask(130),
+            #OpenManipulatorTask(150),
             SlowMoveToFinalPointTask(2.12, 0.31, -1.57),
-            TakeCubesTask(1),
-            SuperFastMoveToIntermediaryPointTask(2.125, 0.43, -1.57)]}]
+            #TakeCubesTask(1),
+            SuperFastMoveToIntermediaryPointTask(2.125, 0.43, -1.57),
+            SuperFastMoveToIntermediaryPointTask(1.2, 0.515, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
 localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot))
@@ -982,10 +1058,10 @@ states_list = [
     #BrokeMiddleWallState()]
     CollectCubesStates(),
     #CollectCubesStates(),
-    UnloadCubesState(),
+    UnloadCubesState(15),
     CloseDoorsState(),
     CollectCubesStates(),
     DragCubesState(),
-    UnloadCubesState()]
-#states_list = [InitializeRobotState(), CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
+    UnloadCubesState(15)]
+#states_list = [InitializeRobotState(), TestState()]
 MainState(states_list).run_game()

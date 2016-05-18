@@ -16,7 +16,7 @@ BUFFER_SIZE = 8192 #4096
 
 # PC server address and  port
 HOST = '192.168.1.251'
-PORT = 9997
+PORT = 9999
 
 #STM 32 board parameters
 VID = 1155
@@ -219,6 +219,7 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 
 def connect_pc(HOST, PORT):
     try:    
+        print 'In connect to pc'
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((HOST, PORT))
         return sock
@@ -242,7 +243,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
     """Main function for localisation"""
     try: 
         s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-        pc = connect_pc(HOST,PORT)
+        #pc = connect_pc(HOST,PORT)
         myrobot = Robot(True,start_position)
         #myrobot.set(start_position[0]*1000,start_position[1]*1000,start_position[2])
         print myrobot
@@ -289,14 +290,14 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
                 myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
                             center[1]-R*math.sin(mean_orientation+BETA), 
                             mean_orientation)
-                print myrobot
+                #print myrobot
                 current_coordinatess[0] = myrobot.x/1000
                 current_coordinatess[1] = myrobot.y/1000
                 current_coordinatess[2] = myrobot.orientation
                 #print '==================', current_coordinatess[:]
                 w_prev = w_norm
-                p_pos = [part.pose() for part in p]
-                pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
+                #p_pos = [part.pose() for part in p]
+                #pc.sendall(str(p_pos)+'\n')#+str(w_prev)+'\n')
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
                 if n_eff < n_trash:# and sum(rel_motion) > 0.1:
                     try:

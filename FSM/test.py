@@ -24,8 +24,29 @@ def get_com_port_number():
 port_number = get_com_port_number()
 port = serialWrapper.SerialWrapper(port_number)
 
+raw_input('switched on. Press to switched off')
+packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
+reply = port.sendRequest(packet.bytearray).reply
+print reply
 
-packet = packetBuilder.BuildPacket(commands_to_stm.getManipulatorAngle)
+while True:
+    raw_input('switched on. Press to switched off')
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
+    reply = port.sendRequest(packet.bytearray).reply
+    print reply
+
+
+
+raw_input('switched on. Press to switched off')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.closeCubeCollector)
+reply = port.sendRequest(packet.bytearray).reply
+
+print reply
+
+raw_input('switched on. Press to switched off')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.openCubeCollector)
 reply = port.sendRequest(packet.bytearray).reply
 
 print reply
@@ -33,7 +54,7 @@ print reply
 raw_input('switched on. Press to switched off')
 
 
-packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 270)
+'''packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 270)
 reply = port.sendRequest(packet.bytearray).reply
 
 print reply
@@ -73,7 +94,7 @@ packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
 reply = port.sendRequest(packet.bytearray).reply
 
 print reply
-'''
+
 while True:
     raw_input('Press enter')
     packet = packetBuilder.BuildPacket(commands_to_stm.closeCubeCollector)
@@ -87,7 +108,7 @@ while True:
 raw_input('Press enter')
 packet = packetBuilder.BuildPacket(commands_to_stm.addPointToStack, [0.1725, 0.72, 0.0, 1])
 recievedPacket = port.sendRequest(packet.bytearray)
-'''	
+
 
 #packet = packetBuilder.BuildPacket(commands_to_stm.setCoordinates, [0.1525, 0.72, 0])
 #port.sendRequest(packet.bytearray)
@@ -95,4 +116,4 @@ recievedPacket = port.sendRequest(packet.bytearray)
 #recievedPacket = port.sendRequest(packet.bytearray)
 #time.sleep(2)
 #packet = packetBuilder.BuildPacket(commands_to_stm.getNumberOfReachedPoints)
-reply = port.sendRequest(packet.bytearray).reply
+reply = port.sendRequest(packet.bytearray).reply'''

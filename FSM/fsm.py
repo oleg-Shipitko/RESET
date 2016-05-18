@@ -5,12 +5,17 @@ import math
 import localisation
 import socket
 
+# PC server address and  port
+HOST = '192.168.1.146'
+PORT = 9090
+
 input_command_queue = multiprocessing.Queue()
 reply_to_fsm_queue = multiprocessing.Queue()
 reply_to_localization_queue = multiprocessing.Queue()
 
 request_source = 'fsm'
 start_time = time.time()
+last_update_for_robot = time.time()
 check_start_time = True
 start_game_time = None
 current_coordinatess_from_robot = multiprocessing.Array('d', [0.0, 0.0, 0.0])
@@ -22,9 +27,9 @@ trunk_capacity = 12
 unloading_cubes_position = 0
 taken_cubes_number = None
 
-start_position = [2.847, 0.77, -3.14]
+#start_position = [2.847, 0.77, -3.14]
 server_ip = '192.168.1.146'
-#start_position = [0.1525, 0.72, 0.0]
+start_position = [0.1525, 0.72, 0.0]
 
 class SwitchOnKinematicsAction(object):
     def run_action(self):
@@ -52,7 +57,7 @@ class SwitchOnTrajectoryAction(object):
 
 class OpenCubesManipulatorAction(object):
     def run_action(self):
-        stm_driver('open_cube_collector')
+        #stm_driver('open_cube_collector')
         self.start_time = time.time()
 
     def check_action(self):
@@ -98,7 +103,8 @@ class SwitchOffVibrationTableAction():
 
 class CloseCubesBorderAction():
     def run_action(self):
-        stm_driver('close_cubes_border')
+        print 'close'
+        #stm_driver('close_cubes_border')
 
     def check_action(self):
             print 'Cubes border was closed'
@@ -636,13 +642,23 @@ class ResetCoordinatesTask(object):
     def check_task(self):
         return True
 
+class OpenManipulatorTask(object):
+    def __init__(self, angle):
+        self.angle = angle
+
+    def run_task(self):
+        stm_driver('set_cube_manipulator_angle', self.angle)
+    
+    def check_task(self):
+        return True
+
 class MainState(object):
     def __init__(self, states_list):
         states_list.reverse()
         self.current_state = states_list.pop()
         self.future_states = states_list
         self.interrupted_state = None
-        self.robot_state = RobotState()        
+        self.robot_state = RobotState()
     
     def run_game(self):
         self.current_state.run_state()
@@ -686,15 +702,19 @@ class MainState(object):
     def check_game_time(self):
         global start_game_time
         current_time = time.time()
-        if (current_time - start_game_time >= 89 and check_start_time is False):
+        if start_game_time is not None and (current_time - start_game_time >= 89 and check_start_time is False):
             stm_driver('switch_off_tajectory_regulator')
             stm_driver('set_movement_speed', [0.0, 0.0, 0.0])
 
-    def send_data_to_socket(self):
-        if time.time() - self.start_game_time > 2:
+    def check_time_and_send_data_to_socket(self):
+        global last_update_for_robot
+        if time.time() - last_update_for_robot > 1:
             try:
+                a = time.time() - last_update_for_robot
+                print 'time difference', a
+                last_update_for_robot = time.time()
                 self.robot_state.update_robot_state()
-                self.send_data_to_socket()
+                self.robot_state.send_data_to_socket()
             except:
                 pass
 
@@ -879,11 +899,8 @@ class TestState(object):
     all_tasks_were_completed = False
 
     def __init__(self): 
-        self.future_tasks = [
-            TakeCubesTask(3),
-            TakeCubesTask(2),
-            TakeCubesTask(1)]
-            #MoveToIntermediaryPointTask(0.1625, 0.72, 0),
+        self.future_tasks = [FastMoveToFinalPointTask(0.4, 0.45, -1.57)]
+            #MoveToIntermediaryPointTask(0.1525, 0.72, 0.0),
             #MoveToFinalPointTask(0.3, 0.72, 0)] 
             #SetInitialCoordinateTask([0.3, 0.72, 0])]
         self.future_tasks.reverse()
@@ -935,27 +952,43 @@ class DragCubesState(object):
 class RobotState(object):
     def __init__(self):
         global current_coordinatess_from_robot
-        self.current_coordinates = current_coordinatess_from_robot
+        self.current_coordinatess_from_robot = current_coordinatess_from_robot
         global current_coordinatess
         self.current_coordinatess = current_coordinatess
-        self.collision_avoidance = False
+        self.collision_avoidance = 1
+        self.pc = self.connect_pc(HOST, PORT)
+
+    def connect_pc(self, HOST, PORT):
+        try:    
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((HOST, PORT))
+            return sock
+        except Exception as err:
+            print 'Error in connecting to pc server: ', err
+            sock.close()
     
     def update_robot_state(self):
+        print 'we are in update_robot_state method'
         global current_coordinatess_from_robot
         self.current_coordinatess_from_robot = current_coordinatess_from_robot
         global current_coordinatess
         self.current_coordinatess = current_coordinatess
-        #get collision avoidance state
-        self.collision_avoidance = False
+        self.collision_avoidance = 1
 
     def send_data_to_socket(self):
+        data_to_send = self.current_coordinatess[0], self.current_coordinatess[1], self.current_coordinatess[2], self.current_coordinatess_from_robot[0], self.current_coordinatess_from_robot[1], self.current_coordinatess_from_robot[2], self.collision_avoidance
+        string_to_send = str(data_to_send)
+        print 'String to send:', string_to_send
+        #self.pc.sendall(string_to_send +'\n')
+        '''
         try:
-            self.socket = socket.socket()
-            self.socket.connect((server_ip, 9090))
-            string_to_send = str(self.current_coordinates, self.current_coordinatess_from_robot, self.collision_avoidance)
-            self.socket.send(string_to_send)
+            data_to_send = self.current_coordinatess[0], self.current_coordinatess[1], self.current_coordinatess[2], self.current_coordinatess_from_robot[0], self.current_coordinatess_from_robot[1], self.current_coordinatess_from_robot[2], self.collision_avoidance
+            string_to_send = str(data_to_send)
+            print 'String to send:', string_to_send
+            self.pc.sendall(string_to_send +'\n')
         except:
-            pass
+            print 'exception occured'
+            pass'''
 
 def stm_driver(command, parameters = ''):
     command = {'request_source': 'fsm', 'command': command, 'parameters': parameters}
@@ -974,47 +1007,55 @@ collect_cubes_options = [{
             SlowMoveToFinalPointTask(0.67, 0.13, -1.57),
             FastMoveToFinalPointTask(0.67, 0.38, -1.57),
             FastMoveToFinalPointTask(0.95, 0.38, -1.57),
-            SlowMoveToFinalPointTask(0.95, 0.32, -1.57),
-            SlowMoveToFinalPointTask(0.925, 0.32, -1.57),
-            TakeCubesTask(2),
-            FastMoveToIntermediaryPointTask(0.925, 0.45, -1.57),
-            FastMoveToIntermediaryPointTask(0.5, 0.45, -1.57),
-            FastMoveToIntermediaryPointTask(0.5, 0.9, -1.57)]},
+            #OpenManipulatorTask(193),
+            SlowMoveToFinalPointTask(0.95, 0.30, -1.57),
+            SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
+            #TakeCubesTask(3),
+            #TakeCubesTask(2),
+            SlowMoveToFinalPointTask(0.925, 0.325, -1.57),
+            #OpenManipulatorTask(130),
+            SlowMoveToFinalPointTask(0.925, 0.31, -1.57),
+            #TakeCubesTask(1),
+            FastMoveToIntermediaryPointTask(0.925, 0.45, -1.57)]},
+        { 
+        'priority': 4, 
+        'tasks_list': [
+            FastMoveToFinalPointTask(1.48, 0.43, -1.57),
+            SlowMoveToFinalPointTask(1.5, 0.44, -1.57),
+            #TakeCubesTask(1),
+            SlowMoveToFinalPointTask(1.48, 0.35, -1.57),
+            #TakeCubesTask(3)
+            ]},
         { 
         'priority': 1, 
         'tasks_list': [
-            SlowMoveToFinalPointTask(1.37, 0.42, -1.57),
-            TakeCubesTask(1),
-            SlowMoveToFinalPointTask(1.37, 0.37, -1.57),
-            TakeCubesTask(3),
-            FastMoveToIntermediaryPointTask(1.37, 0.46, -1.57)]},
-        { 
-        'priority': 2, 
-        'tasks_list': [
-            SuperFastMoveToFinalPointTask(2.12, 0.5, -1.57),
-            SlowMoveToFinalPointTask(2.135, 0.48, -1.57),
-            SlowMoveToFinalPointTask(2.135, 0.32, -1.57),
-            SlowMoveToFinalPointTask(2.11, 0.32, -1.57),
-            TakeCubesTask(1),
-            TakeCubesTask(3),
-            FastMoveToIntermediaryPointTask(2.11, 0.43, -1.57)]}]
+            SuperFastMoveToIntermediaryPointTask(0.45, 0.43, 0),
+            SuperFastMoveToIntermediaryPointTask(2.0, 0.43, -1.57),
+            SlowMoveToFinalPointTask(2.05, 0.43, -1.57),
+            #OpenManipulatorTask(193),
+            WaitTimeTask(1),
+            SlowMoveToFinalPointTask(2.125, 0.43, -1.57),
+            SlowMoveToFinalPointTask(2.125, 0.29, -1.57),
+            SlowMoveToFinalPointTask(2.12, 0.31, -1.57),
+            #TakeCubesTask(3),
+            #TakeCubesTask(2),
+            SlowMoveToFinalPointTask(2.12, 0.325, -1.57),
+            #OpenManipulatorTask(130),
+            SlowMoveToFinalPointTask(2.12, 0.31, -1.57),
+            SuperFastMoveToIntermediaryPointTask(2.125, 0.43, -1.57)]}]
 
-stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
-localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot))
+stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue, reply_to_fsm_queue, reply_to_localization_queue))
+localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue, reply_to_localization_queue, current_coordinatess, correction_performed, start_position, current_coordinatess_from_robot))
 stm.start()
 #time.sleep(2)
 localisation.start()
-'''states_list = [
+states_list = [
     InitializeRobotState(),
     #BrokeMiddleWallState(),
     CollectCubesStates(),
-    CollectCubesStates(),
-    UnloadCubesState(),
-    CloseDoorsState(),
-    DragCubesState(),
     UnloadCubesState(),
     CloseDoorsState(),
     CollectCubesStates(),
-    UnloadCubesState()]'''
-states_list = [TestState()]#, CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]
+    DragCubesState()]
+'''states_list = [InitializeRobotState(), TestState()]#, CloseDoorsState(), CollectCubesStates(), CollectCubesStates()]'''
 MainState(states_list).run_game()

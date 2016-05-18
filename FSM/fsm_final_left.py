@@ -800,6 +800,7 @@ class UnloadCubesState(MainState):
             [1.95, 0.617, -1.57],
             [0.9655, 1.015, -3.14],
             [0.9655, 1.115, -3.14]]
+
         self.future_tasks = [
             FastMoveToFinalPointTask(self.coordinates_for_unloading_cubes[unloading_cubes_position][0], self.coordinates_for_unloading_cubes[unloading_cubes_position][1], self.coordinates_for_unloading_cubes[unloading_cubes_position][2]),
             ActivateCubesUnloadingTask(),
@@ -891,8 +892,8 @@ class DragCubesState(object):
     def __init__(self): 
         self.future_tasks = [
             SuperFastMoveToFinalPointTask(2.8, 0.88, -3.14),
-            FastMoveToFinalPointTask(2.4, 0.88, -3.14),
-            FastMoveToFinalPointTask(2.0, 0.88, -3.14)]
+            FastMoveToIntermediaryPointTask(2.4, 0.88, -3.14),
+            FastMoveToFinalPointWithCorrectionTask(2.0, 0.88, -3.14)]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
