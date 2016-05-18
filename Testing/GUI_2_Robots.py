@@ -204,55 +204,108 @@ def draw_lines(X0,Y0,alpha):
     return a
 
 if __name__ == '__main__':
-    data_queue = multiprocessing.Queue()
-    server = multiprocessing.Process(target=server_big.main, args=(data_queue,))
-    server.start()
+    data_queue_big = multiprocessing.Queue()
+    server_big = multiprocessing.Process(target=server_big.main, args=(data_queue_big,))
+    server_big.start()
+
+    data_queue_small = multiprocessing.Queue()
+    server_small = multiprocessing.Process(target=server_small.main, args=(data_queue_small,))
+    server_small.start()
+
     root = Tk()
     app = GUI(root)
     while True:
-        data = data_queue.get()####
-        data1 = str(data)
-        result = re.findall(r'[+-]?\d+(?:\.\d+)?', data1)
-        print data
+        data_big = data_queue_big.get()####
+        data_big_1 = str(data_big)
+        result_big = re.findall(r'[+-]?\d+(?:\.\d+)?', data_big_1)
+        print data_big
+
+        data_small = data_queue_small.get()####
+        data_small_1 = str(data_small)
+        result_small = re.findall(r'[+-]?\d+(?:\.\d+)?', data_small_1)
+        print data_small
+
         #data = [0,1,2,3,4,5,6]###from shared memory
         #result = [0,1,2,3,4,5,6]
 
         app.curXBValue.delete(1.0,2.0)
-        app.curXBValue.insert(tk.END, result[3])
+        app.curXBValue.insert(tk.END, result_big[3])
 
         app.curYBValue.delete(1.0,2.0)
-        app.curYBValue.insert(tk.END, result[4])
+        app.curYBValue.insert(tk.END, result_big[4])
 
         app.curABValue.delete(1.0,2.0)
-        app.curABValue.insert(tk.END, result[5])
+        app.curABValue.insert(tk.END, result_big[5])
 
         app.curXLBValue.delete(1.0,2.0)
-        app.curXLBValue.insert(tk.END, result[1])
+        app.curXLBValue.insert(tk.END, result_big[1])
 
         app.curYLBValue.delete(1.0,2.0)
-        app.curYLBValue.insert(tk.END, result[2])
+        app.curYLBValue.insert(tk.END, result_big[2])
 
         app.curALBValue.delete(1.0,2.0)
-        app.curALBValue.insert(tk.END, result[3])
+        app.curALBValue.insert(tk.END, result_big[3])
 
         app.collBValue.delete(1.0,2.0)
-        app.collBValue.insert(tk.END, result[6])
+        app.collBValue.insert(tk.END, result_big[6])
 
         app.ADCBValue.delete(1.0, 2.0)
-        app.ADCBValue.insert(tk.END, data)
+        app.ADCBValue.insert(tk.END, data_big)
 
-        a=float(result[0])###LIDAR OF BIG RoBOT
-        b=float(result[1])
-        c=float(result[2])
+        app.curXValue.delete(1.0,2.0)
+        app.curXValue.insert(tk.END, result_small[3])
 
-        d=float(result[3])###BIG ROBOT
-        e=float(result[4])
-        f=float(result[5])
+        app.curYValue.delete(1.0,2.0)
+        app.curYValue.insert(tk.END, result_small[4])
+
+        app.curAValue.delete(1.0,2.0)
+        app.curAValue.insert(tk.END, result_small[5])
+
+        app.curXLValue.delete(1.0,2.0)
+        app.curXLValue.insert(tk.END, result_small[1])
+
+        app.curYLValue.delete(1.0,2.0)
+        app.curYLValue.insert(tk.END, result_small[2])
+
+        app.curALValue.delete(1.0,2.0)
+        app.curALValue.insert(tk.END, result_small[3])
+
+        app.collValue.delete(1.0,2.0)
+        app.collValue.insert(tk.END, result_small[6])
+
+        app.ADCValue.delete(1.0, 2.0)
+        app.ADCValue.insert(tk.END, data_small)
+
+        a=float(result_big[0])###LIDAR OF BIG RoBOT
+        b=float(result_big[1])
+        c=float(result_big[2])
+
+        d=float(result_big[3])###BIG ROBOT
+        e=float(result_big[4])
+        f=float(result_big[5])
+
+        a1=float(result_big[0])###LIDAR OF SMALL RoBOT
+        b1=float(result_big[1])
+        c1=float(result_big[2])
+
+        d1=float(result_big[3])###SMALL ROBOT
+        e1=float(result_big[4])
+        f1=float(result_big[5])
 
         big_robot = app.canvas.create_polygon(draw_big(d,e,f), outline = "red", fill = "white", width = 5)
         big_robot_lidar = app.canvas.create_polygon(draw_big(a,b,c), outline = "gray", fill = "gray", width = 5)
         big_robot_line = app.canvas.create_line(draw_lines(d,e,f), fill = "red", width = 5)
         big_robot_lidar_line = app.canvas.create_line(draw_lines(a,b,c), fill = "gray", width = 5)
+
+        small_robot = app.canvas.create_polygon(draw_small(d1,e1,f1), outline = "blue", fill = "white", width = 5)
+        small_robot_lidar = app.canvas.create_polygon(draw_small(a1,b1,c1), outline = "gray", fill = "gray", width = 5)
+        small_robot_line = app.canvas.create_line(draw_lines(d1,e1,f1), fill = "blue", width = 5)
+        small_robot_lidar_line = app.canvas.create_line(draw_lines(a1,b1,c1), fill = "gray", width = 5)
+
+        app.canvas.delete(small_robot)
+        app.canvas.delete(small_robot_line)
+        app.canvas.delete(small_robot_lidar)
+        app.canvas.delete(small_robot_lidar_line)
 
         app.root.update()
         app.canvas.delete(big_robot)
