@@ -40,6 +40,16 @@ def switch_on_pid():
     reply_on_request = send_request(packet)
     return reply_on_request
 
+def switch_off_pid():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffPid)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def switch_off_robot():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffRobot)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
 def switch_on_tajectory_regulator():
     packet = packetBuilder.BuildPacket(commands_to_stm.switchOnTrajectoryRegulator)
     reply_on_request = send_request(packet)
@@ -56,7 +66,7 @@ def switch_on_kinematic_calculator():
     return reply_on_request
 
 def switch_off_kinematic_calculator():
-    packet = packetBuilder.BuildPacke(commands_to_stm.switchOffKinematicCalculation)
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffKinematicCalculation)
     reply_on_request = send_request(packet)
     return reply_on_request
 
@@ -139,8 +149,24 @@ def switch_off_collision_avoidance():
     reply_on_request = send_request(packet)
     return reply_on_request
 
+def get_ik_data():
+    packet = packetBuilder.BuildPacket(commands_to_stm.getDataIKSensors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def get_us_data():
+    packet = packetBuilder.BuildPacket(commands_to_stm.getDataUSSensors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+
 def get_robot_speeds():
     packet = packetBuilder.BuildPacket(commands_to_stm.getCurrentSpeed)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def move_with_correction(parameters):
+    packet = packetBuilder.BuildPacket(commands_to_stm.moveWithCorrection, parameters)
     reply_on_request = send_request(packet)
     return reply_on_request
 

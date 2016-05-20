@@ -224,7 +224,7 @@ def connect_pc(HOST, PORT):
 def localisation(lock, shared, computerPort, commands, sharedcor):
 	"""Main function for localisation"""
 	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-	#pc = connect_pc(HOST,PORT)
+	pc = connect_pc(HOST,PORT)
 	myrobot = Robot(True)
 	myrobot.set(200.0, 720.0, 0.0)
 	print myrobot
@@ -265,14 +265,14 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 			mean_orientation = mean_angl(p, w_norm)
 			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
 			myrobot.set(center[0], center[1], mean_orientation)
-			print myrobot
+#			print myrobot
 			shared[0] = myrobot.x
 			shared[1] = myrobot.y
 			shared[2] = myrobot.orientation
 
 			w_prev = w_norm
-			#p_pos = [part.pose() for part in p]
-			#pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
+			p_pos = [part.pose() for part in p]
+			pc.sendall(str(p_pos))#+'\n'+str(w_prev)+'\n')
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
 			if n_eff < n_trash:# and sum(rel_motion) > 0.1:
 				try:

@@ -74,6 +74,8 @@ class BuildPacket(object):
 			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.IntToHex(parameters[3])
 		elif comand == CommandsList.switchOnVibrationTable:
 			return self.typeConvertor.IntToHex(parameters)
+		elif comand == CommandsList.moveWithCorrection:
+			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.FloatToHex(parameters[3]) + self.typeConvertor.FloatToHex(parameters[4]) + self.typeConvertor.FloatToHex(parameters[5]) + self.typeConvertor.IntToHex(parameters[6])
 		return ""
 
 	def GetByteStringFormString(self, parameters):
@@ -148,7 +150,7 @@ class CommandsList(object):
 	setManipulatorAngle = 0x31 # expected parameter: flot[1]
 	releaseCubeMoovers = 0x2D
 	raiseCubeMoovers = 0x2E
-	switchOnVibrationTable = 0x2F
+	switchOnVibrationTable = 0x2F #expected parameters: int[1]
 	switchOffVibrationTable = 0x30
 	switchOffBelts = 0x33
 	startGame = 0x34
@@ -158,3 +160,8 @@ class CommandsList(object):
 	switchOnCollisionAvoidance = 0x33
 	switchOffCollisionAvoidance = 0x34
 	getManipulatorAngle = 0x35
+	getDataIKSensors = 0x36
+	getDataUSSensors = 0x37
+	switchOffRobot = 0x38
+	moveWithCorrection = 0x39 #expected parameters: float32[6], float32[1]
+

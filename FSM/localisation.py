@@ -31,8 +31,8 @@ n_trash = N/3
 WORLD_X = 3500
 WORLD_Y = 2100
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
-BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # left starting possition (0,0 in corner near beach huts)
-#BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # right starting possition (0,0 in corner near beach huts)
+#BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # right starting possition (0,0 in corner near beach huts)
+BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # left starting possition (0,0 in corner near beach huts)
 
 # Lidar displacement from robo center
 DELTA_X = 60.0
@@ -98,7 +98,7 @@ class Robot(object):
 			if l3 < lmin:
 				lmin = l3
 				num = 2
-			if lmin > 700:
+			if lmin > 200:
 				continue
 			beacon[num] += lmin
 			num_point[num] += 1
@@ -224,18 +224,14 @@ def connect_pc(HOST, PORT):
         sock.connect((HOST, PORT))
         return sock
     except Exception as err:
-        print 'Error in connecting to pc server: ', err
+        print 'Error in connecting to pc server for lidar debug: ', err
         sock.close()
+        return None
 
 def stm_driver(input_command_queue, reply_to_localization_queue, command, parameters = ''):
-    #print 'in stm'
     command = {'request_source': 'localisation', 'command': command, 'parameters': parameters}
-    #print 'this is command: ', command
-    #print 'this is after'
     input_command_queue.put(command)
     return reply_to_localization_queue.get()
-    #print 'reply from stmDriver: ', reply
-    #return reply
 
 ###############################################################################
 
@@ -243,30 +239,27 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
     """Main function for localisation"""
     try: 
         s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-        #pc = connect_pc(HOST,PORT)
+        pc = connect_pc(HOST,PORT)
         myrobot = Robot(True,start_position)
-        #myrobot.set(start_position[0]*1000,start_position[1]*1000,start_position[2])
         print myrobot
         p = [Robot(True, start_position) for i in xrange(N)]
-        #print p[0], p[30], p[170]
         old = start_position
         w_re = [1.0/N for i in xrange(N)]
         w_prev = [1.0 for i in xrange(N)]
         time.sleep(1)
         try:
             while 1:
-                #print 'maki'
-                #start = time.time()
-                rel_motion, old2 = relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot, cc_robot)	
-                #print '=========================after lidar'
+                rel_motion, old2 = relative_motion(input_command_queue, 
+                                                    reply_to_localization_queue, 
+                                                    old, correction_performed,
+                                                    myrobot, cc_robot)	
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
                 p = p2
                 old = old2
                 s.send('GE0000108000\r')
                 data_lidar = s.recv(BUFFER_SIZE)
                 angle, distance = lidar_scan(data_lidar) 
-                x_rob, y_rob = p_trans(angle, distance)			
-                #print 'kkk'
+                x_rob, y_rob = p_trans(angle, distance)		
                 w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
                 w_n_sum = sum(w_next)
                 try:
@@ -290,14 +283,17 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
                 myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
                             center[1]-R*math.sin(mean_orientation+BETA), 
                             mean_orientation)
-                #print myrobot
+                print myrobot
                 current_coordinatess[0] = myrobot.x/1000
                 current_coordinatess[1] = myrobot.y/1000
                 current_coordinatess[2] = myrobot.orientation
-                #print '==================', current_coordinatess[:]
                 w_prev = w_norm
-                #p_pos = [part.pose() for part in p]
-                #pc.sendall(str(p_pos)+'\n')#+str(w_prev)+'\n')
+###############################################################################
+#               UNCOMMENT THIS FOR DEBUGGING
+                if pc != None:
+                    p_pos = [part.pose() for part in p]
+                    pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
+###############################################################################
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
                 if n_eff < n_trash:# and sum(rel_motion) > 0.1:
                     try:
@@ -306,13 +302,11 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
                         w_prev = w_re
                     except:
                         print 'error with choice'
-                #end = time.time()
-                #print end - start
         except:			
             s.shutdown(2)
             s.close()
-            #pc.close()
+            pc.close()
     except:			
         s.shutdown(2)
         s.close()
-        #pc.close()
+        pc.close()

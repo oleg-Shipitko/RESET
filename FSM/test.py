@@ -24,14 +24,21 @@ def get_com_port_number():
 port_number = get_com_port_number()
 port = serialWrapper.SerialWrapper(port_number)
 
-raw_input('switched on. Press to switched off')
-packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
+raw_input('Press to get IK data')
+
+parameters = [0.0, 0.0, 0.0, 0.0, 0.1, 1.57, 1]
+packet = packetBuilder.BuildPacket(commands_to_stm.moveWithCorrection, parameters)
+reply = port.sendRequest(packet.bytearray).reply
+print reply
+
+raw_input('Press to get US data')
+packet = packetBuilder.BuildPacket(commands_to_stm.getDataUSSensors)
 reply = port.sendRequest(packet.bytearray).reply
 print reply
 
 while True:
     raw_input('switched on. Press to switched off')
-    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffCollisionAvoidance)
+    packet = packetBuilder.BuildPacket(commands_to_stm.getDataUSSensors)
     reply = port.sendRequest(packet.bytearray).reply
     print reply
 
