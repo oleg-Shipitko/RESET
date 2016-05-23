@@ -2,11 +2,15 @@
 <EmBlocks_debug_session>
 	<debuggerLastSession>
 		<watches>
+			<watch key="adcData" format="0" array="0" start="0" count="0" />
+			<watch key="distanceFromIR" format="0" array="0" start="0" count="0" />
+			<watch key="distanceFromSonars" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlobCA" format="0" array="0" start="0" count="0" />
 			<watch key="*ch" format="0" array="0" start="0" count="0" />
 			<watch key="*test" format="3" array="0" start="0" count="0" />
 			<watch key="MAX_ACCEL" format="0" array="0" start="0" count="0" />
 			<watch key="MAX_ACCEL_INC" format="0" array="0" start="0" count="0" />
-			<watch key="adcData" format="0" array="1" start="0" count="0" />
 			<watch key="checkSum" format="3" array="0" start="0" count="0" />
 			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
 			<watch key="curAngle" format="0" array="0" start="0" count="0" />
@@ -19,7 +23,6 @@
 			<watch key="curState" format="0" array="0" start="0" count="0" />
 			<watch key="dataIndex" format="0" array="0" start="0" count="0" />
 			<watch key="distance" format="0" array="0" start="0" count="0" />
-			<watch key="distanceFromSonars" format="0" array="0" start="0" count="0" />
 			<watch key="frequency" format="0" array="0" start="0" count="0" />
 			<watch key="i" format="0" array="0" start="0" count="0" />
 			<watch key="inData" format="3" array="1" start="0" count="0" />
@@ -40,8 +43,6 @@
 			<watch key="rotType" format="0" array="0" start="0" count="0" />
 			<watch key="totalPointComplite" format="0" array="0" start="0" count="0" />
 			<watch key="traceFlag" format="0" array="0" start="0" count="0" />
-			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
-			<watch key="vTargetGlobCA" format="0" array="0" start="0" count="0" />
 			<watch key="vTargetGlobF" format="0" array="0" start="0" count="0" />
 		</watches>
 	</debuggerLastSession>

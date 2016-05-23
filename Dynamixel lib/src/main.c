@@ -75,43 +75,43 @@ void soft_delay(long int ticks)
 {
     for(; ticks > 0; ticks-- );
 }
-//
-//long frequency = 9600;
-//
-//int main(void)
-//{
-//    SystemInit();
-//    RCC_Config();
-//    GPIO_Config();
-//
-//    uint8_t ID_broadcast = 0xFE; // Sends to all Dynamixels
-//    uint16_t testAngleVal = 0;
-//    bool flag = 0;
-//
-//
-//    uint8_t ID_test = 1;
-//    uint16_t testAngleVal1 = 150;
-//    uint16_t testAngleVal2 = 300;
-//
-//  while(1)
-//  {
-//// Uploading standart paramiters
-//
-//      for (; frequency <= 1001000; frequency *= 1.01)
-//      {
-//          USART_Config(frequency);
-//          setID(ID_broadcast,  (uint8_t)2);
-//          setBaudRate (ID_broadcast, (uint8_t)MBPS);
-//          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
-//          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
-//          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
-//
-////          flag = setServoAngle(ID_broadcast, testAngleVal);
-//      }
-//      if (frequency > 1000000) frequency = 5000;
-//
-//
-//
+
+long frequency = 9600;
+
+int main(void)
+{
+    SystemInit();
+    RCC_Config();
+    GPIO_Config();
+
+    uint8_t ID_broadcast = 0xFE; // Sends to all Dynamixels
+    uint16_t testAngleVal = 0;
+    bool flag = 0;
+
+
+    uint8_t ID_test = 1;
+    uint16_t testAngleVal1 = 150;
+    uint16_t testAngleVal2 = 300;
+
+  while(1)
+  {
+// Uploading standart paramiters
+
+      for (; frequency <= 1001000; frequency *= 1.01)
+      {
+          USART_Config(frequency);
+          setID(ID_broadcast,  (uint8_t)2);
+          setBaudRate (ID_broadcast, (uint8_t)MBPS);
+          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
+          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
+          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
+
+          flag = setServoAngle(ID_broadcast, testAngleVal);
+      }
+      if (frequency > 1000000) frequency = 5000;
+
+
+
 ////// Test section
 ////// Uncomment when done with first section to test
 ////
@@ -119,29 +119,6 @@ void soft_delay(long int ticks)
 ////        setServoAngle(ID_test, testAngleVal);
 ////        setServoAngle(ID_test, testAngleVal1);
 ////        setServoAngle(ID_test, testAngleVal2);
-//  }
-//}
-
-int main(void)
-{
-    SystemInit();
-    RCC_Config();
-    GPIO_Config();
-    USART_Config(1000000);
-
-    uint8_t ID_1 = 5;
-    uint8_t ID_2 = 2;
-    uint16_t right_open = 300;
-    uint16_t right_closed = 175;
-    uint16_t left_open = 0;
-    uint16_t left_closed = 125;
-    uint16_t testAngleVal2 = 0;
-
-  while(1)
-  {
-        setServoAngle(ID_1, right_open);
-        setServoAngle(ID_2, left_open);
-        setServoAngle(ID_1, right_closed);
-        setServoAngle(ID_2, left_closed);
   }
 }
+

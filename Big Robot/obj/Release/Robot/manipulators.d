@@ -14,4 +14,4 @@ obj\release\robot\manipulators.o: Robot\Manipulators.c \
  SPL\inc/stm32f4xx_syscfg.h SPL\inc/stm32f4xx_tim.h \
  SPL\inc/stm32f4xx_usart.h SPL\inc/stm32f4xx_wwdg.h SPL\inc/misc.h \
  Robot\Path.h Board/Pins.h Board/gpio.h Library/stm32f4xx_conf.h \
- Robot\Dynamixel_control.h Board/Board.h
+ Robot\Dynamixel_control.h Board/Board.h Board/Interrupts.h

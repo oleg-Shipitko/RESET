@@ -1,7 +1,7 @@
 #include "Manipulators.h"
 #include "Dynamixel_control.h"
-
 #include "Board.h"
+#include "Interrupts.h"
 
 void softDelay(__IO unsigned long int ticks)
 {
@@ -36,12 +36,31 @@ bool openCubesCatcher()
 {
     setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT);
     setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT);
+    softDelay(500);
+    // duplicate
+    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT);
+    setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT);
+    return 0;
+}
+
+bool openCubesCatcherWidely()
+{
+    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT_WIDELY);
+    setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT_WIDELY);
+    softDelay(500);
+    // duplicate
+    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT_WIDELY);
+    setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT_WIDELY);
 
     return 0;
 }
 
 bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 {
+    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT);
+    setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT);
+    softDelay(500);
+    // duplicate
     setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT);
     setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT);
     softDelay(20000000);
@@ -75,7 +94,7 @@ bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 
 bool initCubeCatcherPID(void)
 {
-    cubesCatcherPID.target = 275.0;
+    cubesCatcherPID.target = 295.0;
   	cubesCatcherPID.p_k = 0.014;
   	cubesCatcherPID.i_k = 0.004;
   	cubesCatcherPID.d_k = 0.004;
@@ -91,7 +110,7 @@ bool initCubeCatcherPID(void)
 
 bool pidLowLevelManipulator(void) //вычисление ПИД регулятора манипулятора
 {
-    cubesCatcherPID.current = adcData[(char)CUBES_CATCHER_ADC - 1] * 360.0 / 4096.0; // current manipulator's position
+    cubesCatcherPID.current = adcData[(char)CUBES_CATCHER_ADC - 1] * 360.0 / 4096.0 - 22.0; // current manipulator's position
     pidCalc(&cubesCatcherPID);
     setVoltage((char)CUBES_CATCHER_MOTOR_CH - 1, cubesCatcherPID.output);
 
@@ -139,15 +158,22 @@ bool switchOffPneumo()
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////VIBRATING TABLE/////////////////////
-bool switchOnVibration()
+uint16_t vibratingTime = 0;
+uint16_t startingTime = 0;
+
+ bool switchOnVibration(uint8_t time)
 {
    set_pin(VIBRATING_MOTOR_PIN);
+   vibratingTime = time * 10;
+   startingTime = vabrationCnt;
    return 0;
 }
 
 bool switchOffVibration()
 {
    reset_pin(VIBRATING_MOTOR_PIN);
+   vibratingTime = 0;
+   startingTime = 0;
    return 0;
 }
 ///////////////////////////////////////////////////////////////
@@ -200,4 +226,18 @@ bool closeWall(void)
 //
 //    return 0;
 //}
+///////////////////////////////////////////////////////////////
+
+///////////////////////////CONE MOVER///////////////////////
+bool moveCone(void)
+{
+    setVoltage((char)CONE_CH - 1, (float)KICK_CONE);
+    return 0;
+}
+
+bool closeCone(void)
+{
+    setVoltage((char)CONE_CH - 1, (float)CONE_BACK);
+    return 0;
+}
 ///////////////////////////////////////////////////////////////

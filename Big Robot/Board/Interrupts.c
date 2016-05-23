@@ -15,6 +15,7 @@ char traceFlag, movFlag, endFlag;
 
 int16_t int_cnt = 0;
 
+int16_t vabrationCnt = 0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -54,11 +55,15 @@ if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0]
 
   // Sonars
   getSonarData((char)ADC_SONAR_RIGHT, (char)SONAR_RIGHT);
-//  getSonarData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
+  getSonarData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
   getSonarData((char)ADC_SONAR_FRONT_1, (char)SONAR_FRONT_1);
   getSonarData((char)ADC_SONAR_FRONT_2, (char)SONAR_FRONT_2);
   getSonarData((char)ADC_SONAR_BACK, (char)SONAR_BACK);
-  getIRData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
+  // IR
+  getIRData((char)ADC_IR_FRONT, (char)IR_FRONT);
+  getIRData((char)ADC_IR_BACK, (char)IR_BACK);
+  getIRData((char)ADC_IR_LEFT, (char)IR_LEFT);
+  getIRData((char)ADC_IR_RIGHT, (char)IR_RIGHT);
    //   reset_pin(PWM_DIR[8]);
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,9 +111,9 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
            totalPointComplite++;
 
           removePoint(&points[0],&lastPoint); //удалить ткущую точку
-          endFlag=0;
-          movFlag=0;
-          traceFlag=0;
+          endFlag = 0;
+          movFlag = 0;
+          traceFlag = 0;
           }
         }
 
@@ -120,7 +125,7 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
    TrackRegulator(&robotCoord[0], &robotSpeed[0], (&curPath), &vTargetGlob[0]); // расчет глобальных скоростей
 }
 
-if (curState.collisionAvoidance) collisionAvoidance(&vTargetGlob[0],&vTargetGlobCA[0]);
+if (curState.collisionAvoidance) collisionAvoidance(&vTargetGlob[0], &vTargetGlobCA[0]);
 else
 {
       vTargetGlobCA[0] = vTargetGlob[0];
@@ -129,6 +134,17 @@ else
 }
 
 ///////////////////////////////////////////////////////////////////////////
+
+//////////////////CALCULATING TIME for SWITCHING OFF VIBRATION//////////////
+
+vabrationCnt++;
+if (vabrationCnt  -  startingTime >= vibratingTime)
+{
+   switchOffVibration();
+}
+
+///////////////////////////////////////////////////////////////////////////
+
   NVIC_EnableIRQ(TIM6_DAC_IRQn); //включение ПИД
     // reset_pin(PWM_DIR[8]);
 }
