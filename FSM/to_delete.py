@@ -521,26 +521,26 @@ class SlowMoveToFinalPointTask(object):
 
 class TakeCubesTask(object):
     all_actions_were_completed = False
-    angle_for_closed_manipulator = 295
-    default_angle = 295
+    angle_for_closed_manipulator = 283
+    default_angle = 283
     task_was_completed_succesfully = None
 
     def __init__(self, layer, expected_number_of_cubes = 1):
         self.layer = layer
         self.expected_number_of_cubes = expected_number_of_cubes
-        self.manipulator_angle = 295
+        self.manipulator_angle = 283
         self.time = time.time()
         self.timeout = 0
         print 'Start time', self.time
         
         if self.layer is 3:
-            self.manipulator_angle = 195
-            self.timeout = 0.5
+            self.manipulator_angle = 196
+            self.timeout = 0.8
         elif self.layer is 2:
             self.manipulator_angle = 160
             self.timeout = 1.3
         elif self.layer is 1:
-            self.manipulator_angle = 144
+            self.manipulator_angle = 143
             self.timeout = 1.8
 
         self.future_actions  = [
@@ -942,10 +942,9 @@ class CloseDoorsState(object):
 
     def __init__(self):
         self.future_tasks = [
-            SwitchOnCollisionAvoidanceTask(),
-            FastMoveWithCorrectionIntermediatePoinTask(2.5, 0.40, -1.57),
-            FastMoveWithCorrectionTask(2.72, 0.40, -1.57),
             SwitchOffCollisionAvoidanceTask(),
+            FastMoveWithCorrectionIntermediatePoinTask(2.72, 0.40, -1.57),
+            FastMoveWithCorrectionTask(2.72, 0.40, -1.57),
             FastMoveToFinalPointWithCorrectionTask(2.72, 0.09, -1.57),
             FastMoveWithCorrectionTask(2.72, 0.25, -1.57),
             FastMoveWithCorrectionTask(2.45, 0.25, -1.57),
@@ -1137,7 +1136,7 @@ stm.start()
 localisation.start()
 states_list = [
     InitializeRobotState(),
-    BrokeMiddleWallState(),
+    #BrokeMiddleWallState(),
     CloseDoorsState(),
     CollectCubesStates(),
     DragCubesState(),

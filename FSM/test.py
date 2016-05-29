@@ -24,6 +24,69 @@ def get_com_port_number():
 port_number = get_com_port_number()
 port = serialWrapper.SerialWrapper(port_number)
 
+packet = packetBuilder.BuildPacket(commands_to_stm.openConeCrasher)
+reply = port.sendRequest(packet.bytearray).reply
+print reply
+
+raw_input('PressEnter')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.closeConeCrasher)
+reply = port.sendRequest(packet.bytearray).reply
+print reply
+
+raw_input('PressEnter')
+while True:
+    angle = float(raw_input('Angle: '))
+    packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, angle)
+    reply = port.sendRequest(packet.bytearray).reply
+    print reply
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 180)
+reply = port.sendRequest(packet.bytearray).reply
+raw_input('Enter')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.openCubeManipulatorBigAngle)
+reply = port.sendRequest(packet.bytearray).reply
+raw_input('Enter')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.openCubeCollector)
+reply = port.sendRequest(packet.bytearray).reply
+raw_input('Enter')
+
+while True:
+    angle = float(raw_input('Angle: '))
+    packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, angle)
+    reply = port.sendRequest(packet.bytearray).reply
+    print reply
+
+packet = packetBuilder.BuildPacket(commands_to_stm.openCubeBorder)
+reply = port.sendRequest(packet.bytearray).reply
+raw_input('Enter')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 283)
+reply = port.sendRequest(packet.bytearray).reply
+raw_input('Enter')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.closeCubeCollector)
+reply = port.sendRequest(packet.bytearray).reply
+raw_input('Enter')
+
+packet = packetBuilder.BuildPacket(commands_to_stm.setManipulatorAngle, 290)
+reply = port.sendRequest(packet.bytearray).reply
+
+while True:
+    time.sleep(0.5)
+    packet = packetBuilder.BuildPacket(commands_to_stm.getManipulatorAngle)
+    reply = port.sendRequest(packet.bytearray).reply
+    print reply
+
+reply = 0
+
+while reply < 209:
+    packet = packetBuilder.BuildPacket(commands_to_stm.getManipulatorAngle)
+    reply = port.sendRequest(packet.bytearray).reply
+    print reply
+
 raw_input('Press to get IK data')
 
 parameters = [0.0, 0.0, 0.0, 0.0, 0.1, 1.57, 1]

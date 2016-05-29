@@ -15,8 +15,8 @@ TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 
 # PC server address and  port
-HOST = '192.168.1.251'
-PORT = 9999
+HOST = '172.20.10.2'
+PORT = 9997
 
 #STM 32 board parameters
 VID = 1155
@@ -31,8 +31,8 @@ n_trash = N/3
 WORLD_X = 3500
 WORLD_Y = 2100
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
-#BEACONS = [(-56,1000),(3056,-56),(3056,2056)] # right starting possition (0,0 in corner near beach huts)
-BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # left starting possition (0,0 in corner near beach huts)
+#BEACONS = [(-57,1000),(3065,-65),(3065,2065)] # right (green) starting possition (0,0 in corner near beach huts)
+BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # left (purple) starting possition (0,0 in corner near beach huts)
 
 # Lidar displacement from robo center
 DELTA_X = 60.0
@@ -44,11 +44,14 @@ R = math.sqrt(60.0**2 + 7.0**2)
 class Robot(object):
 	"""Robot class. Represent particles in monte carlo localisation"""
 	def __init__(self, first, start_position = None):
-		"""Initialize robot/particle with random position"""
+		"""Initialize robot/particle with random position"""		
 		if first:
-			self.x = random.gauss(start_position[0]*1000, 50)#(200.0, 50) 2.847, 0.72, -3.14
-			self.y = random.gauss(start_position[1]*1000, 50)
+			#print 'blalalalalallala'
+			self.x = random.gauss(start_position[0]*1000+60, 20)#(200.0, 50) 2.847, 0.72, -3.14
+			self.y = random.gauss(start_position[1]*1000, 20)
 			self.orientation = random.gauss(start_position[2], 0.1)
+			#print self.x, self.y, self.orientation
+
 
 	def set(self, x_new, y_new, orientation_new):
 		"""Set particle position on the field"""
@@ -102,7 +105,7 @@ class Robot(object):
 				continue
 			beacon[num] += lmin
 			num_point[num] += 1
-		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (2000) for i in xrange(3)]
+		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (1000) for i in xrange(3)]
 		try:
 			return 1.0/sum(median)
 		except ZeroDivisionError:
@@ -168,6 +171,7 @@ def relative_motion(input_command_queue, reply_to_localization_queue, old, corre
 		"""Calculate robot's relative motion"""	
 		#print 'in relative motion'
 		new = stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
+		#print '+++++++++++++++++++++++', new
 		#print 'after stm ===========', new
 		cc_robot[0] = new[0]
 		cc_robot[1] = new[1]
@@ -210,7 +214,7 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 	s.send('BM\r')
 	data = s.recv(BUFFER_SIZE)
 	time.sleep(0.1)	
-	for i in xrange(3):
+	for i in xrange(5):
 		s.send('GE0000108000\r')
 		data = s.recv(BUFFER_SIZE)
 		time.sleep(0.1)
@@ -235,18 +239,25 @@ def stm_driver(input_command_queue, reply_to_localization_queue, command, parame
 
 ###############################################################################
 
-def main(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, cc_robot):	
+def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
+            correction_performed, start_position, cc_robot, start_flag):	
     """Main function for localisation"""
     try: 
         s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-        pc = connect_pc(HOST,PORT)
+        #pc = connect_pc(HOST,PORT)
         myrobot = Robot(True,start_position)
         print myrobot
         p = [Robot(True, start_position) for i in xrange(N)]
         old = start_position
         w_re = [1.0/N for i in xrange(N)]
         w_prev = [1.0 for i in xrange(N)]
+        current_coordinatess[0] = start_position[0]
+        current_coordinatess[1] = start_position[1]
+        current_coordinatess[2] = start_position[2]
         time.sleep(1)
+        while start_flag.value == True:
+            continue
+        print "particle filter started", start_flag.value
         try:
             while 1:
                 rel_motion, old2 = relative_motion(input_command_queue, 
@@ -256,6 +267,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
                 p = p2
                 old = old2
+                #print '===================', old
                 s.send('GE0000108000\r')
                 data_lidar = s.recv(BUFFER_SIZE)
                 angle, distance = lidar_scan(data_lidar) 
@@ -283,16 +295,16 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
                 myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
                             center[1]-R*math.sin(mean_orientation+BETA), 
                             mean_orientation)
-                print myrobot
+                #print myrobot
                 current_coordinatess[0] = myrobot.x/1000
                 current_coordinatess[1] = myrobot.y/1000
                 current_coordinatess[2] = myrobot.orientation
                 w_prev = w_norm
 ###############################################################################
 #               UNCOMMENT THIS FOR DEBUGGING
-                if pc != None:
-                    p_pos = [part.pose() for part in p]
-                    pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
+                #if pc != None:
+                    #p_pos = [part.pose() for part in p]
+                    #pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
 ###############################################################################
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
                 if n_eff < n_trash:# and sum(rel_motion) > 0.1:
@@ -305,8 +317,8 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,c
         except:			
             s.shutdown(2)
             s.close()
-            pc.close()
+            #pc.close()
     except:			
         s.shutdown(2)
         s.close()
-        pc.close()
+        #pc.close()

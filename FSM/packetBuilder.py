@@ -164,4 +164,7 @@ class CommandsList(object):
 	getDataUSSensors = 0x37
 	switchOffRobot = 0x38
 	moveWithCorrection = 0x39 #expected parameters: float32[6], float32[1]
+	openCubeManipulatorBigAngle = 0x3A
+	openConeCrasher = 0x3B
+	closeConeCrasher = 0x3C
 

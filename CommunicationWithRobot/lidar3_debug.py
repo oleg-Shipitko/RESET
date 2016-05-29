@@ -107,13 +107,13 @@ class Robot(object):
 			if l3 < lmin:
 				lmin = l3
 				num = 2
-			if lmin > 700:
+			if lmin > 200:
 				#print j, x_rob[j], y_rob[j],lmin, l1, l2, l3
 				#print 'beacons', beacons
 				continue
 			beacon[num] += lmin
 			num_point[num] += 1
-		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (5000) for i in xrange(3)]
+		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (2000) for i in xrange(3)]
 		#print 'median', sum(median)
 		try:
 			return (1.0/sum(median), beacons)
@@ -170,10 +170,10 @@ def p_trans(agl, pit):
 
 # Transforms lidar point angle in robot coord sys
 def angle5(angle):
-	if angle >= math.pi/4:
-		return angle - math.pi/4
-	else:
-		return angle + 7*math.pi/4
+	#if angle >= math.pi/4:
+	#	return angle - math.pi/4
+	#else:
+	return (angle + math.pi/4)%(2*math.pi)
 
 # Calculate odometry elative motion
 def relative_motion(old, computerPort, commands, lock, sharedcor, myrobot):
@@ -320,7 +320,7 @@ def localisation(lock, shared, computerPort, commands, plidar, wlidar,sharedcor)
 			mean_val = [(p[i].x*w_norm[i], p[i].y*w_norm[i]) for i in xrange(N)]
 			#print 'mean_val: ', mean_val
 			mean_orientation = mean_angl(p, w_norm)
-			center = np.sum(mean_val, axis = 0)
+			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
 			#center = my_sum(mean_val)
 			myrobot.set(center[0], center[1], mean_orientation)
 			

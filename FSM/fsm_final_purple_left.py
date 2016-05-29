@@ -27,8 +27,8 @@ trunk_capacity = 12
 unloading_cubes_position = 0
 taken_cubes_number = None
 
-start_position = [0.1525, 0.72, 0.0]
-#start_position = [2.847, 0.77, -3.14]
+#start_position = [0.1525, 0.72, 0.0]
+start_position = [2.847, 0.72, 0.0]
 
 '''class PrintCoordinatesAction(object):
     def run_action(self):
@@ -353,10 +353,11 @@ class ThrowCubesTask(object):
     def __init__(self, initial_coordinates):
         self.future_actions= [
             WaitTimeAction(0.5),
-            SlowMoveToFinalPointAction(initial_coordinates[0] - 0.16, initial_coordinates[1], initial_coordinates[2]),
+            SlowMoveToFinalPointAction(initial_coordinates[0] + 0.16, initial_coordinates[1], initial_coordinates[2]),
             WaitTimeAction(0.5),
-            SlowMoveToFinalPointAction(initial_coordinates[0] - 0.24, initial_coordinates[1], initial_coordinates[2]),
-            WaitTimeAction(0.5)]
+            SlowMoveToFinalPointAction(initial_coordinates[0] + 0.24, initial_coordinates[1], initial_coordinates[2]),
+            WaitTimeAction(0.5),
+            SlowMoveToFinalPointAction(initial_coordinates[0] + 0.32, initial_coordinates[1], initial_coordinates[2])]
         self.future_actions.reverse()
         self.current_action = self.future_actions.pop()
 
@@ -521,7 +522,7 @@ class SlowMoveToFinalPointTask(object):
             else:
                 self.all_actions_were_completed = True
 
-class TakeCubesTask(object):
+class TakeCubesTask(object):    
     all_actions_were_completed = False
     angle_for_closed_manipulator = 295
     default_angle = 295
@@ -732,36 +733,6 @@ class FastMoveToFinalPointWithCorrectionTask(object):
             else:
                 self.all_actions_were_completed = True
 
-class SlowMoveToFinalPointWithCorrectionTask(object):
-    all_actions_were_completed = False
-
-    def __init__(self, x, y, theta):
-        self.x = x
-        self.y = y
-        self.theta = theta
-        self.future_actions= [
-            SlowMoveToFinalPointAction(self.x, self.y, self.theta),
-            SetCorrectCoordinatesWithoutMovementAction()]
-        self.future_actions.reverse()
-        self.current_action = self.future_actions.pop()
-
-    def run_task(self):
-        self.current_action.run_action()
-
-    def check_task(self):
-        self.check_actions_in_task()
-        if self.all_actions_were_completed is True:
-            return True
-
-    def check_actions_in_task(self):
-        if self.current_action.check_action() is True:
-            if len(self.future_actions) is not 0:
-                self.current_action = self.future_actions.pop()
-                self.current_action.run_action()
-            else:
-                self.all_actions_were_completed = True
-
-
 class SuperFastMoveWithCorrectionTask():
     def __init__(self, next_x, next_y, next_thata):
         self.next_x = next_x
@@ -853,7 +824,7 @@ class WideOpenCollectorTask(object):
 
     def __init__(self, angle):
         self.future_actions = [
-            SetCubesManipulatorAngleAction(185, 0.5),
+            SetCubesManipulatorAngleAction(230, 0.5),
             WideOpenManipulatorAction(),
             SetCubesManipulatorAngleAction(angle, 0.8)]
         self.future_actions.reverse()
@@ -882,12 +853,50 @@ class OpenManipulatorTask(object):
     def check_task(self):
         return True
 
+class CrashTask(object):
+    def run_task(self):
+        stm_driver('open_cone_crasher')
+        time.sleep(1)
+        stm_driver('close_cone_crasher')
+    
+    def check_task(self):
+        return True
+
 class CloseManipulatorTask(object):
     def run_task(self):
         stm_driver('close_cube_collector')
     
     def check_task(self):
         return True
+
+class SlowMoveToFinalPointWithCorrectionTask(object):
+    all_actions_were_completed = False
+
+    def __init__(self, x, y, theta):
+        self.x = x
+        self.y = y
+        self.theta = theta
+        self.future_actions= [
+            SlowMoveToFinalPointAction(self.x, self.y, self.theta),
+            SetCorrectCoordinatesWithoutMovementAction()]
+        self.future_actions.reverse()
+        self.current_action = self.future_actions.pop()
+
+    def run_task(self):
+        self.current_action.run_action()
+
+    def check_task(self):
+        self.check_actions_in_task()
+        if self.all_actions_were_completed is True:
+            return True
+
+    def check_actions_in_task(self):
+        if self.current_action.check_action() is True:
+            if len(self.future_actions) is not 0:
+                self.current_action = self.future_actions.pop()
+                self.current_action.run_action()
+            else:
+                self.all_actions_were_completed = True
 
 class MainState(object):
     def __init__(self, states_list):
@@ -933,7 +942,7 @@ class MainState(object):
         if check_start_time.value == True:
             robot_speeds = stm_driver('get_robot_speeds')
             #print 'robot speed=============', robot_speeds
-            if robot_speeds[0] > 0.1 or robot_speeds[1] > 0.1 or robot_speeds[2] > 0.1:
+            if abs(robot_speeds[0]) > 0.1 or abs(robot_speeds[1]) > 0.1 or abs(robot_speeds[2] > 0.1):
                 global start_game_time
                 start_game_time = time.time()
                 check_start_time.value = False
@@ -999,18 +1008,14 @@ class BrokeMiddleWallState(MainState):
             FastMoveToFinalPointWithCorrectionTask(1.68, 0.2, 0),
             FastMoveToIntermediaryPointTask(1.3, 0.47, -1.57)]'''
         self.future_tasks = [
+            SuperFastMoveToIntermediaryPointTask(1.95, 0.4, 0),
+            FastMoveToFinalPointTask(1.88, 0.36, 0.54),
             SwitchOffCollisionAvoidanceTask(),
-            SuperFastMoveToIntermediaryPointTask(1.05, 0.5, 0),
-            FastMoveToFinalPointTask(1.25, 0.21, 0),
-            SuperFastMoveToIntermediaryPointTask(1.45, 0.21, 0),
-            FastMoveToFinalPointWithCorrectionTask(1.55, 0.21, 0),
-            #FastMoveToFinalPointWithCorrectionTask(1.55, 0.21, 0.47),
-            #FastMoveToFinalPointWithCorrectionTask(1.55, 0.21, -0.47),
-            #SuperFastMoveWithCorrectionIntermediatePoinTask(1.17, 0.18, 0),
-            #SuperFastMoveWithCorrectionIntermediatePoinTask(1.25, 0.18, 0),
-            #SuperFastMoveWithCorrectionIntermediatePoinTask(1.3, 0.18, 0),
-            #FastMoveToFinalPointWithCorrectionTask(1.75, 0.2, -0.54),
-            FastMoveToIntermediaryPointTask(1.3, 0.47, -1.57)]
+            FastMoveToFinalPointWithCorrectionTask(1.88, 0.1, 0.54),
+            FastMoveToIntermediaryPointTask(1.7, 0.09, 0.54),
+            FastMoveToFinalPointWithCorrectionTask(1.23, 0.09, 0),
+            FastMoveWithCorrectionIntermediatePoinTask(1.8, 0.40, -1.57),
+            SwitchOnCollisionAvoidanceTask()]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -1033,7 +1038,8 @@ class BrokeMiddleWallState(MainState):
                 self.all_tasks_were_completed = True
 
 class CollectCubesStates(MainState):
-    all_tasks_were_completed = False    
+    all_tasks_were_completed = False
+    
     def __init__(self):
         print 'Run collect cubes state'
 
@@ -1089,15 +1095,13 @@ class UnloadCubesState(MainState):
 
     def __init__(self, time):
         global unloading_cubes_position
-        self.coordinates_for_unloading_cubes =  [
-            #[1.28, 0.615, -1.57],
-            [1.15, 1.05, -3.14]]
+        self.coordinates_for_unloading_cubes = [[1.82, 1.05, 0]]
         self.future_tasks = [
             FastMoveToFinalPointTask(self.coordinates_for_unloading_cubes[unloading_cubes_position][0], self.coordinates_for_unloading_cubes[unloading_cubes_position][1], self.coordinates_for_unloading_cubes[unloading_cubes_position][2]),
             ActivateCubesUnloadingTask(time),
             ThrowCubesTask(self.coordinates_for_unloading_cubes[unloading_cubes_position]),
             DisactivateCubesUnloadingTask(),
-            FastMoveToFinalPointTask(1.1, 1.05, -3.14)]
+            FastMoveToFinalPointTask(2.15, 1.05, 0)]
         if unloading_cubes_position < len(self.coordinates_for_unloading_cubes):
             unloading_cubes_position = unloading_cubes_position + 1
         self.future_tasks.reverse()
@@ -1124,15 +1128,16 @@ class CloseDoorsState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            #SuperFastMoveToIntermediaryPointTask(0.4, 0.47, -1.57),
             SwitchOffCollisionAvoidanceTask(),
-            #SwitchOnCollisionAvoidanceTask(),
-            FastMoveToFinalPointWithCorrectionTask(0.28, 0.47, -1.57),
-            #SwitchOffCollisionAvoidanceTask(),
-            FastMoveToIntermediaryPointTask(0.3, 0.09, -1.57),
-            FastMoveToIntermediaryPointTask(0.3, 0.18, -1.57),
-            FastMoveToIntermediaryPointTask(0.57, 0.18, -1.57)]
-            #FastMoveToIntermediaryPointTask(0.57, 0.11, -1.57)]
+            FastMoveToFinalPointTask(2.72, 0.40, 0.0),
+            FastMoveToFinalPointTask(2.72, 0.40, -1.57),
+            FastMoveToFinalPointWithCorrectionTask(2.72, 0.09, -1.57),
+            FastMoveToFinalPointTask(2.72, 0.25, -1.55),
+            FastMoveToFinalPointTask(2.35, 0.25, -1.55),
+            FastMoveToFinalPointWithCorrectionTask(2.35, 0.06, -1.57),
+            #SlowMoveToFinalPointTask(2.38, 0.11, -1.57),
+            CrashTask()]
+
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -1141,7 +1146,7 @@ class CloseDoorsState(object):
         self.current_task.run_task()
 
     def check_state(self):
-        self.check_tasks_in_state()
+        self.check_tasks_in_state() 
         if self.all_tasks_were_completed is True:
             return True
 
@@ -1159,11 +1164,11 @@ class DragCubesState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            FastMoveToFinalPointTask(0.36, 0.65, -1.57),
+            FastMoveToFinalPointTask(2.52, 0.43, -1.57),
+            FastMoveToFinalPointTask(2.52, 1.02, -1.57),
             #SwitchOffCollisionAvoidanceTask(),
-            FastMoveToFinalPointTask(0.36, 0.985, -1.57),
-            SlowMoveToFinalPointWithCorrectionTask(1.28, 0.985, -1.57),
-            FastMoveToIntermediaryPointTask(1.05, 1.0, -1.57)]
+            SlowMoveToFinalPointWithCorrectionTask(1.7, 1.02, -1.57),
+            FastMoveToFinalPointTask(1.9, 1.02, -1.57)]
             #SwitchOnCollisionAvoidanceTask()]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
@@ -1290,59 +1295,54 @@ class RobotState(object):
             SlowMoveToFinalPointTask(0.915, 0.325, -1.57),
             TakeCubesTask(1),
             FastMoveToIntermediaryPointTask(0.915, 0.45, -1.57),
-            SwitchOnCollisionAvoidanceTask()]},'''
-collect_cubes_options = [{ 
-        'priority': 1, 
+            SwitchOnCollisionAvoidanceTask()]},
+collect_cubes_options = [{
+        'priority': 3, 
         'tasks_list': [
-            #SwitchOffCollisionAvoidanceTask(),
-            SlowMoveToFinalPointTask(0.60, 0.13, -1.57),
-            SlowMoveToFinalPointTask(0.67, 0.13, -1.57),
-            #SwitchOnCollisionAvoidanceTask(),
-            FastMoveToFinalPointTask(0.67, 0.4, -1.57),
-            SlowMoveToFinalPointTask(0.935, 0.4, -1.57),
-            #SwitchOffCollisionAvoidanceTask(),
-            OpenCollectorTask(227),
-            SlowMoveToFinalPointTask(0.935, 0.30, -1.57),
-            SuperFastMoveToFinalPointTask(1.035, 0.30, -1.57),
-            SlowMoveToFinalPointTask(0.912, 0.315, -1.57),
-            TakeCubesTask(3),
-            SlowMoveToFinalPointTask(0.912, 0.34, -1.57),
-            WideOpenCollectorTask(160),
-            SlowMoveToFinalPointTask(0.912, 0.315, -1.57),
+            SlowMoveToFinalPointTask(2.48, 0.1, 1.57),
+            SlowMoveToFinalPointTask(2.35, 0.1, 1.57),
+            FastMoveToIntermediaryPointTask(2.35, 0.45, 1.57),
+            FastMoveToFinalPointTask(1.96, 0.45, 1.57),
+            FastMoveToFinalPointTask(1.96, 0.45, -1.57),
+            OpenManipulatorTask(213),
+            SlowMoveToIntermediaryPointTask(1.96, 0.315, -1.57),
+            SuperFastMoveToFinalPointTask(2.085, 0.315, -1.57),
             TakeCubesTask(2),
-            SlowMoveToFinalPointTask(0.912, 0.35, -1.57),
-            WideOpenCollectorTask(133),
-            SlowMoveToFinalPointTask(0.912, 0.325, -1.57),
+            SlowMoveToIntermediaryPointTask(2.085, 0.33, -1.57),
+            OpenManipulatorTask(150),
+            SlowMoveToFinalPointTask(2.085, 0.32, -1.57),
             TakeCubesTask(1),
-            #SwitchOnCollisionAvoidanceTask(),
-            FastMoveToIntermediaryPointTask(0.912, 0.45, -1.57)]},
-        { 
-        'priority': 4, 
-        'tasks_list': [
-            FastMoveToFinalPointTask(1.48, 0.43, -1.57),
-            SlowMoveToFinalPointTask(1.5, 0.44, -1.57),
-            TakeCubesTask(1),
-            SlowMoveToFinalPointTask(1.48, 0.35, -1.57),
-            TakeCubesTask(3)
-            ]},
+            FastMoveToIntermediaryPointTask(2.085, 0.45, -1.57),
+            SwitchOnCollisionAvoidanceTask()]},
         { 
         'priority': 2, 
         'tasks_list': [
-            SuperFastMoveToIntermediaryPointTask(0.45, 0.43, 0),
-            SuperFastMoveToIntermediaryPointTask(2.0, 0.43, -1.57),
-            FastMoveToFinalPointTask(2.05, 0.43, -1.57),
-            OpenCollectorTask(213),
-            SlowMoveToIntermediaryPointTask(2.125, 0.43, -1.57),
-            SlowMoveToIntermediaryPointTask(2.125, 0.26, -1.57),
+            SlowMoveToFinalPointTask(1.37, 0.42, -1.57),
+            TakeCubesTask(1),
+            SlowMoveToFinalPointTask(1.37, 0.37, -1.57),
+            TakeCubesTask(2),
+            FastMoveToIntermediaryPointTask(1.37, 0.46, -1.57)]},'''
+collect_cubes_options = [{ 
+        'priority': 1, 
+        'tasks_list': 
+            [
+            SuperFastMoveToIntermediaryPointTask(2.48, 0.43, -1.57),
+            FastMoveToFinalPointTask(2.14, 0.43, -1.57),
+            SlowMoveToFinalPointTask(2.14, 0.43, -1.57),
+            OpenCollectorTask(220),
+            SlowMoveToIntermediaryPointTask(2.14, 0.43, -1.57),
+            SlowMoveToIntermediaryPointTask(2.13, 0.24, -1.57),
             FastMoveToFinalPointTask(2.12, 0.30, -1.57),
             TakeCubesTask(3),
+            FastMoveToFinalPointTask(2.12, 0.335, -1.57),
+            WideOpenCollectorTask(160),
+            FastMoveToFinalPointTask(2.12, 0.322, -1.57),
             TakeCubesTask(2),
-            FastMoveToFinalPointTask(2.12, 0.325, -1.57),
-            OpenCollectorTask(143),
-            FastMoveToFinalPointTask(2.12, 0.31, -1.57),
+            FastMoveToFinalPointTask(2.12, 0.35, -1.57),
+            WideOpenCollectorTask(133),
+            FastMoveToFinalPointTask(2.12, 0.333, -1.57),
             TakeCubesTask(1),
-            SuperFastMoveToIntermediaryPointTask(2.125, 0.43, -1.57),
-            SuperFastMoveToIntermediaryPointTask(1.28, 0.46, -1.57)]}]
+            SuperFastMoveToIntermediaryPointTask(2.12, 0.43, -1.57)]}]
 
 stm = multiprocessing.Process(target=stmDriver.stmMainLoop, args=(input_command_queue,reply_to_fsm_queue, reply_to_localization_queue))
 localisation = multiprocessing.Process(target=localisation.main, args=(input_command_queue,reply_to_localization_queue, current_coordinatess,correction_performed, start_position, current_coordinatess_from_robot,check_start_time))
@@ -1354,9 +1354,6 @@ states_list = [
     #BrokeMiddleWallState(),
     CloseDoorsState(),
     CollectCubesStates(),
-    #CollectCubesStates(),
-    #UnloadCubesState(15),
-    #CollectCubesStates(),
     DragCubesState(),
     UnloadCubesState(15)]
 '''states_list = [InitializeRobotState(), TestState()]'''

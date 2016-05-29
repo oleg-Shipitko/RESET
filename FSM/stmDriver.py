@@ -159,7 +159,6 @@ def get_us_data():
     reply_on_request = send_request(packet)
     return reply_on_request
 
-
 def get_robot_speeds():
     packet = packetBuilder.BuildPacket(commands_to_stm.getCurrentSpeed)
     reply_on_request = send_request(packet)
@@ -167,6 +166,26 @@ def get_robot_speeds():
 
 def move_with_correction(parameters):
     packet = packetBuilder.BuildPacket(commands_to_stm.moveWithCorrection, parameters)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def get_manipulator_angle():
+    packet = packetBuilder.BuildPacket(commands_to_stm.getManipulatorAngle)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def open_manipulator_big_angle():
+    packet = packetBuilder.BuildPacket(commands_to_stm.openCubeManipulatorBigAngle)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def open_cone_crasher():
+    packet = packetBuilder.BuildPacket(commands_to_stm.openConeCrasher)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def close_cone_crasher():
+    packet = packetBuilder.BuildPacket(commands_to_stm.closeConeCrasher)
     reply_on_request = send_request(packet)
     return reply_on_request
 

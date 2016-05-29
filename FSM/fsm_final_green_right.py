@@ -1159,9 +1159,9 @@ class DragCubesState(object):
 
     def __init__(self): 
         self.future_tasks = [
-            FastMoveToFinalPointTask(0.36, 0.65, -1.57),
+            FastMoveToFinalPointTask(0.35, 0.65, -1.57),
             #SwitchOffCollisionAvoidanceTask(),
-            FastMoveToFinalPointTask(0.36, 0.985, -1.57),
+            FastMoveToFinalPointTask(0.35, 0.985, -1.57),
             SlowMoveToFinalPointWithCorrectionTask(1.28, 0.985, -1.57),
             FastMoveToIntermediaryPointTask(1.05, 1.0, -1.57)]
             #SwitchOnCollisionAvoidanceTask()]
@@ -1302,15 +1302,15 @@ collect_cubes_options = [{
             SlowMoveToFinalPointTask(0.935, 0.4, -1.57),
             #SwitchOffCollisionAvoidanceTask(),
             OpenCollectorTask(227),
-            SlowMoveToFinalPointTask(0.935, 0.30, -1.57),
-            SuperFastMoveToFinalPointTask(1.035, 0.30, -1.57),
-            SlowMoveToFinalPointTask(0.912, 0.315, -1.57),
+            SlowMoveToFinalPointTask(0.935, 0.313, -1.57),
+            SuperFastMoveToFinalPointTask(1.035, 0.313, -1.57),
+            SlowMoveToFinalPointTask(0.912, 0.322, -1.57),
             TakeCubesTask(3),
             SlowMoveToFinalPointTask(0.912, 0.34, -1.57),
             WideOpenCollectorTask(160),
-            SlowMoveToFinalPointTask(0.912, 0.315, -1.57),
+            SlowMoveToFinalPointTask(0.912, 0.32, -1.57),
             TakeCubesTask(2),
-            SlowMoveToFinalPointTask(0.912, 0.35, -1.57),
+            SlowMoveToFinalPointTask(0.912, 0.335, -1.57),
             WideOpenCollectorTask(133),
             SlowMoveToFinalPointTask(0.912, 0.325, -1.57),
             TakeCubesTask(1),
