@@ -103,11 +103,8 @@ bool closeWall(void);
 
 ///////////////////////////CONE MOVER///////////////////////
 #define CONE_CH 8
-#define KICK_CONE 0.07
-#define CONE_BACK 0.97
 
 bool moveCone(void);
-bool closeCone(void);
 ///////////////////////////////////////////////////////////////
 
 #endif

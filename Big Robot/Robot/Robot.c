@@ -124,7 +124,7 @@ switch(cmd->command)
   {
       float *(temp) ={(float*)cmd->param};
       char i;
-   for (i = 0; i<=3; i++)
+   for (i = 0; i <= 3; i++)
   {
   	regulatorOut[i] = temp[i];
   }
@@ -239,7 +239,7 @@ switch(cmd->command)
 
   case 0x15:  //Задать скорость движения
   {
-      float *(temp) ={(float*)(cmd->param)};
+      float *(temp) = {(float*)(cmd->param)};
       char i;
       for (i = 0; i<=4; i++)
         normalVelFast[i]= temp[i];
@@ -440,12 +440,14 @@ switch(cmd->command)
   }
   break;
 
-  case 0x25:    // set current coordinate
+  case 0x25:    //set current coordinate
   {
       float *(temp) ={(float*)cmd->param};
       robotCoord[0]= temp[0];
       robotCoord[1]= temp[1];
       robotCoord[2]= temp[2];
+      addPointInFrontOfQueue(&points[0], &temp[0], (char) 4, &lastPoint);
+      CreatePath(&points[1], &points[0], &curPath);
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }
@@ -504,7 +506,7 @@ switch(cmd->command)
       float *(temp) = (float*)(cmd->param);
       char * ch = cmd->param + 12;
       addPointInFrontOfQueue(&points[0], &temp[0], &ch, &lastPoint);
-      CreatePath(&points[0], &robotCoord[0], &curPath);
+      CreatePath(&points[1], &points[0], &curPath);
 
       char * str ="Ok";
       sendAnswer(cmd->command, str, 3);
@@ -549,10 +551,12 @@ switch(cmd->command)
 
   case 0x2F:  // Switch On the vibration
   {
-      switchOnVibration();
+      uint8_t temp ={*(uint8_t*)(cmd->param)};
+
+      switchOnVibration(temp);
 
       char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
+      sendAnswer(cmd->command, str, 3);
   }
   break;
 
@@ -592,6 +596,97 @@ switch(cmd->command)
   case 0x34:  // Switch off collision avoidance
   {
       curState.collisionAvoidance = 0;
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x35:  // Get Cubes Catcher angle
+  {
+      sendAnswer(cmd->command, (char *)&cubesCatcherPID.current, sizeof(cubesCatcherPID.current));
+  }
+  break;
+
+  case 0x36:  // Get IR Distances
+  {
+     float temp[4];
+     int i = 0;
+     for(; i < 5; i++)
+     {
+         temp[i] = distanceFromIR[i][0];
+     }
+     sendAnswer(cmd->command,(char *)temp, sizeof(temp));
+  }
+  break;
+
+  case 0x37:  // Get Sonar Distances
+  {
+     float temp[5];
+     int i = 0;
+     for(; i < 6; i++)
+     {
+         temp[i] = distanceFromSonars[i][0];
+     }
+     sendAnswer(cmd->command,(char *)temp, sizeof(temp));
+  }
+  break;
+
+  case 0x38:  // Stop command
+  {
+    closeWall();
+    openCubesCatcher();
+    curState.pidEnabled = 0;
+    switchOffVibration();
+    char i;
+    for (i = 0; i < 4; i++)
+    {
+        setVoltage(WHEELS[i], (float) 0);
+    }
+    char * str ="Ok";
+    sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x39:  // Generate new trajectory with correction
+  {
+      float *(temp) ={(float*)cmd->param};
+      char * ch = cmd->param + 24;
+      robotCoord[0] = temp[0];
+      robotCoord[1] = temp[1];
+      robotCoord[2] = temp[2];
+      lastPoint++;
+      points[lastPoint].center[0] = temp[3];
+      points[lastPoint].center[1] = temp[4];
+      points[lastPoint].center[2] = temp[5];
+      points[lastPoint].speedVelTipe = speedType[*ch];
+      points[lastPoint].speedRotTipe = rotType[*ch];
+      points[lastPoint].endTask = NULL;
+      points[lastPoint].movTask = NULL;
+
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3A:  // Open cubes catcher widely
+  {
+      openCubesCatcherWidely();
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3B :  // Kick the cone on a purple side
+  {
+      moveCone();
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3C:  // Close the cone kicker cone on a purple side
+  {
+      closeCone();
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }

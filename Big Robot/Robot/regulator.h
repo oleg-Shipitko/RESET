@@ -5,7 +5,7 @@
 #include "Path.h"
 
 #define MAX_WHEEL_SPEED	    0.6// м/с
-#define MAX_RAD_SPEED       2.7 // рад/с
+#define MAX_RAD_SPEED       3 // рад/с
 #define LINE_SPEED_WEIGHT   0.8
 #define ROTATE_SPEED_WEIGHT 1-LINE_SPEED_WEIGHT
 
@@ -18,7 +18,7 @@
 #define PHI_RAD             0.5236
 #define distA	 	    0.31819
 #define distB		    0.2625
-#define RO                  (0.023)
+#define RO                  (0.022)
 //#define RO                  (0.013)          // Радиус колес
 //#define L1                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
 //#define L2                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
@@ -109,7 +109,7 @@ extern float MLineSpeed[4][3];          //
 extern float MRotSpeed[4][3];           // Матрицы должны быть определены из вне
 extern float InverseKinematics[4][4];   //
 extern float distanceFromSonars[5][3];
-
+extern float distanceFromIR[4][3];
 
 void pidCalc(PidStruct *pid_control); //Расчитать ПИД, в качестве параметра - указатель на структуру
 void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur, float *V_out);
@@ -133,6 +133,7 @@ void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out)
 void removePoint(pathPointStr * points,char *lastPoint);
 void SpeedFiltration(float *V,float *vF);
 void collisionAvoidance(float *V,float *vCA);
+void addPointInFrontOfQueue(pathPointStr *pointsArray, float *newPoint, char ch, char *lastPoint);
 
 void getSonarData(char ADC_ch, char side);
 void getIRData(char ADC_ch, char side);

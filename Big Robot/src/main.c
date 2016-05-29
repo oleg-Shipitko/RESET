@@ -48,7 +48,9 @@ char mode;
 //char pwm_ch = 5;
 //float dir = 1;
 //float speed= 0.7;
-uint8_t number;
+//uint8_t number;
+
+float temp;
 
 int main(void)
 {
@@ -72,7 +74,9 @@ openCubesCatcher();
    {
 //      openCubesCatcher_2();
 //      closeCubesCatcher_2();
-
+//    moveCone();
+//    softDelay(1000);
+//    closeCone();
       char temp = pin_val (EXTI1_PIN);
       if (temp)
       {
@@ -85,6 +89,7 @@ openCubesCatcher();
         vTargetGlob[1] = 0;
         vTargetGlob[2] = 0;
       }
+     //openCubesCatcher();
 
 //switchOnVibration();
 //openWall();

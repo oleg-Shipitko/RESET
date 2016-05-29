@@ -1,7 +1,7 @@
 #include "Manipulators.h"
 #include "Dynamixel_control.h"
-
 #include "Board.h"
+#include "Interrupts.h"
 
 void softDelay(__IO unsigned long int ticks)
 {
@@ -42,10 +42,6 @@ bool openCubesCatcher()
 
 bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 {
-    setServoReturnDelayMicros((uint8_t)ID_RIGHT, (uint16_t) 0);
-    setServoReturnDelayMicros((uint8_t)ID_LEFT, (uint16_t) 0);
-    setServoTorque((uint8_t)ID_RIGHT, 500);
-    setServoTorque((uint8_t)ID_LEFT, 500);
     setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT);
     setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT);
     softDelay(20000000);
@@ -79,10 +75,10 @@ bool closeCubesCatcher(uint8_t *numberOfCubesCatched)
 
 bool initCubeCatcherPID(void)
 {
-    cubesCatcherPID.target = 260.0;
-  	cubesCatcherPID.p_k = 0.007;
-  	cubesCatcherPID.i_k = 0.002;
-  	cubesCatcherPID.d_k = 0.002;
+    cubesCatcherPID.target = 275.0;
+  	cubesCatcherPID.p_k = 0.014;
+  	cubesCatcherPID.i_k = 0.004;
+  	cubesCatcherPID.d_k = 0.004;
   	cubesCatcherPID.pid_on = 1;
   	cubesCatcherPID.pid_error_end  = 3;
   	cubesCatcherPID.pid_output_end = 1000;
@@ -143,15 +139,22 @@ bool switchOffPneumo()
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////VIBRATING TABLE/////////////////////
-bool switchOnVibration()
+char vibratingTime = 0;
+int16_t startingTime = 0;
+
+ bool switchOnVibration(char &time)
 {
    set_pin(VIBRATING_MOTOR_PIN);
+   vibratingTime = time * 10;
+   startingTime = vabrationCnt;
    return 0;
 }
 
 bool switchOffVibration()
 {
    reset_pin(VIBRATING_MOTOR_PIN);
+   vibratingTime = 0;
+   startingTime = 0;
    return 0;
 }
 ///////////////////////////////////////////////////////////////
@@ -184,4 +187,24 @@ bool closeWall(void)
     setVoltage((char)WALL_CH - 1, (float)WALL_IS_CLOSED);
     return 0;
 }
+///////////////////////////////////////////////////////////////
+
+
+///////////////////////////CUBES CATCHER 2///////////////////////
+
+//bool openCubesCatcher_2(void)
+//{
+//    setServoAngle((uint8_t)ID_RIGHT_2, (uint16_t)OPEN_ANG_RIGHT_2);
+//    setServoAngle((uint8_t)ID_LEFT_2, (uint16_t)OPEN_ANG_LEFT_2);
+//
+//    return 0;
+//}
+//
+//bool closeCubesCatcher_2(void)
+//{
+//    setServoAngle((uint8_t)ID_RIGHT_2, (uint16_t)CLOSED_ANG_RIGHT_2);
+//    setServoAngle((uint8_t)ID_LEFT_2, (uint16_t)CLOSED_ANG_LEFT_2);
+//
+//    return 0;
+//}
 ///////////////////////////////////////////////////////////////

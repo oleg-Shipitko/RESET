@@ -360,6 +360,7 @@ initCubeCatcherPID();
 closeWall();
 initDynamixels();
 openCubesCatcher();
+closeCone();
 
 __enable_irq();
 
