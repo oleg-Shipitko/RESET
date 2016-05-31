@@ -6,6 +6,7 @@ import serialWrapper
 import packetBuilder
 import packetParser
 import cPickle as pickle
+import struct
 from collections import deque
 from serial.tools import list_ports
 
@@ -16,7 +17,7 @@ TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 
 # PC server address and  port
-HOST = '192.168.1.251'
+HOST = '192.168.1.4'
 PORT = 9999
 
 #STM 32 board parameters
@@ -92,11 +93,11 @@ class Robot(object):
 			if l3 < lmin:
 				lmin = l3
 				num = 2
-			if lmin > 700:
+			if lmin > 200:
 				continue
 			beacon[num] += lmin
 			num_point[num] += 1
-		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (5000) for i in xrange(3)]
+		median =[(beacon[i]/num_point[i]) if num_point[i] != 0 else (1000) for i in xrange(3)]
 		try:
 			return 1.0/sum(median)
 		except ZeroDivisionError:
@@ -218,6 +219,7 @@ def connect_pc(HOST, PORT):
     except Exception as err:
         print 'Error in connecting to pc server: ', err
         sock.close()
+        return None
 
 ###############################################################################
 
@@ -271,8 +273,17 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 			shared[2] = myrobot.orientation
 
 			w_prev = w_norm
-			p_pos = [part.pose() for part in p]
-			pc.sendall(str(p_pos))#+'\n'+str(w_prev)+'\n')
+###############################################################################
+            #UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
+            #data = []
+            #for part in :
+                #data.extend(part.pose())
+            #data.extend(w_prew)
+            #data.extend(x_rob)
+            #data.extend(y_rob)
+            #send = struct.pack('i%if' %len(data),len(data), *data)
+            #pc.sendall(send)
+###############################################################################
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
 			if n_eff < n_trash:# and sum(rel_motion) > 0.1:
 				try:
