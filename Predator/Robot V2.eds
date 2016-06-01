@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<EmBlocks_debug_session>
+	<debuggerLastSession>
+		<watches>
+			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
+			<watch key="pidLowLevelManipulator" format="0" array="0" start="0" count="0" />
+			<watch key="temp" format="0" array="0" start="0" count="0" />
+		</watches>
+	</debuggerLastSession>
+</EmBlocks_debug_session>
