@@ -6,6 +6,7 @@ import serialWrapper
 import packetBuilder
 import packetParser
 import struct
+from multiprocessing.pool import ThreadPool
 from collections import deque
 from serial.tools import list_ports
 
@@ -237,6 +238,9 @@ def stm_driver(input_command_queue, reply_to_localization_queue, command, parame
     input_command_queue.put(command)
     return reply_to_localization_queue.get()
 
+def lidar_worker(s):
+    s.send('GE0000108000\r')
+    return s.recv(BUFFER_SIZE)
 ###############################################################################
 
 def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
@@ -261,6 +265,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
         current_coordinatess[0] = start_position[0]
         current_coordinatess[1] = start_position[1]
         current_coordinatess[2] = start_position[2]
+        pool = ThreadPool(processes=1)
         time.sleep(1)
         while start_flag.value == True:
             continue
@@ -271,11 +276,11 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                                                     reply_to_localization_queue, 
                                                     old, correction_performed,
                                                     myrobot, cc_robot)	
+                lidar_thread = pool.apply_async(lidar_worker, (s,))
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
                 p = p2
                 old = old2
-                s.send('GE0000108000\r')
-                data_lidar = s.recv(BUFFER_SIZE)
+                data_lidar = lidar_thread.get()
                 angle, distance = lidar_scan(data_lidar) 
                 x_rob, y_rob = p_trans(angle, distance)		
                 w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
@@ -301,7 +306,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
                             center[1]-R*math.sin(mean_orientation+BETA), 
                             mean_orientation)
-                #print myrobot
+                print myrobot
                 current_coordinatess[0] = myrobot.x/1000
                 current_coordinatess[1] = myrobot.y/1000
                 current_coordinatess[2] = myrobot.orientation

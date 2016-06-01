@@ -9,7 +9,7 @@ import cPickle as pickle
 import struct
 from collections import deque
 from serial.tools import list_ports
-
+from multiprocessing.pool import ThreadPool
 
 #Hokuyo socket parameters 
 TCP_IP = '192.168.0.10'
@@ -221,12 +221,18 @@ def connect_pc(HOST, PORT):
         sock.close()
         return None
 
+def lidar_worker(s):
+    print 'in worker'
+    s.send('GE0000108000\r')
+    data = s.recv(BUFFER_SIZE)
+    #print data
+    return data
 ###############################################################################
 
 def localisation(lock, shared, computerPort, commands, sharedcor):
 	"""Main function for localisation"""
 	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-	pc = connect_pc(HOST,PORT)
+	#pc = connect_pc(HOST,PORT)
 	myrobot = Robot(True)
 	myrobot.set(200.0, 720.0, 0.0)
 	print myrobot
@@ -234,15 +240,23 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 	old = [0.152,0.72,0.0]
 	w_re = [1.0/N for i in xrange(N)]
 	w_prev = [1.0 for i in xrange(N)]
+	pool = ThreadPool(processes=1)
+	print 'after pool'
 	try:
 		while 1:
 			#start = time.time()
+			lidar_thread = pool.apply_async(lidar_worker, (s,))
+			print 'after apply_async'
 			rel_motion, old2 = relative_motion(old, computerPort, commands, lock, sharedcor, myrobot)	
+
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
+			print ' after moving part'
 			p = p2
 			old = old2
-			s.send('GE0000108000\r')
-			data_lidar = s.recv(BUFFER_SIZE)
+			data_lidar = lidar_thread.get()
+			print 'after get results'
+			#s.send('GE0000108000\r')
+			#data_lidar = s.recv(BUFFER_SIZE)
 			angle, distance = lidar_scan(data_lidar) 
 			x_rob, y_rob = p_trans(angle, distance)			
 			
@@ -267,7 +281,7 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 			mean_orientation = mean_angl(p, w_norm)
 			center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
 			myrobot.set(center[0], center[1], mean_orientation)
-#			print myrobot
+			print myrobot
 			shared[0] = myrobot.x
 			shared[1] = myrobot.y
 			shared[2] = myrobot.orientation
@@ -297,4 +311,4 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 	except:			
 		s.shutdown(2)
 		s.close()
-		pc.close()
+		#pc.close()
