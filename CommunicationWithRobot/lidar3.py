@@ -222,7 +222,6 @@ def connect_pc(HOST, PORT):
         return None
 
 def lidar_worker(s):
-    print 'in worker'
     s.send('GE0000108000\r')
     data = s.recv(BUFFER_SIZE)
     #print data
@@ -232,7 +231,7 @@ def lidar_worker(s):
 def localisation(lock, shared, computerPort, commands, sharedcor):
 	"""Main function for localisation"""
 	s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
-	#pc = connect_pc(HOST,PORT)
+	pc = connect_pc(HOST,PORT)
 	myrobot = Robot(True)
 	myrobot.set(200.0, 720.0, 0.0)
 	print myrobot
@@ -246,15 +245,12 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 		while 1:
 			#start = time.time()
 			lidar_thread = pool.apply_async(lidar_worker, (s,))
-			print 'after apply_async'
 			rel_motion, old2 = relative_motion(old, computerPort, commands, lock, sharedcor, myrobot)	
 
 			p2 = [p[i].move(rel_motion) for i in xrange(N)]
-			print ' after moving part'
 			p = p2
 			old = old2
 			data_lidar = lidar_thread.get()
-			print 'after get results'
 			#s.send('GE0000108000\r')
 			#data_lidar = s.recv(BUFFER_SIZE)
 			angle, distance = lidar_scan(data_lidar) 
@@ -288,15 +284,17 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 
 			w_prev = w_norm
 ###############################################################################
-            #UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
-            #data = []
-            #for part in :
-                #data.extend(part.pose())
-            #data.extend(w_prew)
-            #data.extend(x_rob)
-            #data.extend(y_rob)
-            #send = struct.pack('i%if' %len(data),len(data), *data)
-            #pc.sendall(send)
+			#UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
+			data = []
+#print 'gfdgdfdfvdfvdfvdfvdfvdf'
+			for part in p:
+				data.extend(part.pose())
+			data.extend(w_prev)
+			data.extend(x_rob)
+			data.extend(y_rob)
+			print len(data)
+			send = struct.pack('4si%if' %len(data),'xxxx',len(data), *data)
+			pc.sendall(send)
 ###############################################################################
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
 			if n_eff < n_trash:# and sum(rel_motion) > 0.1:
@@ -311,4 +309,4 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 	except:			
 		s.shutdown(2)
 		s.close()
-		#pc.close()
+		pc.close()

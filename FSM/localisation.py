@@ -17,7 +17,7 @@ TCP_PORT = 10940
 BUFFER_SIZE = 8192 #4096
 
 # PC server address and  port
-HOST = '172.20.10.2'
+HOST = '192.168.1.4'
 PORT = 9997
 
 #STM 32 board parameters
@@ -313,14 +313,14 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 w_prev = w_norm
 ###############################################################################
                 #UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
-                #data = []
-                #for part in :
-                #    data.extend(part.pose())
-                #data.extend(w_prew)
-                #data.extend(x_rob)
-                #data.extend(y_rob)
-                #send = struct.pack('i%if' %len(data),len(data), *data)
-                #pc.sendall(send)
+                data = []
+                for part in :
+                    data.extend(part.pose())
+                data.extend(w_prew)
+                data.extend(x_rob)
+                data.extend(y_rob)
+                send = struct.pack('i%if' %len(data),len(data), *data)
+                pc.sendall(send)
 ###############################################################################
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
                 if n_eff < n_trash:# and sum(rel_motion) > 0.1:
@@ -333,8 +333,8 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
         except:			
             s.shutdown(2)
             s.close()
-            #pc.close()
+            pc.close()
     except:			
         s.shutdown(2)
         s.close()
-        #pc.close()
+        pc.close()
