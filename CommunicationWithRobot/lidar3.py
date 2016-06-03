@@ -6,7 +6,7 @@ import serialWrapper
 import packetBuilder
 import packetParser
 import cPickle as pickle
-import struct
+import struct			
 from collections import deque
 from serial.tools import list_ports
 from multiprocessing.pool import ThreadPool
@@ -212,14 +212,17 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 	return s
 
 def connect_pc(HOST, PORT):
-    try:    
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+    return sock
+    '''try:    
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((HOST, PORT))
         return sock
     except Exception as err:
         print 'Error in connecting to pc server: ', err
         sock.close()
-        return None
+        return None'''
 
 def lidar_worker(s):
     s.send('GE0000108000\r')
@@ -294,7 +297,13 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 			data.extend(y_rob)
 			print len(data)
 			send = struct.pack('4si%if' %len(data),'xxxx',len(data), *data)
+			try:
+				pc = connect_pc(HOST,PORT)
+			except:
+				print 'exception occured'
+				pass
 			pc.sendall(send)
+			#pc.close()
 ###############################################################################
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
 			if n_eff < n_trash:# and sum(rel_motion) > 0.1:

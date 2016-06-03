@@ -953,28 +953,6 @@ class RobotState(object):
             print 'exception occured'
             pass'''
 
-'''collect_cubes_options = [{ 
-        'priority': 1, 
-        'tasks_list': [
-            SlowMoveToFinalPointTask(0.60, 0.13, -1.57),
-            SlowMoveToIntermediaryPointTask(0.67, 0.13, -1.57),
-            FastMoveToFinalPointTask(0.67, 0.4, -1.57),
-            FastMoveToFinalPointTask(1.035, 0.4, -1.57),
-            OpenCollectorTask(245),
-            SlowMoveToFinalPointTask(1.035, 0.305, -1.57),
-            SuperFastMoveToFinalPointTask(0.915, 0.305, -1.57),
-            SlowMoveToFinalPointTask(0.915, 0.315, -1.57),
-            TakeCubesTask(3),
-            SlowMoveToFinalPointTask(0.915, 0.34, -1.57),
-            OpenCollectorTask(175),
-            SlowMoveToFinalPointTask(0.915, 0.315, -1.57),
-            TakeCubesTask(2),
-            SlowMoveToFinalPointTask(0.915, 0.35, -1.57),
-            OpenCollectorTask(155),
-            SlowMoveToFinalPointTask(0.915, 0.325, -1.57),
-            TakeCubesTask(1),
-            FastMoveToIntermediaryPointTask(0.915, 0.45, -1.57),
-            SwitchOnCollisionAvoidanceTask()]},'''
 movement_type = {'slow': 3, 'fast': 0, 'super_fast': 6} 
 if (selected_side.value == 'green'):
     collect_cubes_options = [{ 
@@ -1041,4 +1019,4 @@ states_list = [
     DragCubesState(),
     UnloadCubesState(15)]
 '''states_list = [InitializeRobotState(), TestState()]'''
-MainState(states_list).run_game()   
+MainState(states_list).run_game()

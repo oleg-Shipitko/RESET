@@ -24,13 +24,13 @@ def get_com_port_number():
 port_number = get_com_port_number()
 port = serialWrapper.SerialWrapper(port_number)
 
-packet = packetBuilder.BuildPacket(commands_to_stm.openConeCrasher)
+packet = packetBuilder.BuildPacket(commands_to_stm.switchOnVibrationTable, 5)
 reply = port.sendRequest(packet.bytearray).reply
 print reply
 
 raw_input('PressEnter')
 
-packet = packetBuilder.BuildPacket(commands_to_stm.closeConeCrasher)
+packet = packetBuilder.BuildPacket(commands_to_stm.switchOffVibrationTable)
 reply = port.sendRequest(packet.bytearray).reply
 print reply
 

@@ -80,13 +80,15 @@ class Robot(object):
 		return self.x, self.y, self.orientation
 
 	def weight(self, x_rob, y_rob, BEACONS):		
-		"""Calculate particel weight based on its pose and lidar data"""	
-		temp_beac = [(beacon[0] - self.x, beacon[1] - self.y) for beacon in BEACONS]
+		"""Calculate particle weight based on its pose and lidar data"""
+		# calculate beacon position relative to robot, translation and rotation
+		temp_beac = [(beacon[0] - self.x, beacon[1] - self.y) for beacon in BEACONS] 
 		beacons = [(math.cos(self.orientation)*beac[0] + math.sin(self.orientation)*beac[1],
 				-math.sin(self.orientation)*beac[0] + math.cos(self.orientation)*beac[1])
 				for beac in temp_beac]
 		beacon = [0, 0, 0]
 		num_point = [0, 0, 0]
+		# find min distance from real to measured beacons
 		for j in xrange(len(x_rob)):
 			l1 = abs(math.sqrt((beacons[0][0] - x_rob[j])**2 + 
 					(beacons[0][1] - y_rob[j])**2) - 40)
@@ -102,6 +104,7 @@ class Robot(object):
 			if l3 < lmin:
 				lmin = l3
 				num = 2
+			# filter particles with distance more than 200 from beacon center
 			if lmin > 200:
 				continue
 			beacon[num] += lmin
@@ -147,6 +150,7 @@ def lidar_scan(answer):
 	lend = len(dist4)
 	while idxh <= lend:
 		point = dist_val(dist4[idxh-3:idxh])
+		# filter based on strength and distance; 1200 strength; 4000mm distance
 		if dist_val(dist4[idxh:idxh+3]) > 1200 and point < 4000:	
 			append_pg(point)
 			append_a(step)
@@ -239,13 +243,15 @@ def stm_driver(input_command_queue, reply_to_localization_queue, command, parame
     return reply_to_localization_queue.get()
 
 def lidar_worker(s):
+    """Request and retrieve data from lidar"""
     s.send('GE0000108000\r')
     return s.recv(BUFFER_SIZE)
 ###############################################################################
 
+# main function 
 def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
             correction_performed, start_position, cc_robot, start_flag, selected_side):
-    global BEACONS
+    #global BEACONS
     if selected_side.value == 'green':
         BEACONS = [(-57,1000),(3065,-65),(3065,2065)] # right (green) starting possition (0,0 in corner near beach huts)
         print 'Beacons for green side'
@@ -254,17 +260,22 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
         print 'Beacons for purple side'
     """Main function for localisation"""
     try: 
+        # s connect to lidar, pc connects to pc server
         s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
         #pc = connect_pc(HOST,PORT)
+        # initialize myrobot and particles
         myrobot = Robot(True,start_position)
         print myrobot
         p = [Robot(True, start_position) for i in xrange(N)]
+        # position of robot at the start of the game (important for odometry)
         old = start_position
+        # particle weights; w_re is constant that we use after resampling
         w_re = [1.0/N for i in xrange(N)]
         w_prev = [1.0 for i in xrange(N)]
         current_coordinatess[0] = start_position[0]
         current_coordinatess[1] = start_position[1]
         current_coordinatess[2] = start_position[2]
+        # create pool for separate lidar thread
         pool = ThreadPool(processes=1)
         time.sleep(1)
         while start_flag.value == True:
@@ -272,25 +283,33 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
         print "particle filter started", start_flag.value
         try:
             while 1:
+                # calculate relative motion of robot
                 rel_motion, old2 = relative_motion(input_command_queue, 
                                                     reply_to_localization_queue, 
                                                     old, correction_performed,
                                                     myrobot, cc_robot)	
+                # dispatche lidar into separate thread to get data
                 lidar_thread = pool.apply_async(lidar_worker, (s,))
+                # move particles based on odometry
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
                 p = p2
                 old = old2
+                # return data from lidar
                 data_lidar = lidar_thread.get()
+                # calculate angle and distance from lidar data
                 angle, distance = lidar_scan(data_lidar) 
+                # calculate x and y position of beacons in robot coord system
                 x_rob, y_rob = p_trans(angle, distance)		
+                # update weights based on lidar data
                 w_next =[p[i].weight(x_rob, y_rob, BEACONS) for i in xrange(N)]
+                # normalize weights
                 w_n_sum = sum(w_next)
                 try:
                     w_n_norm = [i/w_n_sum for i in w_next]
                 except ZeroDivisionError:
                     print 'zero weights in lidar'
                     w_n_norm = [0.0 for i in xrange(N)]
-            	
+                # incorporate new weights with old ones and normalize
                 w = [w_prev[i]*w_n_norm[i] for i in xrange(N)]
                 w_sum = sum(w)
     
@@ -299,10 +318,11 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 except ZeroDivisionError:
                     print 'zero weights in lidar'
                     w_norm = [0.0 for i in xrange(N)]
-                	
+                # calculate weighted mean value of robot pose from particles	
                 mean_val = [(p[i].x*w_norm[i], p[i].y*w_norm[i]) for i in xrange(N)]
                 mean_orientation = mean_angl(p, w_norm)
                 center = reduce(lambda x,y: (x[0] + y[0], x[1] + y[1]), mean_val)
+                # set new robot pose 
                 myrobot.set(center[0]-R*math.cos(mean_orientation+BETA), 
                             center[1]-R*math.sin(mean_orientation+BETA), 
                             mean_orientation)
@@ -313,28 +333,33 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 w_prev = w_norm
 ###############################################################################
                 #UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
-                data = []
-                for part in :
-                    data.extend(part.pose())
-                data.extend(w_prew)
-                data.extend(x_rob)
-                data.extend(y_rob)
-                send = struct.pack('i%if' %len(data),len(data), *data)
-                pc.sendall(send)
+                #data = []
+                #for part in p:
+                    #data.extend(part.pose())
+                #data.extend(w_prew)
+                #data.extend(x_rob)
+                #data.extend(y_rob)
+                #send = struct.pack('i%if' %len(data),len(data), *data)
+                #pc.sendall(send)
 ###############################################################################
+                # calculate efective value and resample if needed
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
                 if n_eff < n_trash:# and sum(rel_motion) > 0.1:
                     try:
+                        # resamples new particles based on probability
                         p3 = resample(p, w_norm, N)
                         p = p3
+                        # sets new weights for resampled particles
                         w_prev = w_re
                     except:
                         print 'error with choice'
-        except:			
+        except:		
+            # close connection with lidar and pc	
             s.shutdown(2)
             s.close()
-            pc.close()
-    except:			
+            #pc.close()
+    except:		
+        # close connection with lidar and pc	
         s.shutdown(2)
         s.close()
-        pc.close()
+        #pc.close()

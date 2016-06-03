@@ -32,9 +32,9 @@ unloading_cubes_position = 0
 taken_cubes_number = None
 
 if (selected_side.value == 'green'):
-    start_position = [0.1525, 0.72, 0.0]
+    start_position = [0.14, 0.76, 0.0]
 else:
-    start_position = [2.847, 0.72, 0.0]
+    start_position = [2.86, 0.76, 0.0]
 
 class SwitchOnKinematicsAction(object):
     def run_action(self):
@@ -789,7 +789,7 @@ class CloseDoorsState(object):
                 print 'All close doors tasks were completed'
                 self.all_tasks_were_completed = True
 
-class DragCubesState(object):
+class CollectMiddleFiguresState(object):
     all_tasks_were_completed = False
 
     def __init__(self):
