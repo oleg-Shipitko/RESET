@@ -60,7 +60,7 @@ char setVoltage(char ch, float duty) // установить напряжение на выходе управлен
 }
 
 
-char setVoltageMaxon (char ch, uint8_t pwm_dir , float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
+char setVoltageMaxon (char ch, int8_t pwm_dir , float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
 {
     if (ch == 255)
         return 0;
@@ -81,7 +81,7 @@ char setVoltageMaxon (char ch, uint8_t pwm_dir , float duty) // установить напря
 
 char setSpeedMaxon(char ch, float targetSpeed) // V can be positive and negative
 {
-    float pwm_dir = 0;
+    int8_t pwm_dir = 0;
     if (targetSpeed > 0)
     {
         pwm_dir = 1;
@@ -152,7 +152,6 @@ PWR->CR|=PWR_CR_DBP;
 __disable_irq();
 
 initRegulators();
-initCubeCatcherPID();
 
 //___CLOCKS_________________________________________________________________
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);   // PORTA
@@ -234,7 +233,7 @@ initCubeCatcherPID();
   conf_af(BTN10_PWM_PIN, AF9);
 
 
-  timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1);
+  timPWMConfigure(TIM4, 2*33600, MAX_PWM, 1, 1, 1, 1);
   //timPWMConfigure(TIM11, 2*33600, MAX_PWM, 1, 0, 0, 0); Maxons
   timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM10, 14, MAX_PWM, 1, 0, 0, 0);
@@ -357,10 +356,8 @@ initCubeCatcherPID();
 //NVIC_EnableIRQ(I2C2_ER_IRQn);
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
 
-closeWall();
 initDynamixels();
-openCubesCatcher();
-closeCone();
+set_pin(PWM_INHIBIT);
 
 __enable_irq();
 

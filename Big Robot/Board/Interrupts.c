@@ -142,6 +142,10 @@ if (vabrationCnt  -  startingTime >= vibratingTime)
 {
    switchOffVibration();
 }
+if (vabrationCnt  -  startingTime >= 17)
+{
+   switchOffVibration();
+}
 
 ///////////////////////////////////////////////////////////////////////////
 

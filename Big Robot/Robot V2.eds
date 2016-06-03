@@ -2,6 +2,15 @@
 <EmBlocks_debug_session>
 	<debuggerLastSession>
 		<watches>
+			<watch key="*PWM_CCR[3]" format="0" array="0" start="0" count="0" />
+			<watch key="MLineSpeed" format="0" array="0" start="0" count="0" />
+			<watch key="MRotSpeed" format="0" array="0" start="0" count="0" />
+			<watch key="curState" format="0" array="0" start="0" count="0" />
+			<watch key="motorSpeed" format="0" array="0" start="0" count="0" />
+			<watch key="pwm" format="0" array="0" start="0" count="0" />
+			<watch key="regulatorOut" format="0" array="0" start="0" count="0" />
+			<watch key="robotCoord" format="0" array="0" start="0" count="0" />
+			<watch key="vTargetGlob" format="0" array="0" start="0" count="0" />
 			<watch key="cubesCatcherPID" format="0" array="0" start="0" count="0" />
 			<watch key="pidLowLevelManipulator" format="0" array="0" start="0" count="0" />
 			<watch key="temp" format="0" array="0" start="0" count="0" />

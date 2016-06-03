@@ -33,10 +33,10 @@ float ACCEL_INC = 0.2;
  TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },  //Стек точек траектории
-                                        {1.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,normalRotSlow,0,1 },
-                                        {1.0, 1.0, 0.0, NULL,NULL,0,stopVelFast,normalRotSlow,0,1 },
-                                        {0.0, 1.0, 0.0, NULL,NULL,0,stopVelFast,stopRotSlow,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotSlow,0,1 },
+                                        {0.1, 0.0, 0.0, NULL,NULL,0,normalVelSuperFast,normalRotSlow,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,normalRotSlow,0,1 },
+                                        {1.55, -0.29, -3.14/2.0, NULL,NULL,0,stopVelSuperFast,stopRotSuperFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotSlow,0,1 },
                                         {0.0, 0.0, 2.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
@@ -47,13 +47,13 @@ pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFas
 char lastPoint = 0;// последняя активная точка в очереди
 Path curPath; //параметры активной прямой для траекторного регулятора
 
-float normalVelSuperFast[5] = {0.6, 0.3, 0.3, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopVelSuperFast[5] = {0.6, 0.3, -0.3, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
-float standVelSuperFast[5] = {0.6, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
+float normalVelSuperFast[5] = {1.5, 0.2, 1.5, 4.0, 3.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
+float stopVelSuperFast[5] = {1.5, 0.2, -1.2, 4.0, 3.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
+float standVelSuperFast[5] = {1.5, 0.6, -0.6, 2.0, 2.5};                                       //удержание заданного положения
 
 float normalRotSuperFast[5] = {4.0, 2.0, -1.0, 4.0, 3.0};//{4.0, 2.0, 0.2, 4.0, 4.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
-float stopRotSuperFast[5] = {4.0, 2.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
-float standRotSuperFast[5] = {4.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
+float stopRotSuperFast[5] = {6.0, 3.0, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};             //движение с остановкой в точке
+float standRotSuperFast[5] = {6.0, 4.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
 
 float normalVelFast[5] = {0.3, 0.2, 0.2, 4.0, 2.0};//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 float stopVelFast[5] = {0.3, 0.2, -0.2, 3.0, 2.0}; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
@@ -149,22 +149,6 @@ void addPointInFrontOfQueue(pathPointStr *pointsArray, float *newPoint, char ch,
 
 void initRegulators(void)  // инициализация регуляторов
 {
-//PID Regulator settings________________________________________________________
-//  int i = 0;
-//  for (i = 0; i<=3; i++)  // пиды колес
-//  {
-//  	wheelsPidStruct[i].p_k = 5.00;
-//  	wheelsPidStruct[i].i_k = 1.0;
-//  	wheelsPidStruct[i].d_k = 0.5;
-//  	wheelsPidStruct[i].pid_on = 1;
-//  	wheelsPidStruct[i].pid_error_end  = 3;
-//  	wheelsPidStruct[i].pid_output_end = 1000;
-//  	wheelsPidStruct[i].max_sum_error =16.0;
-//  	wheelsPidStruct[i].max_output = 1;
-//  	wheelsPidStruct[i].min_output = 0.01;
-//  }
-//Track Regulator settings______________________________________________________
-
   //RadSpeed
   {  //регулятор угловой скорости
         radSpeed.p_k = 1.0;
@@ -213,7 +197,7 @@ void MaxValue(float *a,char rows,float *b)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur, float *V_out) // расчет требуемой скорости вращения двигателей
+void FunctionalRegulator(float *V_target, float *V_out) // расчет требуемой скорости вращения двигателей
 {
   //float cosinus = cosf(-robotCoord[2]), sinus = sinf(-robotCoord[2]);
   //float Velocity[3]  = {(*(V_target)), (*(V_target+1)),*(V_target+2)};
@@ -264,11 +248,7 @@ void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur,
   } else c1 = 1;
 
     matrixMultiplyS2M(&VSum[0], 4, 1, c1, &V_out[0]);
-    int i = 0;
-    for(i; i < 4; i++)
-    {
-        if (curState.pidEnabled) setSpeedMaxon(WHEELS[i], V_out[i]);
-    }
+
   //matrixMultiplyM2M(&Ml[0][0], 4, 2, &Kr[0][0], 2, 2, &buf2[0][0]);//Ml*Kr
   //matrixMultiplyM2M(&buf2[0][0], 4, 2, &deltaVect[0], 2, 1, &vectErrOrig[0]);//*(delta_vect)
 

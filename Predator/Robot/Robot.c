@@ -21,7 +21,7 @@ float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
+robStateStruct curState = {1, 1, 1, 0, 0};    // состояние регуляторов активен-1/неактвен -0
 
 uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
@@ -525,58 +525,42 @@ switch(cmd->command)
 
   case 0x2C:  //Close Cubes Catcher
   {
-      uint8_t numberOfCubesCatched;
-      closeCubesCatcher(&numberOfCubesCatched);
+      uint8_t is_catched;
+      closeCubesCatcher(&is_catched);
 
-      sendAnswer(cmd->command, (char *)&numberOfCubesCatched, sizeof(uint8_t));
+      sendAnswer(cmd->command, (char *)&is_catched, sizeof(uint8_t));
   }
   break;
 
-  case 0x2D:  // Open wall
+  case 0x2D:  //open doors
   {
-      openWall();
-
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x2E:  // Close wall
-  {
-      closeWall();
-
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x2F:  // Switch On the vibration
-  {
-      uint8_t temp ={*(uint8_t*)(cmd->param)};
-
-      switchOnVibration(temp);
-
+      openDoors();
       char * str ="Ok";
       sendAnswer(cmd->command, str, 3);
   }
   break;
 
-  case 0x30:  // Switch Off the vibration
+  case 0x2E:  //close doors
   {
-      switchOffVibration();
-
+      closeDoors();
       char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
+      sendAnswer(cmd->command, str, 3);
   }
   break;
 
-  case 0x31:  // Set angle of cubes catcher
+  case 0x2F:  //switch on pneumo
   {
-      float *(temp) = (float*)(cmd->param);
-      cubesCatcherPID.target = *temp;
-
+      switchOnPneumo();
       char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
+      sendAnswer(cmd->command, str, 3);
+  }
+  break;
+
+  case 0x30:  //switch off pneumo
+  {
+      switchOffPneumo();
+      char * str ="Ok";
+      sendAnswer(cmd->command, str, 3);
   }
   break;
 
@@ -599,12 +583,6 @@ switch(cmd->command)
       curState.collisionAvoidance = 0;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x35:  // Get Cubes Catcher angle
-  {
-      sendAnswer(cmd->command, (char *)&cubesCatcherPID.current, sizeof(cubesCatcherPID.current));
   }
   break;
 
@@ -634,10 +612,7 @@ switch(cmd->command)
 
   case 0x38:  // Stop command
   {
-    closeWall();
-    openCubesCatcher();
     curState.pidEnabled = 0;
-    switchOffVibration();
     char i;
     for (i = 0; i < 4; i++)
     {
@@ -664,30 +639,6 @@ switch(cmd->command)
       points[lastPoint].endTask = NULL;
       points[lastPoint].movTask = NULL;
 
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x3A:  // Open cubes catcher widely
-  {
-      openCubesCatcherWidely();
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x3B :  // Kick the cone on a purple side
-  {
-      moveCone();
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x3C:  // Close the cone kicker cone on a purple side
-  {
-      closeCone();
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
   }

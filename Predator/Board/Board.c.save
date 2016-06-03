@@ -8,6 +8,7 @@
 #include "adc.h"
 #include "Regulator.h"
 #include "Manipulators.h"
+#include "Dynamixel_control.h"
 
 uint16_t adcData[10];
 uint8_t pinType[10];
@@ -59,7 +60,7 @@ char setVoltage(char ch, float duty) // установить напряжение на выходе управлен
 }
 
 
-char setVoltageMaxon (char ch, float pwm_dir , float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
+char setVoltageMaxon (char ch, uint8_t pwm_dir , float duty) // установить напряжение на выходе управления двигателем -1,0 .. 1,0
 {
     if (ch == 255)
         return 0;
@@ -89,7 +90,7 @@ char setSpeedMaxon(char ch, float targetSpeed) // V can be positive and negative
     {
         pwm_dir = -1;
     }
-    float pwm =  0.8 / (MAX_RPM * 2.0 * PI * RO) *  + 0.1;
+    float pwm =  (MAX_MAXON_PWM - MIN_MAXON_PWM) * REDUCTION * 60 * fabs(targetSpeed) / (MAX_RPM * 2.0 * PI * RO)   + MIN_MAXON_PWM;
     setVoltageMaxon(ch, pwm_dir,  pwm);
 }
 
@@ -233,12 +234,12 @@ initCubeCatcherPID();
   conf_af(BTN10_PWM_PIN, AF9);
 
 
-  timPWMConfigure(TIM4, 7, MAX_PWM, 1, 1, 1, 1);
-  timPWMConfigure(TIM11, 2*33600, MAX_PWM, 1, 0, 0, 0);
-  //timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
+  timPWMConfigure(TIM4, 2*33600, MAX_PWM, 1, 1, 1, 1);
+  //timPWMConfigure(TIM11, 2*33600, MAX_PWM, 1, 0, 0, 0); Maxons
+  timPWMConfigure(TIM11, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM10, 14, MAX_PWM, 1, 0, 0, 0);
   timPWMConfigure(TIM9, 2*1667, MAX_PWM, 1, 1, 0, 0); // 50Hz
-  //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz
+  //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz Maxons
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);
 
 //___PID_TIM________________________________________________________________
@@ -343,7 +344,8 @@ initCubeCatcherPID();
 //  NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 //___Dynamixel IO control____________________________________________________________________
-//  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
+  conf_pin(DYNAMIXEL_IO_CONTROL, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
+  set_pin(DYNAMIXEL_IO_CONTROL); // Transmit mode
 
 //___I2C_____________________________________________________________________
 //conf_af(I2C_SDA_PIN, AF4);
@@ -355,8 +357,12 @@ initCubeCatcherPID();
 //NVIC_EnableIRQ(I2C2_ER_IRQn);
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
 
-//CloseCubesMovers();
 closeWall();
+initDynamixels();
+openCubesCatcher();
+closeCone();
+set_pin(PWM_INHIBIT);
+
 __enable_irq();
 
 }

@@ -89,36 +89,36 @@ int main(void)
     bool flag = 0;
 
 
-    uint8_t ID_test = 1;
+    uint8_t ID_test = 11;
     uint16_t testAngleVal1 = 150;
     uint16_t testAngleVal2 = 300;
 
   while(1)
   {
 // Uploading standart paramiters
+//
+//      for (; frequency <= 1001000; frequency *= 1.01)
+//      {
+//          USART_Config(frequency);
+//          setID(ID_broadcast,  (uint8_t)11);
+//          setBaudRate (ID_broadcast, (uint8_t)MBPS);
+//          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
+//          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
+//          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
+//
+//          flag = setServoAngle(ID_broadcast, testAngleVal);
+//      }
+//      if (frequency > 1000000) frequency = 5000;
+//
 
-      for (; frequency <= 1001000; frequency *= 1.01)
-      {
-          USART_Config(frequency);
-          setID(ID_broadcast,  (uint8_t)2);
-          setBaudRate (ID_broadcast, (uint8_t)MBPS);
-          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
-          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
-          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
 
-          flag = setServoAngle(ID_broadcast, testAngleVal);
-      }
-      if (frequency > 1000000) frequency = 5000;
+// Test section
+// Uncomment when done with first section to test
 
-
-
-////// Test section
-////// Uncomment when done with first section to test
-////
-////        USART_Config(1000000);
-////        setServoAngle(ID_test, testAngleVal);
-////        setServoAngle(ID_test, testAngleVal1);
-////        setServoAngle(ID_test, testAngleVal2);
+        USART_Config(1000000);
+        setServoAngle(ID_test, testAngleVal);
+        setServoAngle(ID_test, testAngleVal1);
+        setServoAngle(ID_test, testAngleVal2);
   }
 }
 

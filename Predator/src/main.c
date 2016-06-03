@@ -51,6 +51,7 @@ char mode;
 //uint8_t number;
 
 float temp;
+float speed = 0.2;
 
 int main(void)
 {
@@ -68,27 +69,36 @@ int main(void)
             &USBD_CDC_cb,
             &USR_cb);
 
-openCubesCatcher();
+
 
   while(1)
    {
+       char i = 0;
+
+switchOnPneumo();
+//for(i; i < 4; i++)/
+//{
+//    setSpeedMaxon(WHEELS[i], speed);
+//}
 //      openCubesCatcher_2();
 //      closeCubesCatcher_2();
 //    moveCone();
 //    softDelay(1000);
 //    closeCone();
-      char temp = pin_val (EXTI1_PIN);
-      if (temp)
-      {
-        curState.trackEn = 1;
-      }
-      else
-      {
-        curState.trackEn = 0;
-        vTargetGlob[0] = 0;
-        vTargetGlob[1] = 0;
-        vTargetGlob[2] = 0;
-      }
+
+//      char temp = pin_val (EXTI1_PIN);
+//      if (temp)
+//      {
+//        curState.trackEn = 1;
+//      }
+//      else
+//      {
+//        curState.trackEn = 0;
+//        vTargetGlob[0] = 0;
+//        vTargetGlob[1] = 0;
+//        vTargetGlob[2] = 0;
+//      }
+
      //openCubesCatcher();
 
 //switchOnVibration();

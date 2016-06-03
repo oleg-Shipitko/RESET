@@ -4,8 +4,8 @@
 #include "stm32f4xx.h"
 #include "Path.h"
 
-#define MAX_WHEEL_SPEED	    0.6// м/с
-#define MAX_RAD_SPEED       3 // рад/с
+#define MAX_WHEEL_SPEED	    1.1// м/с
+#define MAX_RAD_SPEED       4 // рад/с
 #define LINE_SPEED_WEIGHT   0.8
 #define ROTATE_SPEED_WEIGHT 1-LINE_SPEED_WEIGHT
 
@@ -23,11 +23,11 @@
 //#define L1                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
 //#define L2                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
 #define JOYST_RAD_VEL_KOFF  MAX_RAD_SPEED/128.0 //(MAX_WHEEL_SPEED/distA/128.0/5.0)
-#define DISKR_TO_REAL       (2.0*PI*RO/2800)
-//#define DISKR_TO_REAL       (2.0*PI*RO / 4096.0/26)
+//#define DISKR_TO_REAL       (2.0*PI*RO/2800)
+#define DISKR_TO_REAL       (2.0*PI*RO / 4096.0/26)
 #define ONE_RO_COS_PHI      1.0                   // 23.0947
 //#define COFF_TO_RAD         (2.0*PI/(4658.346666667))
-#define MAX_CAPACITANCE     0.6 //(120.0*DISKR_TO_REAL/PID_PERIOD)*1.5   // Максимальный вектор задания на ПИДЫ
+#define MAX_CAPACITANCE     1.1 //(120.0*DISKR_TO_REAL/PID_PERIOD)*1.5   // Максимальный вектор задания на ПИДЫ
 #define KOFF_ORTO_TRACE     0.9    // Коэффициент траекторной ошибки траекторного регулятора
 #define PID_PERIOD          (1.0/100.0)
 
@@ -79,6 +79,15 @@ extern Path curPath;
 extern pathPointStr points[POINT_STACK_SIZE];
 extern char lastPoint;
 
+float normalVelSuperFast[5];
+float stopVelSuperFast[5];
+float standVelSuperFast[5];
+
+float normalRotSuperFast[5];
+float stopRotSuperFast[5];
+float standRotSuperFast[5];
+
+
 extern float normalVelFast[5];//V_уст, V_нач, V_кон, А_уск, А_торм  //непрерывное движение
 extern float stopVelFast[5] ; //{0.2,0.1,-0.05,0.2,0.7};            //движение с остановкой в точке
 extern float standVelFast[5] ;                                       //удержание заданного положения
@@ -112,7 +121,7 @@ extern float distanceFromSonars[5][3];
 extern float distanceFromIR[4][3];
 
 void pidCalc(PidStruct *pid_control); //Расчитать ПИД, в качестве параметра - указатель на структуру
-void FunctionalRegulator(float *V_target, float *Coord_target, float *Coord_cur, float *V_out);
+void FunctionalRegulator(float *V_target, float *V_out);
 void pidWheelsFinishWait(void); // Ожидание окончания регулирования пидов колес
 void pidLowLevel(void); // Пид нижнего уровня - колеса
 void GetDataForRegulators(void);

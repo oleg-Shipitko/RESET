@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#define MAX_RPM 13100 // Maxon max rpm
+#define MAX_RPM 12400 // Maxon max rpm
 #define REDUCTION 26 // Gearbox reduction
 #define MAX_MAXON_PWM 0.9
 #define MIN_MAXON_PWM 0.1
@@ -50,7 +50,7 @@ void initAll(void); // That's all!
 void clear_ext_interrupt(unsigned char pin);
 void add_ext_interrupt(unsigned char pin, char edge);
 char setVoltage(char, float);
-char setVoltageMaxon(char, uint8_t, float);
+char setVoltageMaxon(char, int8_t, float);
 char setSpeedMaxon(char, float);
 char setPWM(char, float);
 

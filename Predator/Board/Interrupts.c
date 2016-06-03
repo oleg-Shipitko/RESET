@@ -46,10 +46,13 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регулятор
       vTargetGlobF[2] = vTargetGlobCA[2];
 }
 
-if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
+if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0],  &regulatorOut[0]); // рассчет  кинематики и насыщения
 
-  /////
-
+char i = 0;
+for(i; i < 4; i++)
+{
+    if (curState.pidEnabled) setSpeedMaxon(WHEELS[i], regulatorOut[i]);
+}
 //  pidLowLevel();       // рассчет ПИД
 //  pidLowLevelManipulator();
 
@@ -131,16 +134,6 @@ else
       vTargetGlobCA[0] = vTargetGlob[0];
       vTargetGlobCA[1] = vTargetGlob[1];
       vTargetGlobCA[2] = vTargetGlob[2];
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-//////////////////CALCULATING TIME for SWITCHING OFF VIBRATION//////////////
-
-vabrationCnt++;
-if (vabrationCnt  -  startingTime >= vibratingTime)
-{
-   switchOffVibration();
 }
 
 ///////////////////////////////////////////////////////////////////////////
