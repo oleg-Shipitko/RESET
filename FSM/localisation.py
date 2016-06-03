@@ -291,6 +291,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 # dispatche lidar into separate thread to get data
                 lidar_thread = pool.apply_async(lidar_worker, (s,))
                 # move particles based on odometry
+                # change N to some number < 200 to leave some particles in place
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
                 p = p2
                 old = old2
