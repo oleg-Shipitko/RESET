@@ -227,12 +227,13 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 def connect_pc(HOST, PORT):
     """Connect to remote pc server"""
     try:    
-        print 'In connect to pc'
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(0.5)
         sock.connect((HOST, PORT))
+        print 'PC server connected'
         return sock
     except Exception as err:
-        print 'Error in connecting to pc server for lidar debug: ', err
+        print 'Error in connecting to pc server: ', err
         sock.close()
         return None
 
@@ -340,8 +341,11 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 #data.extend(w_prew)
                 #data.extend(x_rob)
                 #data.extend(y_rob)
-                #send = struct.pack('i%if' %len(data),len(data), *data)
-                #pc.sendall(send)
+                #send = struct.pack('4si%if' %len(data),'xxxx',len(data), *data)
+                #try:
+                    #pc.sendall(send)
+                #except:
+                    #pc = connect_pc(HOST,PORT)
 ###############################################################################
                 # calculate efective value and resample if needed
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
