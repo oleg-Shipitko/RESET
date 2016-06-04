@@ -24,15 +24,16 @@ def get_com_port_number():
 port_number = get_com_port_number()
 port = serialWrapper.SerialWrapper(port_number)
 
-packet = packetBuilder.BuildPacket(commands_to_stm.switchOnVibrationTable, 5)
-reply = port.sendRequest(packet.bytearray).reply
-print reply
+raw_input('Enter')
 
-raw_input('PressEnter')
-
-packet = packetBuilder.BuildPacket(commands_to_stm.switchOffVibrationTable)
+packet = packetBuilder.BuildPacket(commands_to_stm.openCubeManipulatorBigAngle)
 reply = port.sendRequest(packet.bytearray).reply
-print reply
+raw_input('Enter')
+
+
+packet = packetBuilder.BuildPacket(commands_to_stm.closeCubeCollector)
+reply = port.sendRequest(packet.bytearray).reply
+
 
 raw_input('PressEnter')
 while True:

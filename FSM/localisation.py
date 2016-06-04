@@ -278,7 +278,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
         current_coordinatess[2] = start_position[2]
         # create pool for separate lidar thread
         pool = ThreadPool(processes=1)
-        time.sleep(1)
+        #time.sleep(1)
         while start_flag.value == True:
             continue
         print "particle filter started", start_flag.value
@@ -294,7 +294,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 # move particles based on odometry
                 # change N to some number < 200 to leave some particles in place
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
-                p = p2
+                p = p2 #+ p[N:]
                 old = old2
                 # return data from lidar
                 data_lidar = lidar_thread.get()
