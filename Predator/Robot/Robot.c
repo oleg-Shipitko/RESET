@@ -14,14 +14,15 @@
 #include "Communication.h"
 #include "Manipulators.h"
 
-
+float angle_closed = 0;
+float angle_open = 300;
 float robotCoordTarget[3] = {0,0,0}; // Целевые координаты робота в глоб сис-ме координат
 float robotSpeedTarget[3] = {0,0,0}; // Целевые скорости робота в глоб сис-ме координат
 float motorSpeed[4];                // скорости моторов
 float motorCoord[4] = {0,0,0};      // общий пройденный колесом путь
 float robotCoord[3] = {0,0,0};       // Координаты робота по показаниям измерительной тележки
 float robotSpeed[3] = {0,0,0};       // скорость робота по показаниям измерительной тележки
-robStateStruct curState = {1, 1, 1, 0, 0};    // состояние регуляторов активен-1/неактвен -0
+robStateStruct curState = {1, 1, 1, 1, 0};    // состояние регуляторов активен-1/неактвен -0
 
 uint32_t * encCnt[4] ={ENCODER1_CNT, ENCODER2_CNT, ENCODER3_CNT, ENCODER4_CNT};  //массив указателей на счетчики энкодеров колес
 char  WHEELS[4]= {WHEEL1_CH, WHEEL2_CH, WHEEL3_CH, WHEEL4_CH}; //каналы подкючения колес
@@ -526,7 +527,7 @@ switch(cmd->command)
   case 0x2C:  //Close Cubes Catcher
   {
       uint8_t is_catched;
-      closeCubesCatcher(&is_catched);
+      closeCubesCatcher();
 
       sendAnswer(cmd->command, (char *)&is_catched, sizeof(uint8_t));
   }
@@ -566,7 +567,7 @@ switch(cmd->command)
 
   case 0x32:  // Flag of reached point
   {
-      sendAnswer(cmd->command, (char *)&traceFlag, sizeof(traceFlag));
+      sendAnswer(cmd->command, (char *)&allPointsReachedFlag, sizeof(allPointsReachedFlag));
   }
   break;
 
@@ -583,30 +584,6 @@ switch(cmd->command)
       curState.collisionAvoidance = 0;
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
-  }
-  break;
-
-  case 0x36:  // Get IR Distances
-  {
-     float temp[4];
-     int i = 0;
-     for(; i < 5; i++)
-     {
-         temp[i] = distanceFromIR[i][0];
-     }
-     sendAnswer(cmd->command,(char *)temp, sizeof(temp));
-  }
-  break;
-
-  case 0x37:  // Get Sonar Distances
-  {
-     float temp[5];
-     int i = 0;
-     for(; i < 6; i++)
-     {
-         temp[i] = distanceFromSonars[i][0];
-     }
-     sendAnswer(cmd->command,(char *)temp, sizeof(temp));
   }
   break;
 
@@ -641,6 +618,90 @@ switch(cmd->command)
 
       char * str ="Ok";
       sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3A:  //open cubes holders
+  {
+      openHolders();
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3B:  //close cubes holders
+  {
+      closeHolders();
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3C:  //release predator mouth
+  {
+//      closeCubesCatcherInit();
+//      getServoAngle((uint8_t)ID_UP, &angle_open);
+//      moveCubesCatcherUp();
+//      while(angle_closed < 267.0)
+//      {
+//        getServoAngle((uint8_t)ID_UP, &angle_open);
+//      }
+      closeCubesCatcher();
+      moveCubesCatcherForward();
+      moveCubesCatcherDown();
+      getServoAngle((uint8_t)ID_UP, &angle_open);
+      while(angle_open > 10.0)
+      {
+          getServoAngle((uint8_t)ID_UP, &angle_open);
+      }
+      openCubesCatcher();
+      angle_open = 300;
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3D:  //close predator mouth
+  {
+      closeCubesCatcher();
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3E:  //put predator mouth inside
+  {
+      moveCubesCatcherUp();
+      while(angle_closed < 267.0)
+      {
+        getServoAngle((uint8_t)ID_UP, &angle_closed);
+      }
+      moveCubesCatcherBackward();
+//      moveCubesCatcherDown();
+//      getServoAngle((uint8_t)ID_UP, &angle_closed);
+//      while(angle_closed < 247.0)
+//      {
+//        getServoAngle((uint8_t)ID_UP, &angle_closed);
+//      }
+//      setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT_INSIDE);
+//      setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT_INSIDE);
+      angle_closed = 0;
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x3F:  //half open doors
+  {
+      halfOpenDoors();
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
+  }
+  break;
+
+  case 0x40:  //half open doors
+  {
+      sendAnswer(cmd->command,  collisionIsOn, sizeof(collisionIsOn));
   }
   break;
 

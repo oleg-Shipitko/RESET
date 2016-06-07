@@ -18,7 +18,7 @@
 #define PHI_RAD             0.5236
 #define distA	 	    0.31819
 #define distB		    0.2625
-#define RO                  (0.022)
+#define RO                  (0.02288)
 //#define RO                  (0.013)          // Радиус колес
 //#define L1                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
 //#define L2                   (0.1475)         // Расстояние от центра робота до плоскости колеса энкодера
@@ -117,8 +117,7 @@ extern uint16_t totalPointComplite;
 extern float MLineSpeed[4][3];          //
 extern float MRotSpeed[4][3];           // Матрицы должны быть определены из вне
 extern float InverseKinematics[4][4];   //
-extern float distanceFromSonars[5][3];
-extern float distanceFromIR[4][3];
+extern char collisionIsOn;
 
 void pidCalc(PidStruct *pid_control); //Расчитать ПИД, в качестве параметра - указатель на структуру
 void FunctionalRegulator(float *V_target, float *V_out);

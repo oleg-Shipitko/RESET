@@ -9,11 +9,15 @@
 #include "Regulator.h"
 #include "Manipulators.h"
 #include "Dynamixel_control.h"
+#include "robot.h"
 
 uint16_t adcData[10];
 uint8_t pinType[10];
 uint8_t extiType[10];
 uint16_t extiFlag;
+float servo_ang = 0;
+long cnt_true = 0;
+long cnt_false = 0;
 
 uint32_t * PWM_CCR[10] ={BTN1_CCR,BTN2_CCR,BTN3_CCR,BTN4_CCR,BTN5_CCR,
                           BTN6_CCR,BTN7_CCR,BTN8_CCR,BTN9_CCR,BTN10_CCR};  //регистры сравнения каналов ШИМ
@@ -221,8 +225,9 @@ initRegulators();
   conf_af(BTN4_PWM_PIN, AF2);
   conf_pin(BTN5_PWM_PIN, ALTERNATE, PUSH_PULL, FAST_S, NO_PULL_UP); // 5 шим
   conf_af(BTN5_PWM_PIN, AF3);
-  conf_pin(BTN6_PWM_PIN, ALTERNATE, PUSH_PULL, FAST_S, NO_PULL_UP); // 6 шим
-  conf_af(BTN6_PWM_PIN, AF3);
+//  conf_pin(BTN6_PWM_PIN, ALTERNATE, PUSH_PULL, FAST_S, NO_PULL_UP); // 6 шим
+//  conf_af(BTN6_PWM_PIN, AF3);
+  conf_pin(BTN6_PWM_PIN, GENERAL, PUSH_PULL, FAST_S, NO_PULL_UP);
   conf_pin(BTN7_PWM_PIN, ALTERNATE, PUSH_PULL, FAST_S, NO_PULL_UP); // 7 шим
   conf_af(BTN7_PWM_PIN, AF3);
   conf_pin(BTN8_PWM_PIN, ALTERNATE, PUSH_PULL, FAST_S, NO_PULL_UP); // 8 шим
@@ -240,6 +245,13 @@ initRegulators();
   timPWMConfigure(TIM9, 2*1667, MAX_PWM, 1, 1, 0, 0); // 50Hz
   //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz Maxons
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);
+
+//___MAXON'S_PWM________________________________________________________________
+char i = 0;
+for(i; i < 4; i++)
+{
+    setSpeedMaxon(WHEELS[i], (float) 0.0);
+}
 
 //___PID_TIM________________________________________________________________
 
@@ -291,7 +303,8 @@ initRegulators();
   conf_af(RX3_PIN, AF7);
   conf_pin(TX3_PIN, ALTERNATE, PUSH_PULL, LOW_S, PULL_UP);    // TX
   conf_af(TX3_PIN, AF7);
-  uartInit(USART3, 1000000);                                      //Включаем USART3
+  //uartInit(USART3, 1000000);                                      //Включаем USART3
+  uartInit(USART3, 500000);
   NVIC_EnableIRQ(USART3_IRQn);             // Разрешение прерываний для USART3
   USART3->CR3 |= USART_CR3_DMAT;
   //configUsart3DMA();                                 // Настройка DMA для USART3
@@ -315,8 +328,8 @@ initRegulators();
 //___EXTI____________________________________________________________________
   conf_pin(EXTI1_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI2_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
-  conf_pin(EXTI3_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
-  conf_pin(EXTI4_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
+  conf_pin(EXTI3_PIN, INPUT, PUSH_PULL, FAST_S, PULL_DOWN);
+  conf_pin(EXTI4_PIN, INPUT, PUSH_PULL, FAST_S, PULL_DOWN);
   conf_pin(EXTI5_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI6_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI7_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
@@ -355,11 +368,22 @@ initRegulators();
 //RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);  //I2C2
 //NVIC_EnableIRQ(I2C2_ER_IRQn);
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
-
+__enable_irq();
 initDynamixels();
 set_pin(PWM_INHIBIT);
+closeDoors();
+closeCubesCatcherInit();
+moveCubesCatcherUp();
+openHolders();
+while(servo_ang < 275.0)
+{
+    softDelay(10000);
+    if (getServoAngle((uint8_t)ID_UP, &servo_ang))
+        cnt_true++;
+    else
+        cnt_false++;
 
-__enable_irq();
-
+}
+moveCubesCatcherBackward();
 }
 ////////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,6 @@ import random
 import serialWrapper
 import packetBuilder
 import packetParser
-import struct
 from collections import deque
 from serial.tools import list_ports
 
@@ -32,9 +31,8 @@ n_trash = N/3
 WORLD_X = 3500
 WORLD_Y = 2100
 # Beacon location: 1(left middle), 2(right lower), 3(right upper)
-BEACONS = [0, 0, 0]
 #BEACONS = [(-57,1000),(3065,-65),(3065,2065)] # right (green) starting possition (0,0 in corner near beach huts)
-#BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # left (purple) starting possition (0,0 in corner near beach huts)
+BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # left (purple) starting possition (0,0 in corner near beach huts)
 
 # Lidar displacement from robo center
 DELTA_X = 60.0
@@ -48,9 +46,11 @@ class Robot(object):
 	def __init__(self, first, start_position = None):
 		"""Initialize robot/particle with random position"""		
 		if first:
-			self.x = random.gauss(start_position[0]*1000+60, 20)
+			#print 'blalalalalallala'
+			self.x = random.gauss(start_position[0]*1000+60, 20)#(200.0, 50) 2.847, 0.72, -3.14
 			self.y = random.gauss(start_position[1]*1000, 20)
 			self.orientation = random.gauss(start_position[2], 0.1)
+			#print self.x, self.y, self.orientation
 
 
 	def set(self, x_new, y_new, orientation_new):
@@ -169,7 +169,10 @@ def angle5(angle):
 
 def relative_motion(input_command_queue, reply_to_localization_queue, old, correction_performed, myrobot, cc_robot):
 		"""Calculate robot's relative motion"""	
+		#print 'in relative motion'
 		new = stm_driver(input_command_queue, reply_to_localization_queue,'get_current_coordinates')
+		#print '+++++++++++++++++++++++', new
+		#print 'after stm ===========', new
 		cc_robot[0] = new[0]
 		cc_robot[1] = new[1]
 		cc_robot[2] = new[2]
@@ -186,7 +189,6 @@ def dist_val(value):
 		return 0	
 
 def my_sum(val):
-	"""Calculate a sum of two arrays. Not used at all in this script"""
 	f = lambda x,y: (x[0]+y[0],x[1]+y[1])
 	return reduce(f, val)
 
@@ -220,7 +222,6 @@ def start_lidar(AF_INET, SOCK_STREAM, TCP_IP, TCP_PORT):
 	return s
 
 def connect_pc(HOST, PORT):
-    """Connect to remote pc server"""
     try:    
         print 'In connect to pc'
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -232,7 +233,6 @@ def connect_pc(HOST, PORT):
         return None
 
 def stm_driver(input_command_queue, reply_to_localization_queue, command, parameters = ''):
-    """Send drequest to STM board"""
     command = {'request_source': 'localisation', 'command': command, 'parameters': parameters}
     input_command_queue.put(command)
     return reply_to_localization_queue.get()
@@ -240,14 +240,7 @@ def stm_driver(input_command_queue, reply_to_localization_queue, command, parame
 ###############################################################################
 
 def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
-            correction_performed, start_position, cc_robot, start_flag, selected_side):
-    global BEACONS
-    if selected_side.value == 'green':
-        BEACONS = [(-57,1000),(3065,-65),(3065,2065)] # right (green) starting possition (0,0 in corner near beach huts)
-        print 'Beacons for green side'
-    else:
-        BEACONS = [(-56,-55),(-56,2056),(3055,1000)] # left (purple) starting possition (0,0 in corner near beach huts)	
-        print 'Beacons for purple side'
+            correction_performed, start_position, cc_robot, start_flag):	
     """Main function for localisation"""
     try: 
         s = start_lidar(socket.AF_INET, socket.SOCK_STREAM, TCP_IP, TCP_PORT)
@@ -274,6 +267,7 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 p2 = [p[i].move(rel_motion) for i in xrange(N)]
                 p = p2
                 old = old2
+                #print '===================', old
                 s.send('GE0000108000\r')
                 data_lidar = s.recv(BUFFER_SIZE)
                 angle, distance = lidar_scan(data_lidar) 
@@ -307,15 +301,10 @@ def main(input_command_queue,reply_to_localization_queue, current_coordinatess,
                 current_coordinatess[2] = myrobot.orientation
                 w_prev = w_norm
 ###############################################################################
-                #UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
-                #data = []
-                #for part in :
-                #    data.extend(part.pose())
-                #data.extend(w_prew)
-                #data.extend(x_rob)
-                #data.extend(y_rob)
-                #send = struct.pack('i%if' %len(data),len(data), *data)
-                #pc.sendall(send)
+#               UNCOMMENT THIS FOR DEBUGGING
+                #if pc != None:
+                    #p_pos = [part.pose() for part in p]
+                    #pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
 ###############################################################################
                 n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
                 if n_eff < n_trash:# and sum(rel_motion) > 0.1:

@@ -28,8 +28,6 @@ void sendServoCommand (const uint8_t servoId,
                        const uint8_t numParams,
                        const uint8_t *params)
 {
-    //reset_pin(DYNAMIXEL_IO_CONTROL);
-//    softDelay(100);
     sendServoByte (0xff);
     sendServoByte (0xff);  // command header
 
@@ -49,14 +47,11 @@ void sendServoCommand (const uint8_t servoId,
     }
 
     sendServoByte (~checksum);  // checksum
-//    softDelay(100);
-    //set_pin(DYNAMIXEL_IO_CONTROL);
 }
-
+long cnt_err[4];
 bool getServoResponse (void)
 {
     reset_pin(DYNAMIXEL_IO_CONTROL);
-//    softDelay(100);
     uint16_t retries = 0;
 
     clearServoReceiveBuffer();
@@ -69,6 +64,7 @@ bool getServoResponse (void)
             #ifdef SERVO_DEBUG
             printf ("Too many retries at start\n");
             #endif
+            cnt_err[0]++;
             set_pin(DYNAMIXEL_IO_CONTROL);
             return false;
         }
@@ -86,6 +82,7 @@ bool getServoResponse (void)
         #ifdef SERVO_DEBUG
         printf ("Response length too big: %d\n", (int)response.length);
         #endif
+        cnt_err[1]++;
         set_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
@@ -98,6 +95,7 @@ bool getServoResponse (void)
             #ifdef SERVO_DEBUG
             printf ("Too many retries waiting for params, got %d of %d params\n", getServoBytesAvailable(), response.length);
             #endif
+            cnt_err[2]++;
             set_pin(DYNAMIXEL_IO_CONTROL);
             return false;
         }
@@ -123,6 +121,7 @@ bool getServoResponse (void)
         #ifdef SERVO_DEBUG
         printf ("Checksum mismatch: %x calculated, %x received\n", calcChecksum, recChecksum);
         #endif
+        cnt_err[3]++;
         set_pin(DYNAMIXEL_IO_CONTROL);
         return false;
     }
@@ -443,8 +442,22 @@ void initDynamixels(void)
 {
     setServoReturnDelayMicros((uint8_t)ID_RIGHT, (uint16_t) 0);
     setServoReturnDelayMicros((uint8_t)ID_LEFT, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)DOOR_LEFT, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)DOOR_RIGHT, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)ID_UP, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)UPPER_HOLDER, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)LOWER_HOLDER, (uint16_t) 0);
+    setServoReturnDelayMicros((uint8_t)ID_FORWARD_BACKWARD, (uint16_t) 0);
     setServoTorque((uint8_t)ID_RIGHT, 500);
     setServoTorque((uint8_t)ID_LEFT, 500);
+    setServoTorque((uint8_t)DOOR_LEFT, 500);
+    setServoTorque((uint8_t)DOOR_RIGHT, 500);
+    setServoTorque((uint8_t)ID_UP, 400);
+    setServoTorque((uint8_t)UPPER_HOLDER, 500);
+    setServoTorque((uint8_t)LOWER_HOLDER, 500);
+    setServoTorque((uint8_t)ID_FORWARD_BACKWARD, 1023);
+    setServoCWAngleLimit((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 0);
+    setServoCCWAngleLimit((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 0);
 }
 
 void sendServoByte (const uint8_t byte)

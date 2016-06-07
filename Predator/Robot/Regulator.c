@@ -6,6 +6,8 @@
 #include <math.h>
 #include "adc.h"
 #include "Board.h"
+#include "Interrupts.h"
+#include "pins.h"
 
 //#define ENCODER_IMITATION // Encoders emulation
 
@@ -18,8 +20,7 @@ float vTargetGlobCA[3] = {0, 0, 0};// вектор глобальных скоростей робота с учето
 PidStruct wheelsPidStruct[4]; //структура ПИД регуляторов колес
 PidStruct radSpeed; // структура ПИД регулятора уголовой скорости
 PidStruct ortoPos;  // структура ПИД отклонения от траектории
-float distanceFromSonars[5][3] = {{100, 100, 100}, {100, 100, 100}, {100, 100, 100}, {100, 100, 100}, {100, 100, 100}}; // расстояния по показаниям дальномеров
-float distanceFromIR[4][3] = {{100, 100, 100}, {100, 100, 100}, {100, 100, 100}, {100, 100, 100}}; // расстояния по показаниям инфракрасных дальномеров
+char collisionIsOn = 0;
 
 uint16_t totalPointComplite = 0;  //Всего пройдено точек
 
@@ -32,9 +33,9 @@ float ACCEL_INC = 0.2;
  TVector AccelInc2 = {0, 0};
  TVector TargSpeed = {0, 0};
 
-pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,normalVelFast,normalRotSlow,0,1 },  //Стек точек траектории
-                                        {0.1, 0.0, 0.0, NULL,NULL,0,normalVelSuperFast,normalRotSlow,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,normalRotSlow,0,1 },
+pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },  //Стек точек траектории
+                                        {-4.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotFast,0,1 },
+                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotFast,0,1 },
                                         {1.55, -0.29, -3.14/2.0, NULL,NULL,0,stopVelSuperFast,stopRotSuperFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotSlow,0,1 },
                                         {0.0, 0.0, 2.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
@@ -73,41 +74,18 @@ float standRotSlow[5] = {1.0 , 1.0, -1.0, 2.0, 2.5};                            
 
 
 float * speedType[9] = {normalVelFast, stopVelFast, standVelFast, normalVelSlow, stopVelSlow, standVelSlow, normalVelSuperFast, stopVelSuperFast, standVelSuperFast  };// типы  линейный скоростей
-float * rotType[9] = {normalRotFast, stopRotFast, standRotFast, normalRotSlow, stopRotSlow, standRotSlow, normalRotSuperFast, stopRotSuperFast, standRotSuperFast};// типы угловых скоростей
+float * rotType[9] = {stopRotFast, stopRotFast, standRotFast, stopRotSlow, stopRotSlow, standRotSlow, stopRotSuperFast, stopRotSuperFast, standRotSuperFast};// типы угловых скоростей
 
-
-void getSonarData(char ADC_ch, char side) // Reads data from ADC, filter with running mean (window = 3) it and transfers to cm
-{
-    // side:
-    // 0 - right
-    // 1 - left
-    // 2 - front
-    // 3 - back
-
-    distanceFromSonars[side][2] = distanceFromSonars[side][1];
-    distanceFromSonars[side][1] = distanceFromSonars[side][0];
-    distanceFromSonars[side][0] = (adcData[ADC_ch - 1] * 0.0822 * 2.54 + distanceFromSonars[side][1] + distanceFromSonars[side][2]) / 3.0;
-}
-
-void getIRData(char ADC_ch, char side) // Reads data from ADC, filter with running mean (window = 3) it and transfers to cm
-{
-    // side:
-    // 0 - right
-    // 1 - left
-    // 2 - front
-    // 3 - back
-
-    distanceFromIR[side][2] = distanceFromIR[side][1];
-    distanceFromIR[side][1] = distanceFromIR[side][0];
-    if (adcData[ADC_ch - 1]> 0.15*4096.0/3.0)
-    {
-      distanceFromIR[side][0] = ((20.0 / ((3.0 * adcData[ADC_ch - 1] / 4096.0) - 0.15)) + distanceFromIR[side][1] + distanceFromIR[side][2]) / 3.0;
-    } else
-    distanceFromIR[side][0] = (20.0 / ((0.01)) + distanceFromIR[side][1] + distanceFromIR[side][2]) / 3.0;
-
-  }
-//______________________________________________________________________________
 ////////////////////////////////////////////////////////////////////////////////
+//float compareAngles(float ang1, float ang2)
+//{
+//    float dif = fabs(ang1 - ang2);
+//    if (dif > 3.14)
+//    {
+//        dif =
+//    }
+//}
+
 void removePoint(pathPointStr * points, char *lastPoint)  // удаление точки из очереди
 {
   char i,j;
@@ -243,7 +221,6 @@ void FunctionalRegulator(float *V_target, float *V_out) // расчет требуемой скор
 
   if (fabs(MaxMotSpeed) > MAX_CAPACITANCE)
   {
-
      c1 = fabs(MAX_CAPACITANCE/MaxMotSpeed );
   } else c1 = 1;
 
@@ -764,102 +741,110 @@ void SpeedFiltration(float *V,float *vF)
 
 void collisionAvoidance(float *V, float *vCA)
   {
-      if (V[0] > 0.08)
+//      if (V[0] > 0.08)
+//      {
+//          if ((distanceFromSonars[SONAR_FRONT_1][0] < 30) || (distanceFromSonars[SONAR_FRONT_2][0] < 30))
+//          {
+//              vCA[0] = V[0]/2.0;
+//              vCA[1] = V[1]/2.0;
+//              vCA[2] = V[2]/2.0;
+//              if ((distanceFromSonars[SONAR_FRONT_1][0] < 20) || (distanceFromSonars[SONAR_FRONT_2][0] < 20) || (distanceFromIR[IR_FRONT][0] < 15))
+//              {
+//                    vCA[0] = 0;
+//                    vCA[1] = 0;
+//                    vCA[2] = 0;
+//              }
+//          }
+//          else
+//          {
+//            vCA[0] = V[0];
+//            vCA[1] = V[1];
+//            vCA[2] = V[2];
+//          }
+//      }
+//      else if (V[0] < -0.08)
+//      {
+//          if ((distanceFromSonars[SONAR_BACK][0] < 30))
+//          {
+//              vCA[0] = V[0]/2.0;
+//              vCA[1] = V[1]/2.0;
+//              vCA[2] = V[2]/2.0;
+//                if ((distanceFromSonars[SONAR_BACK][0] < 20) || (distanceFromIR[IR_BACK][0] < 15))
+//                {
+//                    vCA[0] = 0;
+//                    vCA[1] = 0;
+//                    vCA[2] = 0;
+//                }
+//          }
+//          else
+//          {
+//            vCA[0] = V[0];
+//            vCA[1] = V[1];
+//            vCA[2] = V[2];
+//        }
+//      }
+//      else if (V[1] > 0.08)
+//      {
+//          if ((distanceFromSonars[SONAR_LEFT][0] < 30))
+//          {
+//              vCA[0] = V[0]/2.0;
+//              vCA[1] = V[1]/2.0;
+//              vCA[2] = V[2]/2.0;
+//                if ((distanceFromSonars[SONAR_LEFT][0] < 20) || (distanceFromIR[IR_LEFT][0] < 15))
+//                {
+//                    vCA[0] = 0;
+//                    vCA[1] = 0;
+//                    vCA[2] = 0;
+//                }
+//          }
+//          else
+//          {
+//            vCA[0] = V[0];
+//            vCA[1] = V[1];
+//            vCA[2] = V[2];
+//        }
+//      }
+//      else if (V[1] < -0.08)
+//      {
+//                    if ((distanceFromSonars[SONAR_RIGHT][0] < 32))
+//          {
+//              vCA[0] = V[0]/2.0;
+//              vCA[1] = V[1]/2.0;
+//              vCA[2] = V[2]/2.0;
+//                if ((distanceFromSonars[SONAR_RIGHT][0] < 20) || (distanceFromIR[IR_RIGHT][0] < 15))
+//                {
+//                    vCA[0] = 0;
+//                    vCA[1] = 0;
+//                    vCA[2] = 0;
+//                }
+//          }
+//          else
+//          {
+//            vCA[0] = V[0];
+//            vCA[1] = V[1];
+//            vCA[2] = V[2];
+//        }
+//      }
+//      else if ((distanceFromSonars[SONAR_LEFT][0] < 20 || distanceFromSonars[SONAR_RIGHT][0] < 20 || distanceFromSonars[SONAR_FRONT_1][0] < 20 ||
+//                distanceFromSonars[SONAR_FRONT_2][0] < 20 || distanceFromSonars[SONAR_BACK][0] < 20) && (V[2] > 1.0))
+//      {
+//          vCA[0] = 0;
+//          vCA[1] = 0;
+//          vCA[2] = 0;
+//      }
+      if (((!frontIR1) || (!frontIR2)) && V[0] < 0.08)
       {
-          if ((distanceFromSonars[SONAR_FRONT_1][0] < 30) || (distanceFromSonars[SONAR_FRONT_2][0] < 30))
-          {
-              vCA[0] = V[0]/2.0;
-              vCA[1] = V[1]/2.0;
-              vCA[2] = V[2]/2.0;
-              if ((distanceFromSonars[SONAR_FRONT_1][0] < 20) || (distanceFromSonars[SONAR_FRONT_2][0] < 20) || (distanceFromIR[IR_FRONT][0] < 15))
-              {
-                    vCA[0] = 0;
-                    vCA[1] = 0;
-                    vCA[2] = 0;
-              }
-          }
-          else
-          {
-            vCA[0] = V[0];
-            vCA[1] = V[1];
-            vCA[2] = V[2];
-          }
-      }
-      else if (V[0] < -0.08)
-      {
-          if ((distanceFromSonars[SONAR_BACK][0] < 30))
-          {
-              vCA[0] = V[0]/2.0;
-              vCA[1] = V[1]/2.0;
-              vCA[2] = V[2]/2.0;
-                if ((distanceFromSonars[SONAR_BACK][0] < 20) || (distanceFromIR[IR_BACK][0] < 15))
-                {
-                    vCA[0] = 0;
-                    vCA[1] = 0;
-                    vCA[2] = 0;
-                }
-          }
-          else
-          {
-            vCA[0] = V[0];
-            vCA[1] = V[1];
-            vCA[2] = V[2];
-        }
-      }
-      else if (V[1] > 0.08)
-      {
-          if ((distanceFromSonars[SONAR_LEFT][0] < 30))
-          {
-              vCA[0] = V[0]/2.0;
-              vCA[1] = V[1]/2.0;
-              vCA[2] = V[2]/2.0;
-                if ((distanceFromSonars[SONAR_LEFT][0] < 20) || (distanceFromIR[IR_LEFT][0] < 15))
-                {
-                    vCA[0] = 0;
-                    vCA[1] = 0;
-                    vCA[2] = 0;
-                }
-          }
-          else
-          {
-            vCA[0] = V[0];
-            vCA[1] = V[1];
-            vCA[2] = V[2];
-        }
-      }
-      else if (V[1] < -0.08)
-      {
-                    if ((distanceFromSonars[SONAR_RIGHT][0] < 32))
-          {
-              vCA[0] = V[0]/2.0;
-              vCA[1] = V[1]/2.0;
-              vCA[2] = V[2]/2.0;
-                if ((distanceFromSonars[SONAR_RIGHT][0] < 20) || (distanceFromIR[IR_RIGHT][0] < 15))
-                {
-                    vCA[0] = 0;
-                    vCA[1] = 0;
-                    vCA[2] = 0;
-                }
-          }
-          else
-          {
-            vCA[0] = V[0];
-            vCA[1] = V[1];
-            vCA[2] = V[2];
-        }
-      }
-      else if ((distanceFromSonars[SONAR_LEFT][0] < 20 || distanceFromSonars[SONAR_RIGHT][0] < 20 || distanceFromSonars[SONAR_FRONT_1][0] < 20 ||
-                distanceFromSonars[SONAR_FRONT_2][0] < 20 || distanceFromSonars[SONAR_BACK][0] < 20) && (V[2] > 1.0))
-      {
-          vCA[0] = 0;
-          vCA[1] = 0;
-          vCA[2] = 0;
+          vCA[0] = 0.0;
+          vCA[1] = 0.0;
+          vCA[2] = 0.0;
+          collisionIsOn = 1;
       }
             else
       {
           vCA[0] = V[0];
           vCA[1] = V[1];
           vCA[2] = V[2];
+          collisionIsOn = 0;
       }
   }
   ////////////////////////////////////////////////////////////////////////////////

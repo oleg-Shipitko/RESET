@@ -42,20 +42,12 @@
 __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 
 char command = 0;
-
 char mode;
-
-//char pwm_ch = 5;
-//float dir = 1;
-//float speed= 0.7;
-//uint8_t number;
-
-float temp;
-float speed = 0.2;
-
+float ang1=100;
+//#define WALL_IS_OPEN 0.085 up
+//#define WALL_IS_CLOSED 0.12 down
 int main(void)
 {
-
 
    initAll();
 
@@ -73,19 +65,19 @@ int main(void)
 
   while(1)
    {
+//             moveCubesCatcherForward();
+//      moveCubesCatcherDown();
+// getServoAngle((uint8_t)ID_UP, &ang1);
+//
+//      while(ang1 > 10.0)
+//      {
+//          getServoAngle((uint8_t)ID_UP, &ang1);
+//      }
+//      openCubesCatcher();
+//       moveCubesCatcherBackward();
+//       moveCubesCatcherForward();
+
        char i = 0;
-
-switchOnPneumo();
-//for(i; i < 4; i++)/
-//{
-//    setSpeedMaxon(WHEELS[i], speed);
-//}
-//      openCubesCatcher_2();
-//      closeCubesCatcher_2();
-//    moveCone();
-//    softDelay(1000);
-//    closeCone();
-
 //      char temp = pin_val (EXTI1_PIN);
 //      if (temp)
 //      {

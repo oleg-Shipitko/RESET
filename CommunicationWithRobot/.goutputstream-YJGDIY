@@ -274,15 +274,12 @@ def localisation(lock, shared, computerPort, commands, sharedcor):
 
 			w_prev = w_norm
 ###############################################################################
-            #UNCOMMENT THIS FOR SENDING DATA TO REMOTE SERVER
-            #data = []
-            #for part in :
-                #data.extend(part.pose())
-            #data.extend(w_prew)
-            #data.extend(x_rob)
-            #data.extend(y_rob)
-            #send = struct.pack('i%if' %len(data),len(data), *data)
-            #pc.sendall(send)
+			#UNCOMMENT THIS FOR DEBUGGING
+			if pc != None:
+				test= struct.pack('d'*200, *w_prev)
+				pc.sendall(test)
+#p_pos = [part.pose() for part in p]
+				#pc.sendall(str(p_pos)+'\n'+str(w_prev)+'\n')
 ###############################################################################
 			n_eff = 1.0/(sum([math.pow(i, 2) for i in w_norm]))
 			if n_eff < n_trash:# and sum(rel_motion) > 0.1:

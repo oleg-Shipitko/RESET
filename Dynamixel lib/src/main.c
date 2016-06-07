@@ -18,6 +18,8 @@
 
 #define MBPS 0x01
 
+float servo_angle = 1;
+
 void RCC_Config(void)
 {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -85,7 +87,7 @@ int main(void)
     GPIO_Config();
 
     uint8_t ID_broadcast = 0xFE; // Sends to all Dynamixels
-    uint16_t testAngleVal = 0;
+    uint16_t testAngleVal = 195;
     bool flag = 0;
 
 
@@ -93,32 +95,37 @@ int main(void)
     uint16_t testAngleVal1 = 150;
     uint16_t testAngleVal2 = 300;
 
+
+
   while(1)
   {
 // Uploading standart paramiters
-//
-//      for (; frequency <= 1001000; frequency *= 1.01)
-//      {
-//          USART_Config(frequency);
-//          setID(ID_broadcast,  (uint8_t)11);
+
+      for (; frequency <= 1001000; frequency *= 1.01)
+      {
+          USART_Config(frequency);
+//          setID(ID_broadcast,  (uint8_t)8);
 //          setBaudRate (ID_broadcast, (uint8_t)MBPS);
 //          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
 //          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
 //          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
-//
+            setBaudRate (ID_broadcast, (uint8_t)0x03);
+
 //          flag = setServoAngle(ID_broadcast, testAngleVal);
-//      }
-//      if (frequency > 1000000) frequency = 5000;
-//
+      }
+      if (frequency > 1000000)
+          frequency = 5000;
 
 
-// Test section
-// Uncomment when done with first section to test
 
-        USART_Config(1000000);
-        setServoAngle(ID_test, testAngleVal);
-        setServoAngle(ID_test, testAngleVal1);
-        setServoAngle(ID_test, testAngleVal2);
+////// Test section
+////// Uncomment when done with first section to test
+////
+//        USART_Config(1000000);
+//        getServoAngle((uint8_t)8, &servo_angle);
+////        setServoAngle(ID_test, testAngleVal);
+////        setServoAngle(ID_test, testAngleVal1);
+////        setServoAngle(ID_test, testAngleVal2);
   }
 }
 

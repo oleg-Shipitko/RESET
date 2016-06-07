@@ -18,7 +18,9 @@ void EXTI0_IRQHandler(void);
 void add_ext_interrupt(unsigned char pin, char edge);
 extern void USB_OTG_BSP_TimerIRQ (void);
 extern char traceFlag;
+extern char allPointsReachedFlag;
 extern int16_t vabrationCnt;
+extern char frontIR1, frontIR2;
 void delay(__IO uint32_t nCount);
 
 
