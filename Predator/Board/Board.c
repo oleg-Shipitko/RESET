@@ -246,13 +246,6 @@ initRegulators();
   //timPWMConfigure(TIM12, 2*33600, MAX_PWM, 1, 1, 0, 0); // 2.5kHz Maxons
   timPWMConfigure(TIM12, 7, MAX_PWM, 1, 1, 0, 0);
 
-//___MAXON'S_PWM________________________________________________________________
-char i = 0;
-for(i; i < 4; i++)
-{
-    setSpeedMaxon(WHEELS[i], (float) 0.0);
-}
-
 //___PID_TIM________________________________________________________________
 
   timPIDConfigure(TIM6, 13107, 64);// 20Hz
@@ -328,8 +321,8 @@ for(i; i < 4; i++)
 //___EXTI____________________________________________________________________
   conf_pin(EXTI1_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI2_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
-  conf_pin(EXTI3_PIN, INPUT, PUSH_PULL, FAST_S, PULL_DOWN);
-  conf_pin(EXTI4_PIN, INPUT, PUSH_PULL, FAST_S, PULL_DOWN);
+  conf_pin(EXTI3_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
+  conf_pin(EXTI4_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI5_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI6_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
   conf_pin(EXTI7_PIN, INPUT, PUSH_PULL, FAST_S, PULL_UP);
@@ -370,19 +363,23 @@ for(i; i < 4; i++)
 //NVIC_EnableIRQ(I2C2_EV_IRQn);
 __enable_irq();
 initDynamixels();
+reset_pin(PWM_INHIBIT);
+softDelay(100000);
 set_pin(PWM_INHIBIT);
+//___MAXON'S_PWM________________________________________________________________
+char i = 0;
+for(i; i < 4; i++)
+{
+    setSpeedMaxon(WHEELS[i], (float) 0.0);
+}
 closeDoors();
 closeCubesCatcherInit();
-moveCubesCatcherUp();
 openHolders();
-while(servo_ang < 275.0)
+moveCubesCatcherUp();
+while(servo_ang < 290.0)
 {
     softDelay(10000);
-    if (getServoAngle((uint8_t)ID_UP, &servo_ang))
-        cnt_true++;
-    else
-        cnt_false++;
-
+    getServoAngle((uint8_t)ID_UP, &servo_ang);
 }
 moveCubesCatcherBackward();
 }

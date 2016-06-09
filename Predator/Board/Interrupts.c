@@ -12,10 +12,9 @@
 
 int indexSpeeds = 0, indexDists = 0;
 char traceFlag, movFlag, endFlag, allPointsReachedFlag;
-
 int16_t int_cnt = 0;
-
-char frontIR1, frontIR2;
+float distanceFromSonar[3] = {100.0, 100.0, 100.0};
+char frontIR1, frontIR2, rightIR, leftIR;
 
 ////////////////////////////////////////////////////////////////////////////////
 //_________________________________TIMERS_____________________________________//
@@ -52,8 +51,14 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регулятор
     {
         if (curState.pidEnabled) setSpeedMaxon(WHEELS[i], regulatorOut[i]);
     }
+    distanceFromSonar[2] = distanceFromSonar[1];
+    distanceFromSonar[1] = distanceFromSonar[0];
+    distanceFromSonar[0] = (adcData[0] * 0.0822 * 2.54 + distanceFromSonar[1] + distanceFromSonar[2]) / 3.0;
+
     frontIR1 = pin_val(EXTI5_PIN);
     frontIR2 = pin_val(EXTI6_PIN);
+    rightIR = pin_val(EXTI7_PIN);
+    leftIR = pin_val(EXTI2_PIN);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -81,8 +86,19 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
 
 //  if ((fabs(curPath.lengthTrace) <= fabs(curPath.Coord_local_track[0])) && // достигнута заданная точка по положению и углу
 //     (fabs((curPath.phiZad)-(robotCoord[2])) < 0.02))
-  if (((fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0])) < 0.005) && ((fabs(curPath.Coord_local_track[1])) < 0.05) && // достигнута заданная точка по положению и углу
-     (fabs((curPath.phiZad) - (robotCoord[2])) < 0.02))
+  if (
+        (fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0]) < 0.005)
+        &&
+        (
+          (
+           (fabs(curPath.Coord_local_track[1]) < 0.02)
+           && // достигнута заданная точка по положению и углу
+           (fabs((curPath.phiZad) - (robotCoord[2])) < 0.02)
+          )
+          ||
+           (curPath.traceVel[2]>0)
+        )
+      )
         {
           traceFlag = 1;  // точка достигнута
         }
@@ -114,7 +130,6 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
           }
         }
 
-
 //////////////////////////// COMPUTING SPEEDS /////////////////////////////////
 
  if (curState.trackEn)
@@ -122,7 +137,7 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
    TrackRegulator(&robotCoord[0], &robotSpeed[0], (&curPath), &vTargetGlob[0]); // расчет глобальных скоростей
 }
 
-if (curState.collisionAvoidance) collisionAvoidance(&vTargetGlob[0], &vTargetGlobCA[0]);
+if (curState.collisionAvoidance) collisionAvoidance(robotSpeed, vTargetGlob, vTargetGlobCA);
 else
 {
       vTargetGlobCA[0] = vTargetGlob[0];

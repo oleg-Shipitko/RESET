@@ -104,14 +104,15 @@ int main(void)
       for (; frequency <= 1001000; frequency *= 1.01)
       {
           USART_Config(frequency);
-//          setID(ID_broadcast,  (uint8_t)8);
+          setID(ID_broadcast,  (uint8_t)7);
+          setBaudRate(ID_broadcast, (uint8_t)0x03);
 //          setBaudRate (ID_broadcast, (uint8_t)MBPS);
-//          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
-//          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
-//          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
-            setBaudRate (ID_broadcast, (uint8_t)0x03);
+          setServoCWAngleLimit (ID_broadcast, (uint16_t) 0);
+          setServoCCWAngleLimit (ID_broadcast, (uint16_t) 1023);
+          setServoReturnDelayMicros (ID_broadcast, (uint16_t) 0);
 
-//          flag = setServoAngle(ID_broadcast, testAngleVal);
+
+          flag = setServoAngle((uint8_t)7, (uint16_t)142);
       }
       if (frequency > 1000000)
           frequency = 5000;

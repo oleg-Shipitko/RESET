@@ -11,12 +11,11 @@
 #include "Manipulators.h"
 
 int indexSpeeds = 0, indexDists = 0;
-char traceFlag, movFlag, endFlag;
+char traceFlag, movFlag, endFlag, allPointsReachedFlag;
 
 int16_t int_cnt = 0;
 
-int16_t vabrationCnt = 0;
-
+char frontIR1, frontIR2;
 
 ////////////////////////////////////////////////////////////////////////////////
 //_________________________________TIMERS_____________________________________//
@@ -44,27 +43,17 @@ void TIM6_DAC_IRQHandler() // 100Hz  // Рассчет ПИД регулятор
       vTargetGlobF[0] = vTargetGlobCA[0];
       vTargetGlobF[1] = vTargetGlobCA[1];
       vTargetGlobF[2] = vTargetGlobCA[2];
-}
+    }
 
-if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0], &robotCoordTarget[0], &robotCoordTarget[0], &regulatorOut[0]); // рассчет  кинематики и насыщения
+    if (curState.kinemEn) FunctionalRegulator(&vTargetGlobF[0],  &regulatorOut[0]); // рассчет  кинематики и насыщения
 
-  /////
-
-//  pidLowLevel();       // рассчет ПИД
-//  pidLowLevelManipulator();
-
-  // Sonars
-  getSonarData((char)ADC_SONAR_RIGHT, (char)SONAR_RIGHT);
-  getSonarData((char)ADC_SONAR_LEFT, (char)SONAR_LEFT);
-  getSonarData((char)ADC_SONAR_FRONT_1, (char)SONAR_FRONT_1);
-  getSonarData((char)ADC_SONAR_FRONT_2, (char)SONAR_FRONT_2);
-  getSonarData((char)ADC_SONAR_BACK, (char)SONAR_BACK);
-  // IR
-  getIRData((char)ADC_IR_FRONT, (char)IR_FRONT);
-  getIRData((char)ADC_IR_BACK, (char)IR_BACK);
-  getIRData((char)ADC_IR_LEFT, (char)IR_LEFT);
-  getIRData((char)ADC_IR_RIGHT, (char)IR_RIGHT);
-   //   reset_pin(PWM_DIR[8]);
+    char i = 0;
+    for(i; i < 4; i++)
+    {
+        if (curState.pidEnabled) setSpeedMaxon(WHEELS[i], regulatorOut[i]);
+    }
+    frontIR1 = pin_val(EXTI5_PIN);
+    frontIR2 = pin_val(EXTI6_PIN);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -92,13 +81,22 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
 
 //  if ((fabs(curPath.lengthTrace) <= fabs(curPath.Coord_local_track[0])) && // достигнута заданная точка по положению и углу
 //     (fabs((curPath.phiZad)-(robotCoord[2])) < 0.02))
-  if (((fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0])) < 0.005) && ((fabs(curPath.Coord_local_track[1])) < 0.05)&& // достигнута заданная точка по положению и углу
-     (fabs((curPath.phiZad)-(robotCoord[2])) < 0.02))
+  if (
+      (fabs(curPath.lengthTrace) - fabs(curPath.Coord_local_track[0]) < 0.005)
+      &&
+      (
+       (fabs(curPath.Coord_local_track[1]) < 0.02)||
+       ((curPath.traceVel)[2]>0)
+       )&& // достигнута заданная точка по положению и углу
+     (fabs((curPath.phiZad) - (robotCoord[2])) < 0.02))
         {
-
           traceFlag = 1;  // точка достигнута
         }
- else traceFlag = 0;
+ else
+ {
+     traceFlag = 0;
+     allPointsReachedFlag = 0;
+ }
  if (!movFlag)
     if (points[0].movTask) movFlag = (points[0].movTask)(); else movFlag =1; // действие в процессе движения
  if (traceFlag && movFlag && (!endFlag))
@@ -108,15 +106,19 @@ void TIM8_UP_TIM13_IRQHandler() // рассчет траекторного ре�
           if (lastPoint > 0) //Остались ли точки в стеке
           {
             CreatePath(&points[1], &points[0], &curPath); // задать новый участок
-           totalPointComplite++;
+            totalPointComplite++;
 
           removePoint(&points[0],&lastPoint); //удалить ткущую точку
           endFlag = 0;
           movFlag = 0;
           traceFlag = 0;
+          allPointsReachedFlag = 0;
+          }
+          else
+          {
+              allPointsReachedFlag = 1;
           }
         }
-
 
 //////////////////////////// COMPUTING SPEEDS /////////////////////////////////
 
@@ -131,16 +133,6 @@ else
       vTargetGlobCA[0] = vTargetGlob[0];
       vTargetGlobCA[1] = vTargetGlob[1];
       vTargetGlobCA[2] = vTargetGlob[2];
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-//////////////////CALCULATING TIME for SWITCHING OFF VIBRATION//////////////
-
-vabrationCnt++;
-if (vabrationCnt  -  startingTime >= vibratingTime)
-{
-   switchOffVibration();
 }
 
 ///////////////////////////////////////////////////////////////////////////

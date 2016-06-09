@@ -2,6 +2,9 @@
 <EmBlocks_debug_session>
 	<debuggerLastSession>
 		<watches>
+			<watch key="leftIR" format="0" array="0" start="0" count="0" />
+			<watch key="localVelocity" format="0" array="0" start="0" count="0" />
+			<watch key="rightIR" format="0" array="0" start="0" count="0" />
 			<watch key="*ch" format="0" array="0" start="0" count="0" />
 			<watch key="MRotSpeed" format="0" array="0" start="0" count="0" />
 			<watch key="adcData" format="0" array="0" start="0" count="0" />

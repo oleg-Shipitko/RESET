@@ -3,6 +3,8 @@
 #include "Board.h"
 #include "Interrupts.h"
 
+typedef void task();
+
 void softDelay(__IO unsigned long int ticks)
 {
     for(; ticks > 0; ticks--);
@@ -13,24 +15,24 @@ void softDelay(__IO unsigned long int ticks)
 ///////////////////////////PREDATOR MOUTH///////////////////////
 bool openCubesCatcher(void)
 {
-    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT);
-    setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT);
+    while(!setServoAngle((uint8_t)ID_RIGHT, (uint16_t)OPEN_ANG_RIGHT)){};
+    while(!setServoAngle((uint8_t)ID_LEFT, (uint16_t)OPEN_ANG_LEFT)){};
 
     return 0;
 }
 
 bool closeCubesCatcher(void)
 {
-    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT);
-    setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT);
+    while(!setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT)){};
+    while(!setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT)){};
 
     return 0;
 }
 
 bool closeCubesCatcherInit(void)
 {
-    setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT_INIT);
-    setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT_INIT);
+    while(!setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT_INIT)){};
+    while(!setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT_INIT)){};
 
     return 0;
 }
@@ -38,56 +40,39 @@ bool closeCubesCatcherInit(void)
 
 bool moveCubesCatcherUp(void)
 {
-    setServoTorque((uint8_t)ID_UP, 800);
-    setServoAngle((uint8_t)ID_UP, (uint16_t)UP_ANG);
+    while(!setServoTorque((uint8_t)ID_UP, 800)){};
+    while(!setServoAngle((uint8_t)ID_UP, (uint16_t)UP_ANG)){};
     return 0;
 }
 
 bool moveCubesCatcherDown(void)
 {
-    setServoTorque((uint8_t)ID_UP, 400);
-    setServoAngle((uint8_t)ID_UP, (uint16_t)DOWN_ANG);
+    while(!setServoTorque((uint8_t)ID_UP, 400)){};
+    while(!setServoAngle((uint8_t)ID_UP, (uint16_t)DOWN_ANG)){};
 
     return 0;
 }
 
 bool moveCubesCatcherForward(void)
 {
-    while(pin_val(EXTI3_PIN))
+//    char input = pin_val(EXTI3_PIN);
+    while(!pin_val(EXTI3_PIN))
     {
-        setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 1023, (uint16_t) CCW);
+        while(!setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 1023, (uint16_t) CCW)){};
     }
-    setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 0, (uint16_t) CCW);
+    while(!setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 0, (uint16_t) CCW)){};
     return 0;
 }
-uint32_t input;
+
 bool moveCubesCatcherBackward(void)
 {
-    input = pin_val(EXTI4_PIN);
-    while(input)
+    while(!pin_val(EXTI4_PIN))
     {
-        input = pin_val(EXTI4_PIN);
-        setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 1023, (uint16_t) CW);
+        while(!setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 1023, (uint16_t) CW)){};
     }
-    setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 0, (uint16_t) CW);
+    while(!setServoMovingSpeed ((uint8_t) ID_FORWARD_BACKWARD, (uint16_t) 0, (uint16_t) CW)){};
     return 0;
 }
-
-//bool moveCubesCatcherForward(void)
-//{
-//    set_pin(BTN6_PWM_PIN);
-//    reset_pin(BTN6_DIR_PIN);
-//
-//    return 0;
-//}
-
-//bool moveCubesCatcherBackward(void)
-//{
-//    reset_pin(BTN6_PWM_PIN);
-//    set_pin(BTN6_DIR_PIN);
-//
-//    return 0;
-//}
 
 ///////////////////////////////////////////////////////////////
 
@@ -112,24 +97,24 @@ bool switchOffPneumo(void)
 /////////////////////////////DOORS/////////////////////////////
 bool openDoors(void)
 {
-    setServoAngle((uint8_t)DOOR_RIGHT, (uint16_t)DOOR_OPEN_ANG_RIGHT);
-    setServoAngle((uint8_t)DOOR_LEFT, (uint16_t)DOOR_OPEN_ANG_LEFT);
+    while(!setServoAngle((uint8_t)DOOR_RIGHT, (uint16_t)DOOR_OPEN_ANG_RIGHT)){};
+    while(!setServoAngle((uint8_t)DOOR_LEFT, (uint16_t)DOOR_OPEN_ANG_LEFT)){};
 
     return 0;
 }
 
 bool halfOpenDoors(void)
 {
-    setServoAngle((uint8_t)DOOR_RIGHT, (uint16_t)DOOR_HALF_OPEN_ANG_RIGHT);
-    setServoAngle((uint8_t)DOOR_LEFT, (uint16_t)DOOR_HALF_OPEN_ANG_LEFT);
+    while(!setServoAngle((uint8_t)DOOR_RIGHT, (uint16_t)DOOR_HALF_OPEN_ANG_RIGHT)){};
+    while(!setServoAngle((uint8_t)DOOR_LEFT, (uint16_t)DOOR_HALF_OPEN_ANG_LEFT)){};
 
     return 0;
 }
 
 bool closeDoors(void)
 {
-    setServoAngle((uint8_t)DOOR_RIGHT, (uint16_t)DOOR_CLOSED_ANG_RIGHT);
-    setServoAngle((uint8_t)DOOR_LEFT, (uint16_t)DOOR_CLOSED_ANG_LEFT);
+    while(!setServoAngle((uint8_t)DOOR_RIGHT, (uint16_t)DOOR_CLOSED_ANG_RIGHT)){};
+    while(!setServoAngle((uint8_t)DOOR_LEFT, (uint16_t)DOOR_CLOSED_ANG_LEFT)){};
 
     return 0;
 }
@@ -138,21 +123,47 @@ bool closeDoors(void)
 //////////////////////////CUBES HOLDERS////////////////////////
 bool openHolders(void)
 {
-    setServoAngle((uint8_t)LOWER_HOLDER, (uint16_t)LOWER_HOLDER_OPEN_ANG);
-    softDelay(9000000);
+    float lower_holder_ang, upper_holder_ang;
+
+    getServoAngle((uint8_t)LOWER_HOLDER, &lower_holder_ang);
+    while(!setServoAngle((uint8_t)LOWER_HOLDER, (uint16_t)LOWER_HOLDER_OPEN_ANG)){};
+    while(lower_holder_ang > 200)
+    {
+        getServoAngle((uint8_t)LOWER_HOLDER, &lower_holder_ang);
+    }
+
+
+
+    getServoAngle((uint8_t)UPPER_HOLDER, &upper_holder_ang);
     setServoAngle((uint8_t)UPPER_HOLDER, (uint16_t)UPPER_HOLDER_OPEN_ANG);
-    softDelay(9000000);
+    while(upper_holder_ang > 200)
+    {
+        getServoAngle((uint8_t)UPPER_HOLDER, &upper_holder_ang);
+    }
+
+
+
     setVoltage((char)CONES_HOLDER_CH - 1, (float)CONES_HOLDER_OPEN_ANG);
     return 0;
 }
 
 bool closeHolders(void)
 {
+    float lower_holder_ang, upper_holder_ang;
+
     setVoltage((char)CONES_HOLDER_CH - 1, (float)CONES_HOLDER_CLOSED_ANG);
     softDelay(7000000);
+
+
     setServoAngle((uint8_t)UPPER_HOLDER, (uint16_t)UPPER_HOLDER_CLOSED_ANG);
-    softDelay(7000000);
-    setServoAngle((uint8_t)LOWER_HOLDER, (uint16_t)LOWER_HOLDER_CLOSED_ANG);
+    getServoAngle((uint8_t)UPPER_HOLDER, &upper_holder_ang);
+    while(upper_holder_ang < 220)
+    {
+        getServoAngle((uint8_t)UPPER_HOLDER, &upper_holder_ang);
+    }
+
+
+    while(!setServoAngle((uint8_t)LOWER_HOLDER, (uint16_t)LOWER_HOLDER_CLOSED_ANG)){};
 
     return 0;
 }

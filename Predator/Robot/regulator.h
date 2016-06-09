@@ -140,7 +140,7 @@ signed char digitalize(char data, char lowerLevel, char upperLevel);
 void CreatePath(pathPointStr * next_point, pathPointStr * cur_point, Path * out);
 void removePoint(pathPointStr * points,char *lastPoint);
 void SpeedFiltration(float *V,float *vF);
-void collisionAvoidance(float *V,float *vCA);
+void collisionAvoidance(float *rV, float *V,float *vCA);
 void addPointInFrontOfQueue(pathPointStr *pointsArray, float *newPoint, char ch, char *lastPoint);
 
 void getSonarData(char ADC_ch, char side);

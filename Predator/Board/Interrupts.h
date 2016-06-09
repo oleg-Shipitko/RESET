@@ -20,7 +20,8 @@ extern void USB_OTG_BSP_TimerIRQ (void);
 extern char traceFlag;
 extern char allPointsReachedFlag;
 extern int16_t vabrationCnt;
-extern char frontIR1, frontIR2;
+extern char frontIR1, frontIR2, rightIR, leftIR;
+extern float distanceFromSonar[3];
 void delay(__IO uint32_t nCount);
 
 

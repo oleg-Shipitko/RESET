@@ -646,11 +646,13 @@ switch(cmd->command)
 //      {
 //        getServoAngle((uint8_t)ID_UP, &angle_open);
 //      }
+      while(!setServoTorque((uint8_t)ID_UP, 800)){};
       closeCubesCatcher();
+      moveCubesCatcherUp();
       moveCubesCatcherForward();
       moveCubesCatcherDown();
       getServoAngle((uint8_t)ID_UP, &angle_open);
-      while(angle_open > 10.0)
+      while(angle_open > 15.0)
       {
           getServoAngle((uint8_t)ID_UP, &angle_open);
       }
@@ -671,12 +673,17 @@ switch(cmd->command)
 
   case 0x3E:  //put predator mouth inside
   {
+      while(!setServoTorque((uint8_t)ID_UP, 800)){};
       moveCubesCatcherUp();
       while(angle_closed < 267.0)
       {
         getServoAngle((uint8_t)ID_UP, &angle_closed);
       }
+      char * str ="Ok";
+      sendAnswer(cmd->command,str, 3);
       moveCubesCatcherBackward();
+      closeCubesCatcherInit();
+      while(!setServoTorque((uint8_t)ID_UP, 100)){};
 //      moveCubesCatcherDown();
 //      getServoAngle((uint8_t)ID_UP, &angle_closed);
 //      while(angle_closed < 247.0)
@@ -686,8 +693,6 @@ switch(cmd->command)
 //      setServoAngle((uint8_t)ID_RIGHT, (uint16_t)CLOSED_ANG_RIGHT_INSIDE);
 //      setServoAngle((uint8_t)ID_LEFT, (uint16_t)CLOSED_ANG_LEFT_INSIDE);
       angle_closed = 0;
-      char * str ="Ok";
-      sendAnswer(cmd->command,str, 3);
   }
   break;
 
@@ -701,7 +706,7 @@ switch(cmd->command)
 
   case 0x40:  //half open doors
   {
-      sendAnswer(cmd->command,  collisionIsOn, sizeof(collisionIsOn));
+      sendAnswer(cmd->command,  (char *)&collisionIsOn, sizeof(collisionIsOn));
   }
   break;
 

@@ -1,7 +1,7 @@
 /*
 **
 **                           Main.c
-**
+**     The newest version 1
 **
 **********************************************************************/
 /*
@@ -43,11 +43,13 @@ __ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
 
 char command = 0;
 char mode;
-float ang1=100;
+float ang1 = 100;
 //#define WALL_IS_OPEN 0.085 up
 //#define WALL_IS_CLOSED 0.12 down
 int main(void)
 {
+
+
 
    initAll();
 
@@ -65,40 +67,18 @@ int main(void)
 
   while(1)
    {
-//             moveCubesCatcherForward();
-//      moveCubesCatcherDown();
-// getServoAngle((uint8_t)ID_UP, &ang1);
-//
-//      while(ang1 > 10.0)
-//      {
-//          getServoAngle((uint8_t)ID_UP, &ang1);
-//      }
-//      openCubesCatcher();
-//       moveCubesCatcherBackward();
-//       moveCubesCatcherForward();
-
-       char i = 0;
-//      char temp = pin_val (EXTI1_PIN);
-//      if (temp)
-//      {
-//        curState.trackEn = 1;
-//      }
-//      else
-//      {
-//        curState.trackEn = 0;
-//        vTargetGlob[0] = 0;
-//        vTargetGlob[1] = 0;
-//        vTargetGlob[2] = 0;
-//      }
-
-     //openCubesCatcher();
-
-//switchOnVibration();
-//openWall();
-
-//setSpeedMaxon(pwm_ch - 1, speed); // Maxons
-//set_pin(PIN6_12V);
-
+      char temp = pin_val (EXTI1_PIN);
+      if (temp)
+      {
+        curState.trackEn = 1;
+      }
+      else
+      {
+        curState.trackEn = 0;
+        vTargetGlob[0] = 0;
+        vTargetGlob[1] = 0;
+        vTargetGlob[2] = 0;
+      }
   }
 }
 

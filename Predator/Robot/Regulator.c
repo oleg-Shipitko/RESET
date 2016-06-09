@@ -34,11 +34,11 @@ float ACCEL_INC = 0.2;
  TVector TargSpeed = {0, 0};
 
 pathPointStr points[POINT_STACK_SIZE]={ {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },  //Стек точек траектории
-                                        {-4.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotFast,0,1 },
-                                        {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotFast,0,1 },
-                                        {1.55, -0.29, -3.14/2.0, NULL,NULL,0,stopVelSuperFast,stopRotSuperFast,0,1 },
+                                        {0.0, 8.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotFast,0,1 },
+                                        {-4.0, 4.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotFast,0,1 },
+                                        {0.0, 4.0, 0., NULL,NULL,0,stopVelSuperFast,stopRotSuperFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelSuperFast,stopRotSlow,0,1 },
-                                        {0.0, 0.0, 2.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
+                                        {0.0, -4.0, 2.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },
                                         {0.0, 0.0, 0.0, NULL,NULL,0,stopVelFast,stopRotFast,0,1 },};
@@ -73,8 +73,17 @@ float stopRotSlow[5] = {1.0, 0.2, -1.0, 4.0, 3.0}; //{0.2,0.1,-0.1,0.3,0.6};    
 float standRotSlow[5] = {1.0 , 1.0, -1.0, 2.0, 2.5};                                       //удержание заданного положения
 
 
-float * speedType[9] = {normalVelFast, stopVelFast, standVelFast, normalVelSlow, stopVelSlow, standVelSlow, normalVelSuperFast, stopVelSuperFast, standVelSuperFast  };// типы  линейный скоростей
-float * rotType[9] = {stopRotFast, stopRotFast, standRotFast, stopRotSlow, stopRotSlow, standRotSlow, stopRotSuperFast, stopRotSuperFast, standRotSuperFast};// типы угловых скоростей
+float * speedType[9] = {normalVelFast,      //0
+                        stopVelFast,        //1
+                        standVelFast,       //2
+                        normalVelSlow,      //3
+                        stopVelSlow,        //4
+                        standVelSlow,       //5
+                        normalVelSuperFast, //6
+                        stopVelSuperFast,   //7
+                        standVelSuperFast  }; //8/ типы  линейный скоростей
+float * rotType[9] = {stopRotFast, stopRotFast, standRotFast, stopRotSlow, stopRotSlow,
+                        standRotSlow, stopRotSuperFast, stopRotSuperFast, standRotSuperFast};// типы угловых скоростей
 
 ////////////////////////////////////////////////////////////////////////////////
 //float compareAngles(float ang1, float ang2)
@@ -739,107 +748,45 @@ void SpeedFiltration(float *V,float *vF)
 
   ////////////////////////////////////////////////////////////////////////////////
 
-void collisionAvoidance(float *V, float *vCA)
+void collisionAvoidance(float * rV, float *V, float *vCA)
   {
-//      if (V[0] > 0.08)
-//      {
-//          if ((distanceFromSonars[SONAR_FRONT_1][0] < 30) || (distanceFromSonars[SONAR_FRONT_2][0] < 30))
-//          {
-//              vCA[0] = V[0]/2.0;
-//              vCA[1] = V[1]/2.0;
-//              vCA[2] = V[2]/2.0;
-//              if ((distanceFromSonars[SONAR_FRONT_1][0] < 20) || (distanceFromSonars[SONAR_FRONT_2][0] < 20) || (distanceFromIR[IR_FRONT][0] < 15))
-//              {
-//                    vCA[0] = 0;
-//                    vCA[1] = 0;
-//                    vCA[2] = 0;
-//              }
-//          }
-//          else
-//          {
-//            vCA[0] = V[0];
-//            vCA[1] = V[1];
-//            vCA[2] = V[2];
-//          }
-//      }
-//      else if (V[0] < -0.08)
-//      {
-//          if ((distanceFromSonars[SONAR_BACK][0] < 30))
-//          {
-//              vCA[0] = V[0]/2.0;
-//              vCA[1] = V[1]/2.0;
-//              vCA[2] = V[2]/2.0;
-//                if ((distanceFromSonars[SONAR_BACK][0] < 20) || (distanceFromIR[IR_BACK][0] < 15))
-//                {
-//                    vCA[0] = 0;
-//                    vCA[1] = 0;
-//                    vCA[2] = 0;
-//                }
-//          }
-//          else
-//          {
-//            vCA[0] = V[0];
-//            vCA[1] = V[1];
-//            vCA[2] = V[2];
-//        }
-//      }
-//      else if (V[1] > 0.08)
-//      {
-//          if ((distanceFromSonars[SONAR_LEFT][0] < 30))
-//          {
-//              vCA[0] = V[0]/2.0;
-//              vCA[1] = V[1]/2.0;
-//              vCA[2] = V[2]/2.0;
-//                if ((distanceFromSonars[SONAR_LEFT][0] < 20) || (distanceFromIR[IR_LEFT][0] < 15))
-//                {
-//                    vCA[0] = 0;
-//                    vCA[1] = 0;
-//                    vCA[2] = 0;
-//                }
-//          }
-//          else
-//          {
-//            vCA[0] = V[0];
-//            vCA[1] = V[1];
-//            vCA[2] = V[2];
-//        }
-//      }
-//      else if (V[1] < -0.08)
-//      {
-//                    if ((distanceFromSonars[SONAR_RIGHT][0] < 32))
-//          {
-//              vCA[0] = V[0]/2.0;
-//              vCA[1] = V[1]/2.0;
-//              vCA[2] = V[2]/2.0;
-//                if ((distanceFromSonars[SONAR_RIGHT][0] < 20) || (distanceFromIR[IR_RIGHT][0] < 15))
-//                {
-//                    vCA[0] = 0;
-//                    vCA[1] = 0;
-//                    vCA[2] = 0;
-//                }
-//          }
-//          else
-//          {
-//            vCA[0] = V[0];
-//            vCA[1] = V[1];
-//            vCA[2] = V[2];
-//        }
-//      }
-//      else if ((distanceFromSonars[SONAR_LEFT][0] < 20 || distanceFromSonars[SONAR_RIGHT][0] < 20 || distanceFromSonars[SONAR_FRONT_1][0] < 20 ||
-//                distanceFromSonars[SONAR_FRONT_2][0] < 20 || distanceFromSonars[SONAR_BACK][0] < 20) && (V[2] > 1.0))
-//      {
-//          vCA[0] = 0;
-//          vCA[1] = 0;
-//          vCA[2] = 0;
-//      }
-      if (((!frontIR1) || (!frontIR2)) && V[0] < 0.08)
+      float realRad = robotCoord[2];
+      float Mrot[3][3]   = {cos(realRad) , sin(realRad), 0,
+                        -sin(realRad), cos(realRad), 0,
+                                    0,            0, 1};
+      float localVelocity[3];
+      matrixMultiplyM2M(&Mrot[0][0], 3, 3, V, 3, 1, &localVelocity[0]); //Ml*Velocity speed in local coordinate system
+
+
+      if (((!frontIR1) || (!frontIR2)) && (localVelocity[0] < -0.08))
+      {
+           vCA[0] = 0.0;
+           vCA[1] = 0.0;
+           vCA[2] = 0.0;
+           collisionIsOn = 1;
+      }
+      else if ((distanceFromSonar[0] < 40) && (localVelocity[0] < -0.08))
+      {
+           vCA[0] = V[0]/2.0;
+           vCA[1] = V[1]/2.0;
+           vCA[2] = V[2]/2.0;
+           collisionIsOn = 0;
+      }
+      else if ((!rightIR) && (localVelocity[1] < -0.08))
       {
           vCA[0] = 0.0;
           vCA[1] = 0.0;
           vCA[2] = 0.0;
           collisionIsOn = 1;
       }
-            else
+      else if ((!leftIR) && (localVelocity[1] > 0.08))
+      {
+          vCA[0] = 0.0;
+          vCA[1] = 0.0;
+          vCA[2] = 0.0;
+          collisionIsOn = 1;
+      }
+      else
       {
           vCA[0] = V[0];
           vCA[1] = V[1];
