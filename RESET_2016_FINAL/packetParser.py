@@ -33,42 +33,15 @@ class ParsePacket(object):
  			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[0:8]))
 			return coordinatesList
 
-		if self.listOfComands.getDataIKSensors == self.command:
-			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
-			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
-			coordinatesList = []
-			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[24:32]))
- 			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[16:24]))
- 			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[8:16]))
- 			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[0:8]))
-			return coordinatesList
-
-		if self.listOfComands.getDataUSSensors == self.command:
-			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
-			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
-			coordinatesList = []
-			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[32:40]))
-			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[24:32]))
- 			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[16:24]))
- 			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[8:16]))
- 			coordinatesList.append(self.typeConvertor.HexToFloat(invertedParametersString[0:8]))
-			return coordinatesList
-			
-		if self.listOfComands.closeCubeCollector == self.command or self.listOfComands.getADCPinState == self.command:
-			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
-			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
-			# check int 16 or int 8
-			return int(invertedParametersString, 16)
-
 		if self.listOfComands.isPointWasReached == self.command:
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
 			return int(invertedParametersString, 16)
-		
-		if self.listOfComands.getManipulatorAngle == self.command:
+
+		if self.listOfComands.checkCollisionAvoidanceFlag == self.command:
 			recievedPametersString = binascii.hexlify(self.byteArray[4:len(self.byteArray) - 2])
 			invertedParametersString = self.typeConvertor.InvertStringArray(recievedPametersString)
-			return self.typeConvertor.HexToFloat(invertedParametersString)
+			return int(invertedParametersString, 16)
 
 		return self.byteArray[4:len(self.byteArray) - 2][:-1]
 

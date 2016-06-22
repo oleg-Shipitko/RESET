@@ -2,7 +2,6 @@ import serial
 import time
 import packetParser
 
-
 class SerialWrapper(object) :
 
 	def __init__ (self, portName):		

@@ -34,8 +34,6 @@ class BuildPacket(object):
 			return self.GetByteStringFromFloatList(parameters)
 		elif comand == CommandsList.dutyCycle:
 			return self.typeConvertor.IntToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1])
-		elif comand == CommandsList.setManipulatorAngle:
-			return self.typeConvertor.FloatToHex(parameters)
 		elif comand == CommandsList.setDirectionBit or comand == CommandsList.removeDirectionBit:
 			return self.typeConvertor.IntToHex(parameters)
 		elif comand == CommandsList.setMotorVoltage:
@@ -72,8 +70,6 @@ class BuildPacket(object):
 			return self.typeConvertor.IntToHex(parameters)
 		elif comand == CommandsList.stopAllMotors:
 			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.IntToHex(parameters[3])
-		elif comand == CommandsList.switchOnVibrationTable:
-			return self.typeConvertor.IntToHex(parameters)
 		elif comand == CommandsList.moveWithCorrection:
 			return self.typeConvertor.FloatToHex(parameters[0]) + self.typeConvertor.FloatToHex(parameters[1]) + self.typeConvertor.FloatToHex(parameters[2]) + self.typeConvertor.FloatToHex(parameters[3]) + self.typeConvertor.FloatToHex(parameters[4]) + self.typeConvertor.FloatToHex(parameters[5]) + self.typeConvertor.IntToHex(parameters[6])
 		return ""
@@ -147,24 +143,25 @@ class CommandsList(object):
 	#changeFishingLatchState = 0x2A	#expected parameters: int[1]
 	openCubeCollector = 0x2B
 	closeCubeCollector = 0x2C
-	setManipulatorAngle = 0x31 # expected parameter: flot[1]
-	releaseCubeMoovers = 0x2D
-	raiseCubeMoovers = 0x2E
-	switchOnVibrationTable = 0x2F #expected parameters: int[1]
-	switchOffVibrationTable = 0x30
-	switchOffBelts = 0x33
-	startGame = 0x34
-	openCubeBorder = 0x2D
-	closeCubeBorder = 0x2E
+	slightlyOpenDoors = 0x3F
+	openDoors = 0x2D
+	closeDoors = 0x2E
+	switchOnPneumo = 0x2F 
+	switchOffPneumo = 0x30
 	isPointWasReached = 0x32	
-	switchOnCollisionAvoidance = 0x33
-	switchOffCollisionAvoidance = 0x34
-	getManipulatorAngle = 0x35
 	getDataIKSensors = 0x36
 	getDataUSSensors = 0x37
 	switchOffRobot = 0x38
 	moveWithCorrection = 0x39 #expected parameters: float32[6], float32[1]
-	openCubeManipulatorBigAngle = 0x3A
-	openConeCrasher = 0x3B
-	closeConeCrasher = 0x3C
+	openHolder = 0x3A
+	closeHolder = 0x3B
+	
+	pushPredatorsMouth = 0x3C
+	closePredatorsMouth  = 0x3D
+	pullPredatorsMouth = 0x3E
 
+	switchOnCollisionAvoidance = 0x33
+	switchOffCollisionAvoidance = 0x34
+	checkCollisionAvoidanceFlag = 0x40
+
+	unloadMiddle = 0x41

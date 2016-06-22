@@ -22,6 +22,7 @@ def get_com_port_number():
     snr = '3677346C3034'
 
     for port in list_ports.comports():
+        print port
         if (port.serial_number == snr) and (port.pid == pid) and (port.vid == vid): 
             return '/dev/' + port.name
 
@@ -130,10 +131,6 @@ def close_cubes_border():
     reply_on_request = send_request(packet)
     return reply_on_request
 
-def get_playing_field_side():
-    # todo: finish method
-    return 1
-
 def is_point_was_reached():
     packet = packetBuilder.BuildPacket(commands_to_stm.isPointWasReached)
     reply_on_request = send_request(packet)
@@ -149,8 +146,18 @@ def switch_off_collision_avoidance():
     reply_on_request = send_request(packet)
     return reply_on_request
 
+def check_collision_avoidance():
+    packet = packetBuilder.BuildPacket(commands_to_stm.checkCollisionAvoidanceFlag)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
 def get_ik_data():
     packet = packetBuilder.BuildPacket(commands_to_stm.getDataIKSensors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def clean_point_stack():
+    packet = packetBuilder.BuildPacket(commands_to_stm.cleanPointsStack)
     reply_on_request = send_request(packet)
     return reply_on_request
 
@@ -188,6 +195,76 @@ def close_cone_crasher():
     packet = packetBuilder.BuildPacket(commands_to_stm.closeConeCrasher)
     reply_on_request = send_request(packet)
     return reply_on_request
+
+def close_doors():
+    packet = packetBuilder.BuildPacket(commands_to_stm.closeDoors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def open_doors():
+    packet = packetBuilder.BuildPacket(commands_to_stm.openDoors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def close_doors():
+    packet = packetBuilder.BuildPacket(commands_to_stm.closeDoors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def open_doors():
+    packet = packetBuilder.BuildPacket(commands_to_stm.openDoors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def slightly_open_doors():
+    packet = packetBuilder.BuildPacket(commands_to_stm.slightlyOpenDoors)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+'''def get_doors_state():
+    packet = packetBuilder.BuildPacket(commands_to_stm.####)
+    reply_on_request = send_request(packet)
+    return reply_on_request'''
+
+def pull_predators_mouth():
+    packet = packetBuilder.BuildPacket(commands_to_stm.pullPredatorsMouth)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def push_predators_mouth():
+    packet = packetBuilder.BuildPacket(commands_to_stm.pushPredatorsMouth)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def close_predators_mouth():
+    packet = packetBuilder.BuildPacket(commands_to_stm.closePredatorsMouth)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def switch_on_pneumo():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOnPneumo)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def switch_off_pneumo():
+    packet = packetBuilder.BuildPacket(commands_to_stm.switchOffPneumo)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def unload_middle():
+    packet = packetBuilder.BuildPacket(commands_to_stm.unloadMiddle)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def open_cubes_border(): 
+    packet = packetBuilder.BuildPacket(commands_to_stm.openHolder)
+    reply_on_request = send_request(packet)
+    return reply_on_request
+
+def close_cubes_border(): 
+    packet = packetBuilder.BuildPacket(commands_to_stm.closeHolder)
+    reply_on_request = send_request(packet)
+    return reply_on_request	
 
 def stmMainLoop(input_command_queue, reply_to_fsm_queue, reply_to_localization_queue):
     global com_port
