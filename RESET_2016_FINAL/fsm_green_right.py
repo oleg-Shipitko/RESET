@@ -210,7 +210,7 @@ class PullPredatorMouthCatcherAction(object):
 class CloseCubesBorderAction(object):
     def run_action(self):
         global taken_cubes_number
-        taken_cubes_number = stm_driver('close_cubes_border')
+        #taken_cubes_number = stm_driver('close_cubes_border')
         self.start_time = time.time()
 
     def check_action(self):
@@ -241,6 +241,17 @@ class PushPredatorMouthCatcherTask(object):
             print time.time() - self.start_time
             return True
 
+class UnloadMiddleTask(object):
+    def run_task(self):
+        print 'unload_middle'
+        stm_driver('unload_middle')
+        self.start_time = time.time()
+
+    def check_task(self):
+        if time.time() - self.start_time > 0.5:
+            print time.time() - self.start_time
+            return True
+
 class PullPredatorMouthCatcherTask(object):
     def __init__(self):
         self.start_time = time.time()
@@ -257,7 +268,7 @@ class PullPredatorMouthCatcherTask(object):
 class CloseCubesBorderTask(object):
     def run_task(self):
         global taken_cubes_number
-        taken_cubes_number = stm_driver('close_cubes_border')
+        #taken_cubes_number = stm_driver('close_cubes_border')
         self.start_time = time.time()
 
     def check_task(self):
@@ -267,7 +278,7 @@ class CloseCubesBorderTask(object):
 class OpenCubesBorderAction(object):
     def run_action(self):
         global taken_cubes_number
-        taken_cubes_number = stm_driver('open_cubes_border')
+        #taken_cubes_number = stm_driver('open_cubes_border')
         self.start_time = time.time()
 
     def check_action(self):
@@ -369,10 +380,12 @@ class ReachMiddleTask(object):
 
     def run_task(self):
         if (selected_side.value == 'green'):
-            stm_driver('go_to_global_point', [0.8, 0.52, -3.14, 6])
+            stm_driver('go_to_global_point', [0.8, 0.52, -3.14, 3])
+            #stm_driver('go_to_global_point', [0.8, 0.52, -3.14, 6])
             stm_driver('go_to_global_point', [1.58, 0.52, -3.14, 7])
         else:
-            stm_driver('go_to_global_point', [2.5, 0.57, 0.0, 6])
+            stm_driver('go_to_global_point', [2.5, 0.57, 0.0, 3])
+            #   stm_driver('go_to_global_point', [2.5, 0.57, 0.0, 6])
             stm_driver('go_to_global_point', [1.4, 0.4, 0.0, 7])
 
     def check_task(self):
@@ -410,6 +423,15 @@ class SwitchOffCollisionAvoidanceTask(object):
         stm_driver('switch_off_collision_avoidance')
 
     def check_task(self):
+        print 'Collision Avoidance is Off'
+        return True
+
+class SwitchOffCollisionAvoidanceAction(object):
+    def run_action(self):
+        print 'collision avoidance switched off'
+        stm_driver('switch_off_collision_avoidance')
+
+    def check_action(self):
         print 'Collision Avoidance is Off'
         return True
 
@@ -510,7 +532,7 @@ class MoveToPointTask(object):
 class CloseCubesBorderTask(object):
     def run_task(self):
         global taken_cubes_number
-        taken_cubes_number = stm_driver('close_cubes_border')
+        #taken_cubes_number = stm_driver('close_cubes_border')
         self.start_time = time.time()
 
     def check_task(self):
@@ -520,7 +542,7 @@ class CloseCubesBorderTask(object):
 class OpenCubesBorderTask(object):
     def run_task(self):
         global taken_cubes_number
-        taken_cubes_number = stm_driver('open_cubes_border')
+        #taken_cubes_number = stm_driver('open_cubes_border')
         self.start_time = time.time()
 
     def check_task(self):
@@ -558,91 +580,65 @@ class ActivateRobotRegulatorsTask(object):
 class TakeMiddleCubesTask(object):
     all_actions_were_completed = False
 
-    def __init__(self):
-        if (selected_side.value == 'green'): 
-            self.future_actions  = [
-                    MoveToPointAction(1.517, 0.5, -1.57, movement_type['fast'], True, True),
-                    WaitTimeAction(0.5),
-                    MoveToPointAction(1.517, 0.46, -1.57, movement_type['slow'], True, True),
-                    PushPredatorMouthCatcherAction(),
-                    MoveToPointAction(1.517, 0.325, -1.57, movement_type['slow'], True, True),
-                    ClosePredatorMouthCatcherAction(),
-                    MoveToPointAction(1.517, 0.35, -1.57, movement_type['slow'], True, True),
-                    PullPredatorMouthCatcherAction(),
-                    SwitchOnPneumoAction(),
-                    MoveToPointAction(1.517, 0.37, -1.57, movement_type['slow'], True, True),
-                    MoveToPointAction(1.517, 0.12, -1.57, movement_type['slow'], True, True, False, True),
-                    MoveToPointAction(1.517, 0.3, -1.57, movement_type['slow'], True, False),
-                    CloseCubesBorderAction(),
-                    SwitchOnPneumoAction()]
-        else:
-            self.future_actions  = [
-                    MoveToPointAction(1.517, 0.46, -1.57, movement_type['slow'], True, True),
-                    WaitTimeAction(1),
-                    MoveToPointAction(1.517, 0.46, -1.57, movement_type['slow'], True, True),
-                    MoveToPointAction(1.517, 0.48, -1.57, movement_type['slow'], True, True),
-                    PushPredatorMouthCatcherAction(),
-                    MoveToPointAction(1.517, 0.325, -1.57, movement_type['slow'], True, True),
-                    WaitTimeAction(1),
-                    ClosePredatorMouthCatcherAction(),
-                    MoveToPointAction(1.517, 0.35, -1.57, movement_type['slow'], True, True),
-                    PullPredatorMouthCatcherAction(),
-                    SwitchOnPneumoAction(),
-                    MoveToPointAction(1.517, 0.37, -1.57, movement_type['slow'], True, True),
-                    MoveToPointAction(1.517, 0.12, -1.57, movement_type['slow'], True, True, False, True),
-                    MoveToPointAction(1.517, 0.3, -1.57, movement_type['slow'], True, False),
-                    CloseCubesBorderAction(),
-                    SwitchOnPneumoAction()]
-        self.future_actions.reverse()
-        self.current_action = self.future_actions.pop()
-
     def run_task(self):
-        self.current_action.run_action()
-
-    def check_task(self):
-        self.check_actions_in_task()
-        if self.all_actions_were_completed is True:
-            return True
-
-    def check_actions_in_task(self):
-        if self.current_action.check_action() is True:
-            if len(self.future_actions) is not 0:
+        global strategy_number
+        
+        print 'STRATEGY #', strategy_number
+        if (selected_side.value == 'green'):
+            if strategy_number == 1:
+                self.future_actions  = [
+                        MoveToPointAction(1.517, 0.5, -1.57, movement_type['fast'], True, True),
+                        WaitTimeAction(0.5),
+                        MoveToPointAction(1.517, 0.46, -1.57, movement_type['slow'], True, True),
+                        PushPredatorMouthCatcherAction(),
+                        MoveToPointAction(1.517, 0.325, -1.57, movement_type['slow'], True, True),
+                        ClosePredatorMouthCatcherAction(),
+                        MoveToPointAction(1.517, 0.35, -1.57, movement_type['slow'], True, True),
+                        PullPredatorMouthCatcherAction(),
+                        SwitchOnPneumoAction(),
+                        MoveToPointAction(1.517, 0.37, -1.57, movement_type['slow'], True, True),
+                        MoveToPointAction(1.517, 0.12, -1.57, movement_type['slow'], True, True, False, True),
+                        SwitchOffCollisionAvoidanceAction(),
+                        MoveToPointAction(1.517, 0.3, -1.57, movement_type['slow'], True, False),
+                        CloseCubesBorderAction(),
+                        MoveToPointAction(1.517, 0.4, -1.57, movement_type['slow'], True, True),
+                        SwitchOnPneumoAction()]
+                self.future_actions.reverse()
                 self.current_action = self.future_actions.pop()
                 self.current_action.run_action()
             else:
-                self.all_actions_were_completed = True
-
-#Wrong, because we have to take cubes simultaneousley
-class ThrowCubesWithDoorsTask(object):
-    all_actions_were_completed = False
-
-    def __init__(self, initial_coordinates):
-        if (selected_side.value == 'green'): 
-            self.future_actions= [
-                    MoveToPointTask[0.98, 0.45, 3.14, movement_type['fast']],
-                    MoveToPointTask[0.65, 0.45, 3.14, movement_type['fast']],
-                    MoveToPointTask[0.65, 0.94, 3.14, movement_type['fast']],
-                    MoveToPointTask[1.1, 0.94, 3.14, movement_type['fast']],
-                    OpenDoorsTask(), 
-                    MoveToPointTask[1.0, 0.94, 3.14, movement_type['fast']]]
+                self.all_actions_were_completed  = True
         else:
-            self.future_actions= [
-                    MoveToPointTask[2.02, 0.45, 3.14, movement_type['fast']],
-                    MoveToPointTask[2.35, 0.45, 3.14, movement_type['fast']],
-                    MoveToPointTask[2.35, 0.94, 3.14, movement_type['fast']],
-                    MoveToPointTask[1.9, 0.94, 3.14, movement_type['fast']],
-                    OpenDoorsAction(), 
-                    MoveToPointTask[2.0, 0.94, 3.14, movement_type['fast']]]
-        self.future_actions.reverse()
-        self.current_action = self.future_actions.pop()
-
-    def run_task(self):
-        self.current_action.run_action()
+            if strategy_number == 1:
+                self.future_actions  = [
+                        MoveToPointAction(1.512, 0.46, -1.57, movement_type['slow'], True, True),
+                        WaitTimeAction(1),
+                        MoveToPointAction(1.512, 0.46, -1.57, movement_type['slow'], True, True),
+                        MoveToPointAction(1.512, 0.48, -1.57, movement_type['slow'], True, True),
+                        PushPredatorMouthCatcherAction(),
+                        MoveToPointAction(1.512, 0.325, -1.57, movement_type['slow'], True, True),
+                        WaitTimeAction(1),
+                        ClosePredatorMouthCatcherAction(),
+                        MoveToPointAction(1.512, 0.35, -1.57, movement_type['slow'], True, True),
+                        PullPredatorMouthCatcherAction(),
+                        SwitchOnPneumoAction(),
+                        MoveToPointAction(1.512, 0.37, -1.57, movement_type['slow'], True, True),
+                        MoveToPointAction(1.512, 0.12, -1.57, movement_type['slow'], True, True, False, True),
+                        SwitchOffCollisionAvoidanceAction(),
+                        MoveToPointAction(1.512, 0.3, -1.57, movement_type['slow'], True, False),
+                        CloseCubesBorderAction(),
+                        MoveToPointAction(1.512, 0.4, -1.57, movement_type['slow'], True, True),
+                        SwitchOnPneumoAction()]
+                self.future_actions.reverse()
+                self.current_action = self.future_actions.pop()
+                self.current_action.run_action()
+            else:
+                self.all_actions_were_completed  = True
 
     def check_task(self):
-        self.check_actions_in_task()
         if self.all_actions_were_completed is True:
             return True
+        self.check_actions_in_task()
 
     def check_actions_in_task(self):
         if self.current_action.check_action() is True:
@@ -662,71 +658,60 @@ class UnloadMiddleCubesState():
         if (selected_side.value == 'green'):
             if strategy_number == 1:
                 self.future_tasks = [
-                MoveToPointTask(0.97, 0.6, -1.57, movement_type['fast'], False, False, True),
-                MoveToPointTask(0.7, 0.6, -1.57, movement_type['fast'], False, False, True),
-                MoveToPointTask(0.7, 1.08, -1.57, movement_type['fast'], False, False, True),
+                MoveToPointTask(0.97, 0.65, -1.57, movement_type['super_fast'], False, False, True),
+                MoveToPointTask(0.7, 0.65, -1.57, movement_type['super_fast'], True, True),
+                MoveToPointTask(0.7, 1.08, -1.57, movement_type['super_fast'], True, True),
                 MoveToPointTask(0.7, 1.08, 0.0, movement_type['slow']),
+                MoveToPointTask(1.15, 1.08, 0.0, movement_type['super_fast'], True, False),
                 SwitchOffPneumoTask(),
-                MoveToPointTask(1.19, 1.08, 0.0, movement_type['fast'], True, False),
-                MoveToPointTask(1.15, 1.08, 0.0, movement_type['fast'], True, False),
-                WaitTimeTask(2),
-                OpenCubesBorderTask(),
-                MoveToPointTask(0.97, 1.08, 0.0, movement_type['fast'], True, False),
-                PushPredatorMouthCatcherTask(),
-                MoveToPointTask(0.87, 1.08, 0.0, movement_type['fast'], True, False),
+                WaitTimeTask(3),
+                #OpenCubesBorderTask(),
+                MoveToPointTask(0.97, 1.08, 0.0, movement_type['super_fast'], True, False),
+                UnloadMiddleTask(),
+                MoveToPointTask(0.87, 1.08, 0.0, movement_type['super_fast'], True, False),
                 ClosePredatorMouthCatcherTask(),
                 PullPredatorMouthCatcherTask(),
                 #MoveToPointAction(0.8, 1.13, -3.14, movement_type['slow'], True, False),
                 #OpenDoorsAction(),
-                MoveToPointTask(0.75, 1.08, -1.57, movement_type['fast'], True, True, False, True)]
+                MoveToPointTask(0.75, 1.08, -1.57, movement_type['super_fast'], True, True, False, True),
+                MoveToPointTask(0.7, 0.75, -1.57, movement_type['super_fast'], False, False)]
+                self.future_tasks.reverse()
+                self.current_task = self.future_tasks.pop()
+                self.current_task.run_task()
             else:
-                self.future_tasks = [
-                    MoveToPointTask(0.98, 0.45, 3.14, movement_type['slow']),
-                    MoveToPointTask(0.6, 0.45, 3.14, movement_type['fast'], False, False),
-                    MoveToPointTask(0.6, 1.1, 3.14, movement_type['fast'], False, False),
-                    MoveToPointTask(1.1, 1.1, 3.14, movement_type['fast'], True, False),
-                    OpenDoorsTask(), 
-                    MoveToPointTask(0.9, 1.1, 3.14, movement_type['fast'], True, False),
-                    CloseDoorsTask(),
-                    MoveToPointTask(0.82, 1.1, 3.14, movement_type['fast'], False, False)]
+                self.all_tasks_were_completed  = True
         else:
             if strategy_number == 1:
                 self.future_tasks = [
-                    MoveToPointTask(2.03, 0.55, -1.57, movement_type['fast'], False, False, True),
-                    MoveToPointTask(2.28, 0.55, -1.57, movement_type['fast'], False, False, True),
-                    MoveToPointTask(2.28, 1.06, -1.57, movement_type['fast'], True, True),
-                    MoveToPointTask(2.28, 1.06, -3.14, movement_type['slow']),
+                    MoveToPointTask(2.03, 0.58, -1.57, movement_type['super_fast'], False, False, True),
+                    MoveToPointTask(2.30, 0.58, -1.57, movement_type['super_fast'], True, True),
+                    MoveToPointTask(2.30, 1.03, -1.57, movement_type['super_fast'], True, True),
+                    MoveToPointTask(2.30, 1.03, -3.14, movement_type['slow']),
+                    MoveToPointTask(1.87, 1.03, -3.14, movement_type['super_fast'], True, False),
+                    MoveToPointTask(1.87, 1.00, -3.14, movement_type['super_fast'], True, False),
                     SwitchOffPneumoTask(),
-                    MoveToPointTask(1.85, 1.06, -3.14, movement_type['fast'], True, False),
-                    MoveToPointTask(1.9, 1.06, -3.14, movement_type['fast'], True, False),
-                    WaitTimeTask(2),
+                    WaitTimeTask(4),
                     OpenCubesBorderTask(),
-                    MoveToPointTask(2.05, 1.06, -3.14, movement_type['fast'], True, False),
-                    PushPredatorMouthCatcherTask(),
-                    MoveToPointTask(2.1, 1.06, -3.14, movement_type['fast'], True, False),
+                    MoveToPointTask(2.09, 1.00, -3.14, movement_type['super_fast'], True, False),
+                    UnloadMiddleTask(),
+                    MoveToPointTask(2.15, 1.00, -3.14, movement_type['super_fast'], True, False),
                     ClosePredatorMouthCatcherTask(),
                     PullPredatorMouthCatcherTask(),
                     #MoveToPointAction(0.8, 1.13, -3.14, movement_type['slow'], True, False),
                     #OpenDoorsAction(),
-                    MoveToPointTask(2.1, 1.06, 1.57, movement_type['fast'], True, True)]
+                    MoveToPointTask(2.12, 1.00, 1.57, movement_type['super_fast'], True, True),
+                    MoveToPointTask(2.22, 1.08, 1.57, movement_type['super_fast'], True, False),
+                    MoveToPointTask(2.4, 0.7, 1.57, movement_type['super_fast'], True, False)]
+                self.future_tasks.reverse()
+                self.current_task = self.future_tasks.pop()
+                self.current_task.run_task()
             else:
-                self.future_tasks = [
-                    MoveToPointTask(2.06, 0.48, 0.0, movement_type['slow'], True, False),
-                    MoveToPointTask(2.43, 0.55, 0.0, movement_type['fast'], False, False),
-                    MoveToPointTask(2.43, 1.1, 0.0, movement_type['fast'], False, False),
-                    MoveToPointTask(1.9, 1.1, 0.0, movement_type['fast'], False, False),
-                    OpenDoorsTask(), 
-                    MoveToPointTask(2.05, 1.1, 0.0, movement_type['fast'], False, False),
-                    CloseDoorsTask()]
-
-        self.future_tasks.reverse()
-        self.current_task = self.future_tasks.pop()
-        self.current_task.run_task()
+                self.all_tasks_were_completed  = True
 
     def check_state(self):
-        self.check_tasks_in_state()
         if self.all_tasks_were_completed is True:
             return True
+        self.check_tasks_in_state()
 
     def check_tasks_in_state(self):
         if self.current_task.check_task() is True:
@@ -773,7 +758,7 @@ class MainState(object):
         global check_start_time
         if check_start_time.value == True:
             robot_speeds = stm_driver('get_robot_speeds')
-            if abs(robot_speeds[0]) > 0.1 or abs(robot_speeds[1]) > 0.1 or abs(robot_speeds[2] > 0.1):
+            if abs(robot_speeds[0]) > 0.2 or abs(robot_speeds[1]) > 0.2 or abs(robot_speeds[2] > 0.2):
                 global start_game_time
                 start_game_time = time.time()
                 check_start_time.value = False
@@ -854,33 +839,28 @@ class CloseDoorsState(object):
                 #SuperFastMoveToIntermediaryPointTask(0.4, 0.47, -1.57),
                 SwitchOffCollisionAvoidanceTask(),
                 #SwitchOnCollisionAvoidanceTask(),0.9, 1.05, -1.57
-                MoveToPointTask(0.7, 0.75, -1.57, movement_type['fast'], False, False),
-                MoveToPointTask(0.5, 0.47, -1.57, movement_type['fast'], True, False),
-                MoveToPointTask(0.5, 0.47, 1.57, movement_type['fast'], True, True),
+                MoveToPointTask(0.5, 0.5, -1.57, movement_type['super_fast'], True, False),
+                MoveToPointTask(0.5, 0.5, 1.57, movement_type['fast'], True, True),
                 MoveToPointTask(0.35, 0.47, 1.57, movement_type['fast'], False, False),
                 #SwitchOffCollisionAvoidanceTask(),
-                MoveToPointTask(0.35, 0.06, 1.57, movement_type['fast'], True, True, False, True),
+                MoveToPointTask(0.35, 0.06, 1.57, movement_type['super_fast'], True, True, False, True),
                 MoveToPointTask(0.35, 0.25, 1.57, movement_type['fast'], False, False),
                 MoveToPointTask(0.6, 0.25, 1.57, movement_type['fast'], False, False),
-                MoveToPointTask(0.6, 0.08, 1.57, movement_type['fast'], True, True, False, True),
-                MoveToPointTask(0.6, 0.25, 1.57, movement_type['fast'], True, False),
-                MoveToPointTask(0.2, 0.76, -3.14, movement_type['fast'], True, False)]
+                MoveToPointTask(0.6, 0.08, 1.57, movement_type['super_fast'], True, True, False, True),
+                MoveToPointTask(0.6, 0.25, 1.57, movement_type['super_fast'], True, False)]
 
         else:
             self.future_tasks = [
                 #SuperFastMoveToIntermediaryPointTask(0.4, 0.47, -1.57),
                 SwitchOffCollisionAvoidanceTask(),
                 #SwitchOnCollisionAvoidanceTask(),0.9, 1.05, -1.57
-                MoveToPointTask(2.22, 1.08, 1.57, movement_type['fast'], False, False),
-                MoveToPointTask(2.4, 0.7, 1.57, movement_type['fast'], False, False),
-                MoveToPointTask(2.7, 0.47, 1.57, movement_type['fast'], True, True),
+                MoveToPointTask(2.7, 0.5, 1.57, movement_type['super_fast'], True, True),
                 #SwitchOffCollisionAvoidanceTask(),
-                MoveToPointTask(2.7, 0.08, 1.57, movement_type['fast'], True, True, False, True),
+                MoveToPointTask(2.7, 0.08, 1.57, movement_type['super_fast'], True, True, False, True),
                 MoveToPointTask(2.7, 0.25, 1.57, movement_type['fast'], False, False),
                 MoveToPointTask(2.45, 0.25, 1.57, movement_type['fast'], False, False),
-                MoveToPointTask(2.45, 0.06, 1.57, movement_type['fast'], True, True),
-                MoveToPointTask(2.45, 0.25, 1.57, movement_type['fast'], True, False),
-                MoveToPointTask(2.86, 0.76, 0.0, movement_type['fast'], True, False)]
+                MoveToPointTask(2.45, 0.06, 1.57, movement_type['super_fast'], True, True),
+                MoveToPointTask(2.45, 0.25, 1.57, movement_type['super_fast'], True, False)]
             '''self.future_tasks = [
                 SwitchOffCollisionAvoidanceTask(),
                 MoveToPointTask(2.4, 0.96, 0.0, movement_type['fast']),
@@ -918,13 +898,13 @@ class CollectCubesInTheMiddleState(object):
         if (selected_side.value == 'green'): 
             self.future_tasks = [ 
                 ReachMiddleTask(),
-                SwitchOffCollisionAvoidanceTask(),
-                TakeMiddleCubesTask()]
+                TakeMiddleCubesTask(),
+                SwitchOffCollisionAvoidanceTask()]
         else:
             self.future_tasks = [
                 ReachMiddleTask(),
-                SwitchOffCollisionAvoidanceTask(),
-                TakeMiddleCubesTask()]
+                TakeMiddleCubesTask(),
+                SwitchOffCollisionAvoidanceTask()]
         self.future_tasks.reverse()
         self.current_task = self.future_tasks.pop()
 
@@ -937,7 +917,11 @@ class CollectCubesInTheMiddleState(object):
         print 'strategy_number', strategy_number
         print 'check_start_time', check_start_time.value
         print 'collision avoidance flag', collision_avoidance_activated
-        if (start_game_time is not None) and (time.time() - start_game_time >= 20) and (check_start_time.value is 0) and (strategy_number == 1) and (collision_avoidance_activated == 1):
+        # +40
+        if (start_game_time is not None) and (time.time() - start_game_time >= 30) and (check_start_time.value is 0) and (strategy_number == 1) and (collision_avoidance_activated == 1):
+            strategy_number = 2
+
+        if (start_game_time is not None) and (time.time() - start_game_time >= 60) and (check_start_time.value is 0) and (collision_avoidance_activated == 1):
             strategy_number = 2
             print 'STRATEGY', strategy_number
             self.all_tasks_were_completed = True
@@ -1232,6 +1216,6 @@ localisation = multiprocessing.Process(target=localisation.main, args=(input_com
 stm.start()
 #time.sleep(2)
 localisation.start()
-states_list = [InitializeRobotState(), CollectCubesInTheMiddleState(), CollectSideCubesState(), UnloadMiddleCubesState(), CloseDoorsState()]
+states_list = [InitializeRobotState(), CollectCubesInTheMiddleState(), UnloadMiddleCubesState(), CloseDoorsState()]
 #states_list = [InitializeRobotState(), TestState()]
 MainState(states_list).run_game()
