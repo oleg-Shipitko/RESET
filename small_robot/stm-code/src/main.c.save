@@ -1,0 +1,84 @@
+/*
+**
+**                           Main.c
+**
+**
+**********************************************************************/
+/*
+   Last committed:     $Revision: 00 $
+   Last changed by:    $Author: $
+   Last changed date:  $Date:  $
+   ID:                 $Id:  $
+
+**********************************************************************/
+#include "stm32f4xx_conf.h"
+
+#include "stm32f4xx.h"
+#include "щфкв.h"  //файл инициализации
+
+#include "gpio.h" // работа с портами ввода-вывода
+#include "Pins.h" // определение ножек на плате
+#include "Interrupts.h"
+#include "regulator.h"  // регуляторы колес, кинематика, траекторный
+
+#include "usart.h" //обмен с измерительной тележкой
+#include "robot.h"  //определение конфигурации робота и его основных функций
+
+// обмен с компьютером
+#include "usbd_cdc_core.h"
+#include "usbd_usr.h"
+#include "usb_conf.h"
+#include "usbd_desc.h"
+#include "usbd_cdc_vcp.h"
+
+#ifdef USB_OTG_HS_INTERNAL_DMA_ENABLED
+  #if defined ( __ICCARM__ ) /*!< IAR Compiler */
+    #pragma data_alignment=4
+  #endif
+#endif /* USB_OTG_HS_INTERNAL_DMA_ENABLED */
+
+__ALIGN_BEGIN USB_OTG_CORE_HANDLE    USB_OTG_dev __ALIGN_END;
+
+char command=0;
+
+char mode;
+
+int main(void)
+{
+
+   initAll();
+
+      USBD_Init(&USB_OTG_dev,
+#ifdef USE_USB_OTG_HS
+            USB_OTG_HS_CORE_ID,
+#else
+            USB_OTG_FS_CORE_ID,
+#endif
+            &USR_desc,
+            &USBD_CDC_cb,
+            &USR_cb);
+
+       //сброс координат измерительной тележки в случае перезапуска контроллера
+       command = 0;
+       outEnc.adress = 0x02;
+       outEnc.sync = 0xAA;
+       outEnc.Command =  ENC_SET_CUR_POS;
+       outEnc.checkSum = packetCheck((char *) &outEnc,sizeof(outEnc) - 2);
+       sendPacket((char *) &outEnc,sizeof(outEnc));
+ //            __enable_irq();
+
+     //   char * str ="mobile robot V1.0";
+
+    char ch = 5;
+    float duty = 0.09;
+
+
+  while(1)
+  {
+
+    //sendAnswer(1,str, strlen(str)+1);
+    //setVoltage(ch - 1, (float)0.12);
+    //setVoltage(ch - 1, (float)0.045);
+
+  }
+}
